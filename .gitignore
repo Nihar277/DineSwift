@@ -113,6 +113,17 @@ dishes/
 *.wav
 *.mp3
 
+# Allow documentation screenshots (so README images can be committed)
+!docs/
+!docs/screenshots/
+!docs/screenshots/**/*
+!docs/screenshots/**/*.png
+!docs/screenshots/**/*.jpg
+!docs/screenshots/**/*.jpeg
+!docs/screenshots/**/*.gif
+!docs/screenshots/**/*.webp
+!docs/screenshots/**/*.svg
+
 # --- Environment-specific files ---
 appsettings.Local.json
 appsettings.Staging.json
