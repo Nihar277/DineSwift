@@ -1,0 +1,346 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - DineSwift</title>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Bootstrap & Kendo -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/kendo/kendo.default-v2.min.css" />
+
+    <!-- SweetAlert -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/Login.css" />
+</head>
+
+<body>
+
+    <!-- Loader -->
+    <div class="global-loader" id="globalLoader">
+        <div class="loader-container">
+            <div class="loader-icon"></div>
+            <p>Signing you in...</p>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Left Side - Brand Section -->
+        <div class="brand-section">
+            <div class="brand-header">
+                <img src="~/Images/icons/dineLogo.png" alt="DineSwift" class="brand-logo" />
+                <p class="tagline">Delicious food, delivered fast 🍔🍕</p>
+                <p class="sub-tagline">Order from your favorite anytime, anywhere.</p>
+            </div>
+
+            <!-- Chef Animation Container -->
+            <div class="chef-container">
+                <!-- Food Particles -->
+                <span class="food-particle">🍕</span>
+                <span class="food-particle">🍔</span>
+                <span class="food-particle">🌮</span>
+                <span class="food-particle">🍜</span>
+                <span class="food-particle">🍣</span>
+                <span class="food-particle">🥗</span>
+
+                <!-- Steam Effects -->
+                <div class="steam"></div>
+                <div class="steam"></div>
+                <div class="steam"></div>
+
+                <!-- Glow Ring -->
+                <div class="glow-ring"></div>
+
+                <!-- Chef Image -->
+                <img src="~/Images/image.png" alt="Chef" class="chef-image" />
+
+                <!-- Floating Tags -->
+                <div class="float-tag tag-fresh">🌿 Fresh</div>
+                <div class="float-tag tag-fast">⚡ Fast</div>
+                <div class="float-tag tag-tasty">😋 Tasty</div>
+            </div>
+
+            <!-- Stats -->
+            <div class="brand-stats">
+                <div class="stat-item">
+                    <div class="stat-number">5K+</div>
+                    <div class="stat-label">Restaurants</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">5K+</div>
+                    <div class="stat-label">Orders/Day</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Cities</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Login Section -->
+        <div class="login-section">
+            <a href="/" class="back-home-btn" title="Back to Home">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+
+            <div class="login-header">
+                <h2>Welcome Back 👋</h2>
+                <p>Login to order your favourite food</p>
+            </div>
+
+            <div class="login-card">
+                <div class="login-form">
+                    <form id="loginForm"></form>
+
+                    <div class="forgot-password">
+                        <a href="/ForgotPassword/ForgotPassword">Forgot your password?</a>
+                    </div>
+                </div>
+
+                <div class="register-link">
+                    New to DineSwift?
+                    <a href="/home/Customer_register">Create an account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/kendo/kendo.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    <script>
+        kendo.ui.validator.rules.customPassword = function (input) {
+            if (input.is("[name='c_password']")) {
+                var value = input.val();
+
+                // First check if empty
+                if (!value || value.trim() === "") {
+                    return false; // Will show "Password is required"
+                }
+
+                // If not empty, check regex pattern
+                var passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@@$!%*?&]).{8,}$/;
+                return passwordRegex.test(value);
+            }
+            return true;
+        };
+
+        kendo.ui.validator.messages.customPassword = function (input) {
+            if (input.is("[name='c_password']")) {
+                var value = input.val();
+                if (!value || value.trim() === "") {
+                    return "Password is required";
+                }
+                return "Password must be at least 8 characters with uppercase, lowercase, number and special character";
+            }
+            return "";
+        };
+
+        hideLoader();
+
+        $("#loginForm").kendoForm({
+            items: [
+                {
+
+                    field: "c_email",
+                    label: "Email",
+                    editor: "TextBox",
+                    editorOptions: {
+                        type: "text",
+                        placeholder: "Enter your email"
+                    },
+                    validation: {
+                        required: { message: "Email is required" },
+                        email: { message: "Please enter a valid email address" }
+                    }
+                },
+                {
+                    field: "c_password",
+                    label: "Password",
+                    editor: function (container, options) {
+                        $('<input type="password" name="' + options.field + '" />')
+                            .appendTo(container)
+                            .kendoTextBox({
+                                placeholder: "Enter your password"
+                            });
+                    },
+                    validation: {
+                        customPassword: true
+                    }
+                },
+                {
+                    field: "captcha",
+                    label: "",
+                    editor: function (container, options) {
+                        $(`<div class="captcha-container">
+                            <div class="g-recaptcha"
+                                data-sitekey="6LebQC8sAAAAAJyGJO3VmE8QXfqqMwOwg2cIDZem"
+                                data-callback="onCaptchaVerified"
+                                data-expired-callback="onCaptchaExpired">
+                            </div>
+                        </div>
+                        <small id="captchaError"></small>`)
+                            .appendTo(container);
+                    }
+                }
+            ],
+            buttonsTemplate: `<button type="submit" class="login-btn k-button">Login</button>`,
+            submit: function (e) {
+                e.preventDefault();
+
+                const captchaResponse = grecaptcha.getResponse();
+
+                if (!captchaResponse) {
+                    $("#captchaError").text("Please verify that you are not a robot");
+                    return;
+                }
+
+                $("#captchaError").text("");
+                showLoader();
+
+                const data = {
+                    email: e.model.email,
+                    password: e.model.password,
+                    captcha: captchaResponse
+                };
+
+                var form = new FormData($("#loginForm")[0]);
+
+                $.ajax({
+                    url: "http://localhost:5245/api/AuthApi/Login",
+                    type: "POST",
+                    data: form,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        $.ajax({
+                            url: "/Auth/SetSession",
+                            type: "POST",
+                            data: {
+                                role: res.role,
+                                token: res.token,
+                                customerId: res.userData.c_customerid,
+                                email: res.userData.c_email,
+                                name: res.userData.c_fname + " " + res.userData.c_lname
+                            },
+                            success: function () {
+                                hideLoader();
+                                console.log("Session set successfully");
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Login Successful",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    if (res.role == "admin") {
+                                        window.location = "/Admin/Dashboard";
+                                    } else if (res.role == "customer") {
+                                        window.location = "/UserHome/Index";
+                                    } else if (res.role == "delivery") {
+                                        window.location = "/Delivery/Dashboard";
+                                    } else if (res.role == "restaurant") {
+                                        window.location = "/Restaurant/Dashboard";
+                                    }
+                                });
+                            },
+                            error: function (xhr) {
+                                console.log("Error setting session:", xhr);
+                            }
+                        });
+                    },
+                    error: function (xhr) {
+                        hideLoader();
+                        console.log(xhr);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Login Failed",
+                            text: xhr.responseJSON?.message || "Invalid credentials"
+                        });
+                    }
+                });
+            }
+        });
+
+        function showLoader() {
+            const loader = document.getElementById('globalLoader');
+            if (loader) {
+                loader.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function hideLoader() {
+            const loader = document.getElementById('globalLoader');
+            if (loader) {
+                loader.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function onCaptchaVerified() {
+            $("#captchaError").text("");
+        }
+
+        function onCaptchaExpired() {
+            $("#captchaError").text("Captcha expired. Please verify again.");
+        }
+    </script>
+    <script>
+        (function () {
+
+            // Function to remove field-name overlays (like "c_email")
+            function cleanKendoFields(container) {
+                $(container)
+                    .find("input, textarea, select")
+                    .each(function () {
+                        $(this)
+                            .removeAttr("title")
+                            .removeAttr("aria-label")
+                            .attr("autocomplete", "off");
+                    });
+            }
+
+            // Run on initial page load
+            $(document).ready(function () {
+                cleanKendoFields(document);
+            });
+
+            // Run when focusing any input (fixes stepper dynamic rendering)
+            $(document).on("focusin", ".k-form input, .k-form textarea, .k-form select", function () {
+                $(this).removeAttr("title").removeAttr("aria-label");
+            });
+
+            // Stepper support: when step changes, re-clean fields
+            $(document).on("kendoStepperActivate", function (e) {
+                try { cleanKendoFields(e.sender.element); } catch (err) { }
+            });
+
+        })();
+    </script>
+</body>
+
+</html>

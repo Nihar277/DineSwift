@@ -1,0 +1,478 @@
+@{
+    Layout = "_deliveryLayout";
+
+    ViewData["Title"] = "Orders";
+    int customerId = Context.Session.GetInt32("CustomerId") ?? 0;
+}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if (customerId == 0)
+{
+    <script>
+        window.location.href = "http://localhost:5030/";
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Orders.css" asp-append-version="true" />
+}
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+    <div class="header-left">
+        <h1>Orders Management</h1>
+        <p class="subtitle">Track and manage all restaurant orders</p>
+    </div>
+</div>
+
+<!-- STATS SUMMARY -->
+<div class="orders-stats">
+    <div class="mini-stat">
+        <div class="mini-stat-icon pending">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="mini-stat-info">
+            <span class="mini-stat-value" id="processingCount">0</span>
+            <span class="mini-stat-label">Processing</span>
+        </div>
+    </div>
+    <div class="mini-stat">
+        <div class="mini-stat-icon preparing">
+            <i class="fas fa-fire"></i>
+        </div>
+        <div class="mini-stat-info">
+            <span class="mini-stat-value" id="preparedCount">0</span>
+            <span class="mini-stat-label">Prepared</span>
+        </div>
+    </div>
+    <div class="mini-stat">
+        <div class="mini-stat-icon delivered">
+            <i class="fas fa-truck"></i>
+        </div>
+        <div class="mini-stat-info">
+            <span class="mini-stat-value" id="outForDeliveryCount">0</span>
+            <span class="mini-stat-label">Out for delivery</span>
+        </div>
+    </div>
+    <div class="mini-stat">
+        <div class="mini-stat-icon cancelled">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="mini-stat-info">
+            <span class="mini-stat-value" id="deliveredCount">0</span>
+            <span class="mini-stat-label">Delivered</span>
+        </div>
+    </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-section">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search by Order ID or Customer" />
+    </div>
+    <div class="filter-group">
+        <select class="filter-select" id="statusFilter">
+            <option value="">All Status</option>
+            <option value="Processing">Processing</option>
+            <option value="Prepared">Prepared</option>
+            <option value="Out for delivery">Out for delivery</option>
+        </select>
+        <select class="filter-select" id="dateFilter">
+            <option value="all">All Time</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+        </select>
+    </div>
+</div>
+
+<!-- KENDO GRID -->
+<div id="ordersGrid"></div>
+
+@section Scripts {
+    <script>
+        const customerId = @customerId;
+
+        $(document).ready(function () {
+            // LOAD CARD COUNTS (delivery-wide)
+            $.get(`http://localhost:5245/api/Delivery/cards`, function (data) {
+                animateCountUp("#processingCount", data.processing);
+                animateCountUp("#preparedCount", data.prepared);
+                animateCountUp("#outForDeliveryCount", data.outForDelivery);
+                animateCountUp("#deliveredCount", data.delivered);
+            });
+
+
+            function swellFire(message, options = {}) {
+                Swal.fire({
+                    title: options.title || 'Message',
+                    text: message,
+                    icon: options.icon || 'info',
+                    toast: options.toast || false,
+                    position: options.position || 'center',
+                    timer: options.timer || null,
+                    showConfirmButton: !options.toast,
+                    @* isHtml: true, *@
+                    html: message
+                });
+            }
+
+            // Check active order on load
+            checkActiveOrder();
+
+            // KENDO GRID
+            $("#ordersGrid").kendoGrid({
+                dataSource: {
+                    transport: {
+                        read: {
+                            url: `http://localhost:5245/api/Delivery/available-orders`,
+                            dataType: "json"
+                        }
+                    },
+                    schema: {
+                        model: {
+                            fields: {
+                                bookingId: { type: "number" },
+                                orderId: { type: "string" },
+                                customerName: { type: "string" },
+                                customerPhone: { type: "string" },
+                                dishName: { type: "string" },
+                                quantity: { type: "number" },
+                                totalPrice: { type: "number" },
+                                orderStatus: { type: "string" },
+                                orderDateTime: { type: "date" }
+                            }
+                        }
+                    },
+                    pageSize: 10
+                },
+                pageable: true,
+                sortable: true,
+                dataBound: function () {
+                    // Add animation to rows when grid loads
+                    var rows = this.tbody.find("tr");
+                    rows.each(function (index) {
+                        $(this).css({
+                            "opacity": "0",
+                            "transform": "translateY(20px)"
+                        });
+                        setTimeout(() => {
+                            $(this).addClass("row-animate-in");
+                        }, index * 50);
+                    });
+                },
+                columns: [
+                    { field: "orderId", title: "Order ID" },
+                    { field: "customerName", title: "Customer" },
+                    { field: "customerPhone", title: "Phone" },
+                    { field: "dishName", title: "Dish" },
+                    { field: "quantity", title: "Qty", width: 70 },
+                    { field: "totalPrice", title: "Total ₹", width: 90 },
+                    {
+                        field: "orderStatus",
+                        title: "Status",
+                        width: 140,
+                        template: function (d) {
+                            var statusClass = getStatusClass(d.orderStatus);
+                            return `<span class="status-badge ${statusClass}">${d.orderStatus}</span>`;
+                        }
+                    },
+                    {
+                        title: "Action",
+                        width: 160,
+                        template: function (d) {
+                            if (d.orderStatus === "Prepared") {
+                                return `<button class="action-btn-animated accept-btn" 
+                                                                                onclick="acceptOrder(this, ${d.bookingId})">
+                                                                                <i class="fas fa-check"></i> Accept
+                                                                            </button>`;
+                            }
+                            if (d.orderStatus === "Out for delivery") {
+                                return `<button class="action-btn-animated deliver-btn" 
+                                                                                onclick="updateStatus(this, ${d.bookingId}, 'Delivered')">
+                                                                                <i class="fas fa-box"></i> Deliver
+                                                                            </button>`;
+                            }
+                            return `<span class="no-action"><i class="fas fa-check-double"></i> Done</span>`;
+                        }
+                    }
+                ],
+            });
+
+            // Wire up filter inputs
+            $("#searchInput").on('input', applyFilters);
+            $("#statusFilter, #dateFilter").on('change', applyFilters);
+
+            // STATUS CLASS HELPER
+            function getStatusClass(status) {
+                switch (status) {
+                    case "Processing": return "status-processing";
+                    case "Prepared": return "status-prepared";
+                    case "Out for delivery": return "status-delivery";
+                    case "Delivered": return "status-delivered";
+                    default: return "";
+                }
+            }
+
+            // COUNT UP ANIMATION
+            function animateCountUp(selector, target) {
+                var current = 0;
+                var increment = Math.ceil(target / 20);
+                var timer = setInterval(function () {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    $(selector).text(current);
+                }, 30);
+            }
+
+            // APPLY FILTERS
+            function applyFilters() {
+                var grid = $("#ordersGrid").data("kendoGrid");
+                var filters = [];
+
+                var searchText = $("#searchInput").val();
+                if (searchText) {
+                    filters.push({
+                        logic: "or",
+                        filters: [
+                            { field: "orderId", operator: "contains", value: searchText },
+                            { field: "customerName", operator: "contains", value: searchText }
+                        ]
+                    });
+                }
+
+                var status = $("#statusFilter").val();
+                if (status) {
+                    filters.push({ field: "orderStatus", operator: "eq", value: status });
+                }
+
+                var dateFilter = $("#dateFilter").val();
+                if (dateFilter !== "all") {
+                    var fromDate = new Date();
+                    if (dateFilter === "today") fromDate.setHours(0, 0, 0, 0);
+                    else if (dateFilter === "week") fromDate.setDate(fromDate.getDate() - 7);
+                    else if (dateFilter === "month") fromDate.setMonth(fromDate.getMonth() - 1);
+                    filters.push({ field: "orderDateTime", operator: "gte", value: fromDate });
+                }
+
+                grid.dataSource.filter(filters);
+            }
+
+            // UPDATE STATUS WITH ANIMATIONS
+            window.updateStatus = function (btn, bookingId, status) {
+                // Use SweetAlert2 orange-themed confirmation instead of native confirm
+                Swal.fire({
+                    title: 'Confirm',
+                    text: `Are you sure you want to ${status.toLowerCase()}?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#f97316',
+                    cancelButtonColor: '#64748b',
+                    background: '#fff7ed',
+                    color: '#1f2937',
+                    iconColor: '#f97316',
+                    customClass: { popup: 'swal-orange-popup', confirmButton: 'swal-orange-confirm', cancelButton: 'swal-orange-cancel' }
+                }).then(result => {
+                    if (!result.isConfirmed) return;
+
+                    var $btn = $(btn);
+                    var $row = $btn.closest("tr");
+
+                    // Button loading animation
+                    $btn.addClass("btn-loading");
+                    $btn.prop("disabled", true);
+                    var originalHtml = $btn.html();
+                    $btn.html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+
+                    $.ajax({
+                        url: `http://localhost:5245/api/Delivery/update-status`,
+                        contentType: "application/json",
+                        data: JSON.stringify({ BookingId: bookingId, Status: status }),
+                        type: "POST",
+                        success: function () {
+                            // Success animation on button
+                            $btn.removeClass("btn-loading").addClass("btn-success-animate");
+                            $btn.html('<i class="fas fa-check"></i> Done!');
+
+                            // Show orange toast confirmation
+                            swellFire('Status updated successfully', { title: 'Success', icon: 'success', toast: true, timer: 2000, position: 'top-end' });
+
+                            // Row highlight animation
+                            $row.addClass("row-success-flash");
+
+                            // After animation, refresh grid
+                            setTimeout(function () {
+                                $row.addClass("row-fade-out");
+
+                                setTimeout(function () {
+                                    $("#ordersGrid").data("kendoGrid").dataSource.read();
+
+                                    // Reload cards with animation
+                                    $.get(`http://localhost:5245/api/Delivery/cards`, function (data) {
+                                        $(".mini-stat").addClass("stat-pulse");
+                                        setTimeout(() => $(".mini-stat").removeClass("stat-pulse"), 600);
+
+                                        animateCountUp("#processingCount", data.processing);
+                                        animateCountUp("#preparedCount", data.prepared);
+                                        animateCountUp("#outForDeliveryCount", data.outForDelivery);
+                                        animateCountUp("#deliveredCount", data.delivered);
+                                    });
+
+                                    checkActiveOrder();
+                                }, 300);
+                            }, 800);
+                        },
+                        error: function () {
+                            // Error animation
+                            $btn.removeClass("btn-loading").addClass("btn-error-animate");
+                            $btn.html('<i class="fas fa-times"></i> Failed');
+                            $row.addClass("row-error-shake");
+
+                            setTimeout(function () {
+                                $btn.removeClass("btn-error-animate");
+                                $row.removeClass("row-error-shake");
+                                $btn.html(originalHtml);
+                                $btn.prop("disabled", false);
+                            }, 1500);
+                        }
+                    });
+                });
+            }
+
+            // ACCEPT ORDER (Assign to delivery partner with single-order constraint)
+            window.acceptOrder = function (btn, bookingId) {
+                // Replace native confirm with orange-themed SweetAlert2 confirmation
+                Swal.fire({
+                    title: 'Accept Order',
+                    text: 'Accept this order?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Accept',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#f97316',
+                    cancelButtonColor: '#64748b',
+                    background: '#fff7ed',
+                    color: '#1f2937',
+                    iconColor: '#f97316',
+                    customClass: { popup: 'swal-orange-popup', confirmButton: 'swal-orange-confirm', cancelButton: 'swal-orange-cancel' }
+                }).then(result => {
+                    if (!result.isConfirmed) return;
+
+                    var $btn = $(btn);
+                    var $row = $btn.closest("tr");
+
+                    // Button loading animation
+                    $btn.addClass("btn-loading");
+                    $btn.prop("disabled", true);
+                    var originalHtml = $btn.html();
+                    $btn.html('<i class="fas fa-spinner fa-spin"></i> Accepting...');
+
+                    $.ajax({
+                        url: `http://localhost:5245/api/Delivery/accept-order`,
+                        contentType: "application/json",
+                        data: JSON.stringify({ BookingId: bookingId, DeliveryPartnerId: customerId }),
+                        type: "POST",
+                        success: function () {
+                            // Success animation on button
+                            $btn.removeClass("btn-loading").addClass("btn-success-animate");
+                            $btn.html('<i class="fas fa-check"></i> Accepted!');
+
+                            // Show orange toast confirmation
+                            swellFire('Order accepted successfully', { title: 'Order Accepted', icon: 'success', toast: true, timer: 2000, position: 'top-end' });
+
+                            // Row highlight animation
+                            $row.addClass("row-success-flash");
+
+                            // After animation, refresh grid
+                            setTimeout(function () {
+                                $row.addClass("row-fade-out");
+
+                                setTimeout(function () {
+                                    $("#ordersGrid").data("kendoGrid").dataSource.read();
+
+                                    // Reload cards with animation
+                                    $.get(`http://localhost:5245/api/Delivery/cards`, function (data) {
+                                        $(".mini-stat").addClass("stat-pulse");
+                                        setTimeout(() => $(".mini-stat").removeClass("stat-pulse"), 600);
+
+                                        animateCountUp("#processingCount", data.processing);
+                                        animateCountUp("#preparedCount", data.prepared);
+                                        animateCountUp("#outForDeliveryCount", data.outForDelivery);
+                                        animateCountUp("#deliveredCount", data.delivered);
+                                    });
+
+                                    checkActiveOrder();
+                                }, 300);
+                            }, 800);
+                        },
+                        error: function (xhr) {
+                            // Error animation
+                            $btn.removeClass("btn-loading").addClass("btn-error-animate");
+
+                            var errorMsg = "Failed to accept order";
+                            if (xhr.status === 409) {
+                                errorMsg = "You have an active delivery. Complete it first!";
+                            }
+
+                            $btn.html(`<i class="fas fa-times"></i> ${errorMsg}`);
+                            $row.addClass("row-error-shake");
+
+                            setTimeout(function () {
+                                $btn.removeClass("btn-error-animate");
+                                $row.removeClass("row-error-shake");
+                                $btn.html(originalHtml);
+                                $btn.prop("disabled", false);
+                            }, 1500);
+                        }
+                    });
+                });
+            }
+
+            // CHECK ACTIVE ORDER AND DISPLAY
+            function checkActiveOrder() {
+                $.get(`http://localhost:5245/api/Delivery/active-order/${customerId}`, function (data) {
+                    if (data && data.bookingId) {
+                        // Show active order info
+                        console.log("Active order:", data);
+                        showActiveOrderAlert(data);
+                    }
+                });
+            }
+
+            @* function showActiveOrderAlert(order) {
+                var title = 'Active Delivery';
+                var msg = `<i class="fa-solid fa-fire" style="color:#f97316;margin-right:6px"></i> Order #${order.orderId}<br/>Customer: ${order.customerName}<br/>Address: ${order.fullAddress}`;
+                // Use global orange 'swell fire' notification
+                swellFire(msg, { title: title, icon: 'info', toast: true, position: 'top-end', timer: 8000, isHtml: true });
+            } *@
+
+                function showActiveOrderAlert(order) {
+                    var msg = `
+                            <div style="line-height:1.6">
+                                <i class="fa-solid fa-fire" style="color:#f97316;margin-right:6px"></i>
+                                <b>Order #${order.orderId}</b><br/>
+                                <b>Customer:</b> ${order.customerName}<br/>
+                                <b>Address:</b> ${order.fullAddress}
+                            </div>
+                        `;
+
+                    swellFire(msg, {
+                        title: 'Active Delivery',
+                        icon: 'info',
+                        toast: true,
+                        position: 'top-end',
+                        timer: 8000
+                    });
+                }
+
+
+        });
+
+    </script>
+}

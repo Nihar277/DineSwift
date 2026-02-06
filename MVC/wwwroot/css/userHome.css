@@ -1,0 +1,564 @@
+/* =====================================================
+   ROOT VARIABLES
+===================================================== */
+:root {
+    --primary: #fa7414;
+    --primary-dark: #e35f00;
+    --bg: #fdfdfd;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --radius: 18px;
+    --shadow: 0 14px 40px rgba(0,0,0,0.12);
+}
+
+/* =====================================================
+   RESET
+===================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding-top: 80px;
+}
+
+/* =====================================================
+   CONTAINER & SECTION
+===================================================== */
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 20px;
+}
+
+.section {
+    padding: 80px 0;
+}
+
+.section.light {
+    background: transparent;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 40px;
+}
+
+.section-title span {
+    color: var(--primary);
+}
+
+/* =====================================================
+   HERO
+===================================================== */
+.hero {
+    min-height: 80vh;
+    background:
+        linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+        url('/css/userHome_background/background.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    color: white;
+    /* margin-top: 0.5rem; */
+}
+
+.hero-grid {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.hero-content {
+    max-width: 600px;
+    text-align: right;
+}
+
+.hero-content h1 {
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+.hero-content p {
+    font-size: 22px;
+    margin: 30px 0;
+    color: #f0f0f0;
+}
+
+.search-box {
+    display: flex;
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 10px;
+    box-shadow: var(--shadow);
+}
+
+.search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    padding: 12px;
+}
+
+.search-box button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 26px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hero-btns {
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
+    justify-content: flex-end;
+}
+
+.btn-primary {
+    border: none;
+    padding: 12px 26px;
+    border-radius: 14px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+}
+
+.btn-order {
+    background: #22c55e;
+}
+
+.btn-deals {
+    background: #f59e0b;
+}
+
+/* =====================================================
+   CUISINES
+===================================================== */
+.cuisine-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 22px;
+    max-width: 1400px;
+    margin: auto;
+}
+
+.cuisine-card {
+    position: relative;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    transition: transform .4s ease;
+}
+
+.cuisine-card:hover {
+    transform: translateY(-8px) scale(1.05);
+}
+
+.cuisine-image {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.85);
+}
+
+.cuisine-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    text-shadow: 0 4px 14px rgba(0,0,0,0.7);
+}
+
+.cuisine-emoji {
+    font-size: 44px;
+    margin-bottom: 8px;
+}
+
+.cuisine-name {
+    font-size: 18px;
+}
+
+/* =====================================================
+   KENDO RESET (CRITICAL)
+===================================================== */
+#dishes-list,
+#restaurant-list,
+.k-listview,
+.k-listview-content,
+.k-listview-item {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.k-listview-item {
+    padding: 0 !important;
+}
+
+/* =====================================================
+   MARQUEE ANIMATION (SHARED)
+===================================================== */
+@keyframes marquee-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* =====================================================
+   TRENDING DISHES
+===================================================== */
+/* =====================================================
+   TRENDING DISHES — CLEAN CAROUSEL ONLY
+===================================================== */
+
+#dishes {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Wrapper */
+#dishes .dishes-carousel-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* Viewport */
+#dishes .dishes-carousel {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Track */
+#dishes #dishes-list .k-listview-content {
+    display: flex;
+    gap: 24px;
+    width: max-content;
+    transform: translateX(0);
+    transition: transform 0.6s ease;
+    animation: none !important;
+    will-change: transform;
+}
+
+/* Cards */
+#dishes .dish-card {
+    width: 260px;
+    flex-shrink: 0;
+}
+
+/* Remove shadow ONLY for dishes */
+#dishes .k-card {
+    box-shadow: none !important;
+    border-radius: 20px;
+}
+
+#dishes .k-card:hover {
+    transform: translateY(-6px) scale(1.03);
+}
+
+/* Arrows */
+#dishes .carousel-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    cursor: pointer;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
+#dishes .carousel-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Disable any scrollbars */
+#dishes,
+#dishes-list,
+#dishes .dishes-carousel {
+    overflow: hidden !important;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    #dishes .carousel-btn {
+        display: none;
+    }
+
+    #dishes .dishes-carousel {
+        overflow-x: auto;
+    }
+}
+
+/* =====================================================
+   TRENDING RESTAURANTS
+===================================================== */
+.trending-restaurants {
+    padding: 80px 0;
+}
+
+.restaurant-scroll {
+    overflow: hidden;
+}
+
+#restaurant-list .k-listview-content {
+    display: flex;
+    gap: 24px;
+    width: max-content;
+    animation: marquee-left 40s linear infinite;
+}
+
+.restaurant-scroll:hover .k-listview-content {
+    animation-play-state: paused;
+}
+
+.restaurant-card {
+    width: 300px;
+    height: 220px;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform .4s ease, box-shadow .4s ease;
+}
+
+.restaurant-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.restaurant-card:hover {
+    transform: translateY(-12px) scale(1.05);
+    box-shadow: 0 35px 80px rgba(0,0,0,0.35);
+}
+
+.restaurant-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.85), transparent);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    color: white;
+    opacity: 0;
+    transition: opacity .3s ease;
+}
+
+.restaurant-card:hover .restaurant-overlay {
+    opacity: 1;
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+.footer {
+    background: #111;
+    color: #aaa;
+    text-align: center;
+    padding: 25px;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+@media (max-width: 768px) {
+
+    .hero-content {
+        text-align: center;
+    }
+
+    .hero-grid {
+        justify-content: center;
+    }
+
+    #dishes-list .k-listview-content,
+    #restaurant-list .k-listview-content {
+        animation: none;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+    }
+
+    .dish-card,
+    .restaurant-card {
+        scroll-snap-align: center;
+    }
+}
+
+/* =====================================================
+   FIX: REMOVE SHADOW FROM TRENDING DISHES
+===================================================== */
+#dishes-list .k-card {
+    box-shadow: none !important;
+}
+
+#dishes-list .k-card:hover {
+    box-shadow: none !important;
+    transform: translateY(-6px) scale(1.03);
+}
+
+/* =====================================================
+   FIX: TRUE SEAMLESS MARQUEE (NO JUMP)
+===================================================== */
+#dishes-list .k-listview-content,
+#restaurant-list .k-listview-content {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+}
+
+/* Faster & smoother */
+#dishes-list .k-listview-content {
+    animation: marquee-left 28s linear infinite;
+}
+
+#restaurant-list .k-listview-content {
+    animation: marquee-left 34s linear infinite;
+}
+
+/* =====================================================
+   FIX: REMOVE SCROLLBAR / SLIDER COMPLETELY
+===================================================== */
+.dishes-grid,
+.restaurant-scroll,
+#dishes-list,
+#restaurant-list {
+    overflow: hidden !important;
+}
+
+/* Prevent mobile scrollbar */
+#dishes-list .k-listview-content::-webkit-scrollbar,
+#restaurant-list .k-listview-content::-webkit-scrollbar {
+    display: none;
+}
+
+/* =====================================================
+   FIX: PAUSE ON HOVER (BOTH)
+===================================================== */
+#dishes-list:hover .k-listview-content,
+.restaurant-scroll:hover .k-listview-content {
+    animation-play-state: paused;
+}
+
+/* =====================================================
+   CUISINES – MODERN HOVER EFFECT
+===================================================== */
+
+/* Smooth base transition */
+.cuisine-card {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Image zoom */
+.cuisine-image {
+    transition: transform 0.6s ease, filter 0.6s ease;
+}
+
+/* Content animation */
+.cuisine-content {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Hover effect */
+.cuisine-card:hover .cuisine-image {
+    transform: scale(1.15);
+    filter: brightness(0.75);
+}
+
+/* Hide name + emoji smoothly */
+.cuisine-card:hover .cuisine-content {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Optional: subtle inner glow for premium feel */
+.cuisine-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(255,255,255,0.15),
+        transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.cuisine-card:hover::after {
+    opacity: 1;
+}
+
+
+/* ============================= */
+    /* SWEETALERT (SWAL.FIRE) */
+    /* ============================= */
+    .swal2-popup {
+        border-radius: 14px !important;
+        font-family: inherit;
+    }
+
+    .swal2-title {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .swal2-confirm {
+        background-color: #fa7414 !important;
+        border-radius: 20px !important;
+        padding: 8px 26px !important;
+        font-weight: 500;
+    }
+
+    .swal2-confirm:hover {
+        background-color: var(--primary-dark) !important;
+    }
+
+    .swal2-cancel {
+        border-radius: 20px !important;
+    }
+
+    /* Success icon color */
+    .swal2-icon.swal2-success {
+        border-color: #22B55B !important;
+    }
+
+    .swal2-icon.swal2-success [class^="swal2-success-line"] {
+        background-color: #22B55B !important;
+    }
+
+    /* Error icon color */
+    .swal2-icon.swal2-error {
+        border-color: #d32f2f !important;
+    }

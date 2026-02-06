@@ -1,0 +1,544 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - DineSwift</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+        
+
+    <!-- Home CSS -->
+    <link rel="stylesheet" href="~/css/Home.css" asp-append-version="true" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    
+
+    <style>
+        /* ======================================================
+           FOOTER STYLES
+        ====================================================== */
+        footer {
+            background: linear-gradient(135deg, #2E2621 0%, #1a1614 100%);
+            color: #fff;
+            padding-top: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(233, 98, 42, 0.1), transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(223, 68, 35, 0.08), transparent 50%);
+            pointer-events: none;
+        }
+
+        /* AI CTA Banner */
+        .footer-cta {
+            background: linear-gradient(135deg, #E9622A 0%, #DF4423 50%, #fa7414 100%);
+            border-radius: 32px;
+            padding: 4rem 3rem;
+            text-align: center;
+            position: relative;
+            max-width: 1200px;
+            margin:auto;
+            margin-top:2rem;
+            box-shadow: 0 25px 60px rgba(233, 98, 42, 0.4);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .footer-cta::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15), transparent 70%);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .footer-cta::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            right: -15%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 70%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite reverse;
+        }
+
+        .footer-cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-cta h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .footer-cta p {
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2.5rem;
+            background: #fff;
+            color: #E9622A;
+            border: none;
+            border-radius: 999px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer-cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Main Footer Content */
+        .footer-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+            gap: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-brand-section {
+            padding-right: 2rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-brand .brand-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #E9622A, #DF4423);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .footer-brand-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .footer-brand-text .brand-dot {
+            color: #E9622A;
+        }
+
+        .footer-description {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            background: #E9622A;
+            transform: translateY(-3px);
+        }
+
+        .footer-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-links a:hover {
+            color: #E9622A;
+            transform: translateX(5px);
+        }
+
+        /* Newsletter Section */
+        .footer-newsletter h3 {
+            margin-bottom: 0.8rem;
+        }
+
+        .newsletter-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.4rem;
+            border-radius: 999px;
+            backdrop-filter: blur(10px);
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border: none;
+            background: transparent;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .newsletter-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .newsletter-btn {
+            padding: 0.8rem 1.8rem;
+            background: #E9622A;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .newsletter-btn:hover {
+            background: #DF4423;
+            transform: translateX(2px);
+        }
+
+        /* Footer Bottom */
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-copyright {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-legal a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-legal a:hover {
+            color: #E9622A;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 992px) {
+            .footer-main {
+                grid-template-columns: 1fr 1fr;
+                gap: 2.5rem;
+            }
+
+            .footer-cta h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .footer-cta {
+                margin: -60px 1rem 0;
+                padding: 3rem 2rem;
+            }
+
+            .footer-cta h2 {
+                font-size: 1.75rem;
+            }
+
+            .footer-main {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 4rem 1.5rem 2rem;
+            }
+
+            .footer-brand-section {
+                padding-right: 0;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-legal {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+                border-radius: 16px;
+                padding: 0.5rem;
+            }
+
+            .newsletter-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .footer-cta {
+                padding: 2.5rem 1.5rem;
+            }
+
+            .footer-cta h2 {
+                font-size: 1.5rem;
+            }
+
+            .footer-cta p {
+                font-size: 0.95rem;
+            }
+        }
+
+        @@keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -30px); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page">
+
+        <!-- ===== HEADER / NAVBAR ===== -->
+        <header class="nav" id="top">
+            <div class="nav-inner">
+                <a href="/Home/Index" class="brand">
+                    <img src="~/Images/dineswift-logo.png" alt="DineSwift" class="brand-logo-img" />
+                </a>
+
+                <nav class="nav-links">
+                    <a href="/Delivery/Register">Become delivery partner</a>
+                    <a href="/Home/Register">Register restaurant</a>
+                </nav>
+
+                <div class="nav-cta">
+                    <a href="/home/Customer_register"><button class="nav-ghost-btn">Sign Up</button></a>
+                    <a href="/Auth/Login"><button class="nav-primary-btn">
+                            Login 
+                    </button>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== PAGE CONTENT ===== -->
+        <main>
+            @RenderBody()
+        </main>
+
+        <!-- ===== FOOTER ===== -->
+         <footer>
+
+    <!-- Food Delivery CTA Banner -->
+    <div class="footer-cta">
+        <div class="footer-cta-content">
+            <h2>Hungry? Get your favorite food delivered fast</h2>
+            <p>
+                Discover nearby restaurants, order in seconds, and enjoy hot & fresh meals delivered right to your doorstep.
+            </p>
+           <a href="#hero" class="footer-cta-link">
+    <a class="footer-cta-btn" href="#dishes" style="text-decoration: none;">
+        Order Food Now
+        <i class="fas fa-arrow-right"></i>
+    </a>
+</a>
+        </div>
+    </div>
+
+    <!-- Main Footer Content -->
+    <div class="footer-main">
+
+        <!-- Brand Section -->
+        <div class="footer-brand-section">
+            <div class="footer-brand">
+                <img src="~/Images/dineswift-logo.png" alt="DineSwift" class="brand-logo-img footer-logo-img" />
+            </div>
+
+            <p class="footer-description">
+                DineSwift connects you with the best local restaurants. Order food online, track delivery in real-time,
+                and enjoy your meals anytime, anywhere.
+            </p>
+
+            <div class="footer-social">
+                <a href="#" class="social-link" aria-label="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="LinkedIn">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Company Links -->
+        <div class="footer-section">
+            <h3>Company</h3>
+            <ul class="footer-links">
+                <li><a href="#">About DineSwift</a></li>
+                <li><a href="#">Our Story</a></li>
+                <li><a href="#">Careers</a></li>
+                <li><a href="#">Press & Media</a></li>
+                <li><a href="#">Blog</a></li>
+            </ul>
+        </div>
+
+        <!-- Explore / Services -->
+        <div class="footer-section">
+            <h3>Explore</h3>
+            <ul class="footer-links">
+                <li><a href="#">Restaurants Near You</a></li>
+                <li><a href="#">Popular Cuisines</a></li>
+                <li><a href="#">Top Offers</a></li>
+                <li><a href="#">New Restaurants</a></li>
+                <li><a href="#">Partner With Us</a></li>
+            </ul>
+        </div>
+
+        <!-- Customer Support -->
+        <div class="footer-section">
+            <h3>Support</h3>
+            <ul class="footer-links">
+                <li><a href="#">Help Center</a></li>
+                <li><a href="#">Track Your Order</a></li>
+                <li><a href="#">Cancellation & Refunds</a></li>
+                <li><a href="#">FAQs</a></li>
+                <li><a href="#">Contact Support</a></li>
+            </ul>
+        </div>
+
+
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+        <div class="footer-copyright">
+            ©️ @DateTime.Now.Year DineSwift. All rights reserved.
+        </div>
+
+        <div class="footer-legal">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms & Conditions</a>
+            <a href="#">Refund Policy</a>
+            <a href="#">Cookies</a>
+        </div>
+    </div>
+
+</footer>
+
+    </div>
+
+
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+
+</html>

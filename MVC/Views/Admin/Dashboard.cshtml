@@ -1,0 +1,2860 @@
+@{
+    Layout = "_Admin";
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+}
+
+<style>
+    :root {
+        --primary-orange: #f97316;
+        --deep-orange: #ea580c;
+        --orange-light: #fff7ed;
+        --primary-gradient: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+        --text-heading: #0f172a;
+        --text-body: #475569;
+        --border-color: #e2e8f0;
+        --accent-success: #10b981;
+        --accent-danger: #ef4444;
+        --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    }
+
+    body {
+        background-color: #f8fafc;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    /* ============ NOTIFICATION BELL DESIGN ============ */
+    .notification-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .notification-btn {
+        background: linear-gradient(135deg, #fff7ed, #ffedd5);
+        border: 2px solid #fed7aa;
+        font-size: 1.3rem;
+        color: #f97316;
+        cursor: pointer;
+        position: relative;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(249, 115, 22, 0.15);
+    }
+
+    .notification-btn:hover {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+        border-color: #f97316;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(249, 115, 22, 0.3);
+    }
+
+    .notification-btn:hover .notification-count {
+        transform: scale(1.1);
+    }
+
+    .notification-count {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid white;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        animation: pulse-badge 2s ease-in-out infinite;
+    }
+
+    @@keyframes pulse-badge {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        }
+        50% {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.6);
+        }
+    }
+
+    .notification-dropdown {
+        position: absolute;
+        right: 0;
+        top: 55px;
+        width: 360px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        z-index: 9999;
+        overflow: hidden;
+        border: 1px solid #fed7aa;
+        animation: slideDown 0.3s ease;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .notification-header {
+        padding: 16px 20px;
+        background: linear-gradient(135deg, #fff7ed, #ffedd5);
+        border-bottom: 1px solid #fed7aa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .notification-header strong {
+        color: #9a3412;
+        font-size: 1rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .notification-header strong i {
+        color: #f97316;
+    }
+
+    .clear-all-btn {
+        background: none;
+        border: none;
+        color: #f97316;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 6px 12px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .clear-all-btn:hover {
+        background: #f97316;
+        color: white;
+    }
+
+    .notification-list {
+        max-height: 350px;
+        overflow-y: auto;
+    }
+
+    .notification-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .notification-list::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    .notification-list::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+
+    .notification-list::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    .notification-item {
+        padding: 14px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+
+    .notification-item:hover {
+        background: #fff7ed;
+    }
+
+    .notification-item.unread {
+        background: #fffbeb;
+        border-left: 3px solid #f97316;
+    }
+
+    .notification-item.unread::before {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 8px;
+        height: 8px;
+        background: #f97316;
+        border-radius: 50%;
+    }
+
+    .notification-item .notification-title {
+        font-weight: 600;
+        color: #0f172a;
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+        padding-left: 16px;
+    }
+
+    .notification-item .notification-time {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding-left: 16px;
+    }
+
+    .notification-empty {
+        padding: 40px 20px;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+    .notification-empty i {
+        font-size: 2.5rem;
+        color: #cbd5e1;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .notification-empty p {
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .notification-footer {
+        padding: 12px 20px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        text-align: center;
+    }
+
+    .view-all-btn {
+        color: #f97316;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .view-all-btn:hover {
+        color: #ea580c;
+        text-decoration: underline;
+    }
+
+    /* Main Dashboard Layout */
+    .dashboard-container {
+        padding: 20px;
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+
+    /* Welcome Header */
+    .welcome-header {
+        background: linear-gradient(135deg, #fff7ed, #ffedd5);
+        border-radius: 18px;
+        padding: 24px 30px;
+        margin-bottom: 24px;
+        border: 1px solid #fed7aa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .welcome-header h1 {
+        color: #9a3412;
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .welcome-header p {
+        color: #92400e;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    /* Quick Stats Row */
+    .quick-stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .quick-stat-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border-left: 6px solid var(--primary-orange);
+        transition: all 0.25s ease;
+    }
+
+    .quick-stat-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .quick-stat-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #64748b;
+        margin-bottom: 8px;
+    }
+
+    .quick-stat-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .quick-stat-change {
+        font-size: 0.75rem;
+        color: #10b981;
+        margin-top: 4px;
+    }
+
+    .quick-stat-change.negative {
+        color: #ef4444;
+    }
+
+    /* Main Grid Layout */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+    }
+
+    .grid-left {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    /* Charts Section */
+    .charts-section {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+    }
+
+    .charts-section h3 {
+        color: #9a3412;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .chart-container {
+        height: 300px;
+        position: relative;
+    }
+
+    /* User Status Grids */
+    .status-grids-section {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+    }
+
+    .grid-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .grid-header h3 {
+        color: #9a3412;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .grid-switch {
+        display: flex;
+        gap: 10px;
+    }
+
+    .grid-switch-btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .grid-switch-btn.active {
+        background: var(--primary-orange);
+        color: white;
+        border-color: var(--primary-orange);
+    }
+
+    /* Grids Container */
+    .grids-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .user-grid {
+        min-height: 350px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    /* Right Sidebar */
+    .right-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    /* Pending Approvals */
+    .pending-approvals {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+    }
+
+    .pending-approvals h3 {
+        color: #9a3412;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .approval-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .approval-item {
+        padding: 15px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .approval-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .approval-name {
+        font-weight: 700;
+        color: var(--text-heading);
+    }
+
+    .approval-type {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        border-radius: 6px;
+        background: #ffedd5;
+        color: #9a3412;
+    }
+
+    .approval-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .approval-btn {
+        flex: 1;
+        padding: 8px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .approve-btn {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .approve-btn:hover {
+        background: #bbf7d0;
+    }
+
+    .reject-btn {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .reject-btn:hover {
+        background: #fecaca;
+    }
+
+    /* Revenue & Commissions */
+    .revenue-section {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+    }
+
+    .revenue-section h3 {
+        color: #9a3412;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .revenue-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .revenue-stat {
+        text-align: center;
+        padding: 15px;
+        background: #f8fafc;
+        border-radius: 12px;
+    }
+
+    .revenue-stat-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 5px;
+    }
+
+    .revenue-stat-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-heading);
+    }
+
+    /* Message Center */
+    .message-center {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+    }
+
+    .message-center h3 {
+        color: #9a3412;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .message-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .form-group label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-heading);
+    }
+
+    .form-control {
+        padding: 10px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 0.9rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-orange);
+        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+    }
+
+    .send-btn {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .send-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(249, 115, 22, 0.35);
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 1200px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .grids-container {
+            grid-template-columns: 1fr;
+        }
+
+        .quick-stats-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .revenue-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .quick-stats-row {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-container {
+            padding: 15px;
+        }
+
+        .welcome-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .notification-wrapper {
+            align-self: flex-end;
+        }
+
+        .notification-dropdown {
+            width: 300px;
+            right: -10px;
+        }
+
+        .welcome-header,
+        .charts-section,
+        .status-grids-section,
+        .pending-approvals,
+        .revenue-section,
+        .message-center {
+            padding: 20px;
+        }
+    }
+
+    /* Kendo Grid Customization */
+    .k-grid {
+        border: none !important;
+    }
+
+    .k-grid-header {
+        background: transparent !important;
+    }
+
+    .k-grid-header th.k-header {
+        background: #f8fafc !important;
+        color: #64748b !important;
+        font-weight: 700 !important;
+        font-size: 0.75rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 12px 15px !important;
+    }
+
+    .k-grid td {
+        padding: 12px 15px !important;
+        font-size: 0.9rem !important;
+    }
+
+    .k-grid tr:hover {
+        background-color: var(--orange-light) !important;
+    }
+
+    /* Status Tags */
+    .status-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .tag-active {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .tag-inactive {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .tag-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    /* Chart Section */
+    .charts-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #f97316, #fb923c);
+    }
+
+    .charts-section h3 {
+        color: #9a3412;
+        font-size: 1.4rem;
+        font-weight: 800;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .charts-section h3 i {
+        color: #f97316;
+        font-size: 1.2rem;
+    }
+
+    .chart-description {
+        color: #92400e;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        opacity: 0.8;
+    }
+
+    /* Chart Container */
+    .chart-container {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #fed7aa;
+        height: 400px;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .chart-container:hover {
+        border-color: #f97316;
+        box-shadow: 0 8px 25px rgba(249, 115, 22, 0.1);
+    }
+
+    /* Chart Controls */
+    .chart-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+        padding: 15px;
+        background: #fff7ed;
+        border-radius: 10px;
+        border: 1px solid #fed7aa;
+    }
+
+    .period-selector {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .period-btn {
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: 2px solid #fed7aa;
+        background: white;
+        color: #9a3412;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .period-btn:hover {
+        border-color: #f97316;
+        color: #f97316;
+        transform: translateY(-1px);
+    }
+
+    .period-btn.active {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+        border-color: #f97316;
+        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+    }
+
+    .chart-type-selector {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .type-btn {
+        padding: 8px;
+        border-radius: 8px;
+        border: 2px solid #fed7aa;
+        background: white;
+        color: #9a3412;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+    }
+
+    .type-btn:hover {
+        border-color: #f97316;
+        color: #f97316;
+        transform: translateY(-1px);
+    }
+
+    .type-btn.active {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+        border-color: #f97316;
+    }
+
+    /* Chart Stats */
+    .chart-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .chart-stat-item {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.2s ease;
+    }
+
+    .chart-stat-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        border-color: #f97316;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        background: #fff7ed;
+        color: #ea580c;
+    }
+
+    .stat-info h4 {
+        font-size: 0.9rem;
+        color: #64748b;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .stat-value {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1;
+    }
+
+    .stat-change {
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-top: 4px;
+    }
+
+    .change-positive {
+        color: #10b981;
+    }
+
+    .change-negative {
+        color: #ef4444;
+    }
+
+    /* Empty State */
+    .chart-empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #94a3b8;
+    }
+
+    .chart-empty-state i {
+        font-size: 3rem;
+        color: #cbd5e1;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    .chart-empty-state p {
+        font-size: 1rem;
+        color: #94a3b8;
+        margin-bottom: 10px;
+    }
+
+    .chart-empty-state .retry-btn {
+        padding: 8px 20px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 15px;
+        transition: all 0.2s ease;
+    }
+
+    .chart-empty-state .retry-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .charts-section {
+            margin: 15px;
+            padding: 20px;
+        }
+
+        .chart-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .period-selector,
+        .chart-type-selector {
+            justify-content: center;
+        }
+
+        .chart-container {
+            height: 350px;
+            padding: 15px;
+        }
+
+        .chart-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .charts-section {
+            margin: 10px;
+            padding: 15px;
+        }
+
+        .chart-container {
+            height: 300px;
+        }
+
+        .period-btn {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+    }
+
+    /* Custom Kendo Chart Styles */
+    .k-chart {
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    .k-chart .k-chart-surface {
+        border-radius: 8px;
+    }
+
+    .k-chart .k-selection {
+        border-color: #f97316 !important;
+    }
+
+    .k-chart .k-tooltip {
+        background: linear-gradient(135deg, #fff7ed, #ffffff) !important;
+        border: 1px solid #fed7aa !important;
+        border-radius: 12px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+        color: #9a3412 !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    .k-chart .k-tooltip .k-tooltip-title {
+        font-weight: 700 !important;
+        color: #9a3412 !important;
+        border-bottom: 1px solid #fed7aa !important;
+    }
+
+    .k-chart .k-legend-item-text {
+        color: #475569 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Today's Orders Card */
+    .todays-orders-card {
+        background: #ffffff;
+        border-radius: 18px;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+        margin: 20px;
+        overflow: hidden;
+        border: none;
+        position: relative;
+    }
+
+    .todays-orders-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #10b981, #f59e0b, #3b82f6, #8b5cf6);
+    }
+
+    .todays-orders-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 26px;
+        background: linear-gradient(135deg, #fff7ed, #ffedd5);
+        border-bottom: 1px solid #fed7aa;
+    }
+
+    .todays-orders-header strong {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #9a3412;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .todays-orders-header strong i {
+        color: #f97316;
+        font-size: 1.4rem;
+    }
+
+    .header-subtitle {
+        font-size: 0.85rem;
+        color: #92400e;
+        margin-top: 4px;
+    }
+
+    .todays-date {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #9a3412;
+        background: white;
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: 2px solid #fed7aa;
+    }
+
+    /* Main Content Layout */
+    .todays-content {
+        padding: 2rem;
+    }
+
+    @@media (max-width: 992px) {
+        .todays-content {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Chart Container */
+    .todays-chart-container {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #fed7aa;
+    }
+
+    .todays-chart-container:hover {
+        border-color: #f97316;
+        box-shadow: 0 8px 25px rgba(249, 115, 22, 0.1);
+    }
+
+    /* Status Breakdown */
+    .status-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .status-item {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .status-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+    }
+
+    .status-delivered::before {
+        background: #10b981;
+    }
+
+    .status-delivered:hover {
+        border-color: #10b981;
+    }
+
+    .status-outfordelivery::before {
+        background: #f59e0b;
+    }
+
+    .status-outfordelivery:hover {
+        border-color: #f59e0b;
+    }
+
+    .status-processing::before {
+        background: #3b82f6;
+    }
+
+    .status-processing:hover {
+        border-color: #3b82f6;
+    }
+
+    .status-prepared::before {
+        background: #8b5cf6;
+    }
+
+    .status-prepared:hover {
+        border-color: #8b5cf6;
+    }
+
+    .status-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .status-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        color: var(--text-heading);
+    }
+
+    .status-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .status-delivered .status-icon {
+        background: #dcfce7;
+        color: #10b981;
+    }
+
+    .status-outfordelivery .status-icon {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .status-processing .status-icon {
+        background: #dbeafe;
+        color: #3b82f6;
+    }
+
+    .status-prepared .status-icon {
+        background: #f3e8ff;
+        color: #8b5cf6;
+    }
+
+    .status-count {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-heading);
+    }
+
+    .status-percentage {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .status-progress {
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 999px;
+        margin-top: 10px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        border-radius: 999px;
+        transition: width 1s ease;
+    }
+
+    .status-delivered .progress-bar {
+        background: #10b981;
+    }
+
+    .status-outfordelivery .progress-bar {
+        background: #f59e0b;
+    }
+
+    .status-processing .progress-bar {
+        background: #3b82f6;
+    }
+
+    .status-prepared .progress-bar {
+        background: #8b5cf6;
+    }
+
+    /* Summary Stats */
+    .todays-summary {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        padding: 0 25px 25px;
+    }
+
+    .summary-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        border: 2px solid #fed7aa;
+        transition: all 0.3s ease;
+    }
+
+    .summary-card:hover {
+        border-color: #f97316;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .summary-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        margin: 0 auto 15px;
+        background: linear-gradient(135deg, #fff7ed, #ffedd5);
+        color: #ea580c;
+    }
+
+    .summary-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--text-heading);
+        margin-bottom: 5px;
+    }
+
+    .summary-label {
+        font-size: 0.9rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    /* Chart Legend */
+    .chart-legend {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 15px 25px 25px;
+        background: #f8fafc;
+        margin: 0 25px 20px;
+        border-radius: 12px;
+        border: 1px solid #fed7aa;
+    }
+
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 15px;
+        background: white;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid #e2e8f0;
+    }
+
+    .legend-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .legend-item.active {
+        background: #fff7ed;
+        border-color: #f97316;
+    }
+
+    /* Empty State */
+    .todays-empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: #94a3b8;
+    }
+
+    .todays-empty i {
+        font-size: 3rem;
+        color: #cbd5e1;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    .todays-empty p {
+        font-size: 1rem;
+        color: #94a3b8;
+        margin-bottom: 10px;
+    }
+
+    .todays-empty .refresh-btn {
+        padding: 10px 24px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 15px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .todays-empty .refresh-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .todays-orders-card {
+            margin: 15px;
+        }
+
+        .todays-orders-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .todays-date {
+            align-self: flex-end;
+        }
+
+        .todays-content {
+            padding: 20px;
+        }
+
+        .todays-chart-container {
+            height: 300px;
+        }
+
+        .todays-summary {
+            grid-template-columns: 1fr;
+            padding: 0 20px 20px;
+        }
+
+        .chart-legend {
+            margin: 0 20px 20px;
+            padding: 12px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .todays-orders-card {
+            margin: 10px;
+        }
+
+        .todays-content {
+            padding: 15px;
+        }
+
+        .todays-chart-container {
+            height: 250px;
+        }
+
+        .legend-item {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* Commission Chart Specific Styles */
+    .commission-chart-container {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+        margin: 20px 0;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .commission-chart-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #8b5cf6, #3b82f6);
+    }
+
+    .commission-chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .commission-chart-header h3 {
+        color: #7c3aed;
+        font-size: 1.4rem;
+        font-weight: 800;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .commission-chart-header h3 i {
+        color: #8b5cf6;
+        font-size: 1.2rem;
+    }
+
+    .commission-chart-subtitle {
+        color: #7c3aed;
+        font-size: 0.9rem;
+        margin-top: 5px;
+        opacity: 0.8;
+    }
+
+    .commission-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 150px;
+    }
+
+    .commission-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin-top: 25px;
+    }
+
+    .commission-stat-item {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 15px;
+        border: 1px solid #e2e8f0;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .commission-stat-item:hover {
+        border-color: #8b5cf6;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(139, 92, 246, 0.15);
+    }
+
+    .commission-stat-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .commission-stat-value {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #7c3aed;
+    }
+
+    .commission-stat-change {
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-top: 5px;
+    }
+
+    .commission-change-positive {
+        color: #10b981;
+    }
+
+    .commission-change-negative {
+        color: #ef4444;
+    }
+
+    /* Color variables for commission chart */
+    .commission-color-orders {
+        background: #f97316 !important;
+        color: #f97316 !important;
+    }
+
+    .commission-color-revenue {
+        background: #10b981 !important;
+        color: #10b981 !important;
+    }
+
+    .commission-color-platform {
+        background: #8b5cf6 !important;
+        color: #8b5cf6 !important;
+    }
+
+    .commission-color-vendor {
+        background: #3b82f6 !important;
+        color: #3b82f6 !important;
+    }
+
+    .commission-color-delivery {
+        background: #f59e0b !important;
+        color: #f59e0b !important;
+    }
+
+    /* Legend for commission chart */
+    .commission-legend {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+        padding: 15px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .commission-legend-item {
+        display: flex;
+        align-items: center;
+        padding: 6px 12px;
+        background: white;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid #e2e8f0;
+    }
+
+    .commission-legend-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .commission-legend-item.active {
+        background: #f5f3ff;
+        border-color: #8b5cf6;
+    }
+
+    /* Chart type selector for commissions */
+    .commission-type-selector {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .commission-type-btn {
+        padding: 8px;
+        border-radius: 8px;
+        border: 2px solid #fed7aa;
+        background: white;
+        color: #9a3412;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+    }
+
+    .commission-type-btn:hover {
+        border-color: #f97316;
+        color: #f97316;
+        transform: translateY(-1px);
+    }
+
+    .commission-type-btn.active {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+        border-color: #f97316;
+    }
+
+    @@media (max-width: 768px) {
+        .commission-chart-header {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .commission-controls {
+            width: 100%;
+            align-items: stretch;
+        }
+        
+        .commission-type-selector {
+            justify-content: center;
+        }
+        
+        .commission-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="dashboard-container">
+    <!-- Welcome Header with Notification -->
+    <div class="welcome-header">
+        <div>
+            <h1>Welcome Back, @Context.Session.GetString("Name")!</h1>
+            <p>Here's what's happening with your platform today</p>
+        </div>
+        
+        <!-- 🔔 Notification Bell -->
+        <div class="notification-wrapper">
+            <button id="notificationBtn" class="notification-btn">
+                <i class="bi bi-bell-fill"></i>
+                <span id="notificationCount" class="notification-count d-none">0</span>
+            </button>
+
+            <!-- Notification Dropdown -->
+            <div id="notificationDropdown" class="notification-dropdown d-none">
+                <div class="notification-header">
+                    <strong><i class="bi bi-bell"></i> Notifications</strong>
+                    <button class="clear-all-btn" id="clearAllBtn">Clear All</button>
+                </div>
+                <div id="notificationList" class="notification-list">
+                    <div class="notification-empty">
+                        <i class="bi bi-bell-slash"></i>
+                        <p>No notifications yet</p>
+                    </div>
+                </div>
+                <div class="notification-footer">
+                    <a href="/Admin/NotificationDetails" onclick="openNotificationDetails()">
+                        View All Notifications
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats-row">
+        <div class="quick-stat-card">
+            <div class="quick-stat-title">Today's Orders</div>
+            <div class="quick-stat-value" id="todayOrders">0</div>
+        </div>
+        <div class="quick-stat-card">
+            <div class="quick-stat-title">Total Revenue</div>
+            <div class="quick-stat-value" id="totalRevenue">₹0</div>
+        </div>
+        <div class="quick-stat-card">
+            <div class="quick-stat-title">Active Users</div>
+            <div class="quick-stat-value" id="activeUsers">0</div>
+        </div>
+        <div class="quick-stat-card">
+            <div class="quick-stat-title">Total Delivered Orders</div>
+            <div class="quick-stat-value" id="pendingApprovals">0</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-grid">
+        <div class="grid-left">
+            <!-- Commission Statistics Chart -->
+            <div class="charts-section">
+                <h3><i class="fa-solid fa-chart-pie"></i> Commission & Revenue Analysis</h3>
+                <p class="chart-description">Track orders and commission breakdown over time</p>
+                
+                <div class="chart-controls">
+                    <div class="period-selector">
+                        <button class="period-btn commission-period-btn active" data-period="7" onclick="changeCommissionPeriod(7)">7 Days</button>
+                        <button class="period-btn commission-period-btn" data-period="30" onclick="changeCommissionPeriod(30)">30 Days</button>
+                        <button class="period-btn commission-period-btn" data-period="90" onclick="changeCommissionPeriod(90)">90 Days</button>
+                        <button class="period-btn commission-period-btn" data-period="365" onclick="changeCommissionPeriod(365)">1 Year</button>
+                    </div>
+
+                    <div class="chart-type-selector">
+                        <button class="commission-type-btn active" title="column" onclick="changeCommissionChartType('column')">
+                            <i class="fa-solid fa-chart-column"></i> 
+                        </button>
+                        <button class="commission-type-btn" title="line" onclick="changeCommissionChartType('line')">
+                            <i class="fa-solid fa-chart-line"></i> 
+                        </button>
+                        <button class="commission-type-btn" title="area" onclick="changeCommissionChartType('area')">
+                            <i class="fa-solid fa-chart-area"></i> 
+                        </button>
+                        <button class="commission-type-btn" title="bar" onclick="changeCommissionChartType('bar')">
+                            <i class="fa-solid fa-chart-simple"></i>
+                        </button>
+                        <button class="commission-type-btn" title="donut" onclick="changeCommissionChartType('donut')">
+                            <i class="fa-solid fa-circle-notch"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="chart-container">
+                    <div id="commissionChart"></div>
+                </div>
+            </div>
+
+            <!-- Order Stats Chart -->
+            <div class="charts-section">
+                <h3><i class="fa-solid fa-chart-line"></i> Order Statistics</h3>
+                <p class="chart-description">Track order trends and revenue performance over time</p>
+
+                <!-- Chart Controls -->
+                <div class="chart-controls">
+                    <div class="period-selector">
+                        <button class="period-btn active" data-period="7" onclick="changePeriod(7)">7 Days</button>
+                        <button class="period-btn" data-period="30" onclick="changePeriod(30)">30 Days</button>
+                        <button class="period-btn" data-period="90" onclick="changePeriod(90)">90 Days</button>
+                        <button class="period-btn" data-period="365" onclick="changePeriod(365)">1 Year</button>
+                    </div>
+
+                    <div class="chart-type-selector">
+                        <button class="type-btn active" title="Line Chart" onclick="changeChartType('line')">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </button>
+                        <button class="type-btn" title="Column Chart" onclick="changeChartType('column')">
+                            <i class="fa-solid fa-chart-column"></i>
+                        </button>
+                        <button class="type-btn" title="Area Chart" onclick="changeChartType('area')">
+                            <i class="fa-solid fa-chart-area"></i>
+                        </button>
+                        <button class="type-btn" title="Stacked Chart" onclick="changeChartType('stacked')">
+                            <i class="fa-solid fa-chart-simple"></i>
+                        </button>
+                        <button class="type-btn" title="Donut Chart" onclick="changeChartType('donut')">
+                            <i class="fa-solid fa-circle-notch"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="chart-container">
+                    <div id="ordersChart"></div>
+                </div>
+
+                <!-- Chart Stats -->
+                <div class="chart-stats" id="chartStats">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="todays-orders-card">
+                <div class="todays-orders-header">
+                    <div>
+                        <strong><i class="fa-solid fa-clipboard-list"></i> Today's Order Status</strong>
+                        <div class="header-subtitle">Real-time distribution of today's orders</div>
+                    </div>
+                    <div class="todays-date" id="currentDate">
+                        <!-- Date will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="todays-content">
+                    <!-- Chart -->
+                    <div class="todays-chart-container">
+                        <div id="todaysOrdersChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-sidebar">
+            <!-- Revenue & Commissions -->
+            <div class="revenue-section">
+                <h3>Today's Revenue & Commissions</h3>
+                <div class="revenue-stats">
+                    <div class="revenue-stat">
+                        <div class="revenue-stat-label">Total Revenue</div>
+                        <div class="revenue-stat-value" id="todayRevenue">₹0</div>
+                    </div>
+                    <div class="revenue-stat">
+                        <div class="revenue-stat-label">Platform Fee</div>
+                        <div class="revenue-stat-value" id="platformFee">₹0</div>
+                    </div>
+                    <div class="revenue-stat">
+                        <div class="revenue-stat-label">Vendor Commissions</div>
+                        <div class="revenue-stat-value" id="vendorCommissions">₹0</div>
+                    </div>
+                    <div class="revenue-stat">
+                        <div class="revenue-stat-label">Delivery Commissions</div>
+                        <div class="revenue-stat-value" id="deliveryCommissions">₹0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Center -->
+            <div class="message-center">
+                <h3>Send Message</h3>
+                <form class="message-form" id="messageForm">
+                    <div class="form-group">
+                        <label for="recipientType">Recipient Type</label>
+                        <select class="form-control" id="recipientType" required>
+                            <option value="">Select Type</option>
+                            <option value="restaurant">Restaurant</option>
+                            <option value="delivery">Delivery Partner</option>
+                            <option value="all_restaurants">All Restaurants</option>
+                            <option value="all_delivery">All Delivery Partners</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipient">Recipient (Leave empty for all)</label>
+                        <select class="form-control" id="recipient">
+                            <option value="">Select Recipient</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" class="form-control" id="subject" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea class="form-control" id="message" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="send-btn">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for View Details -->
+<div id="detailsModal"></div>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script>
+    $(document).ready(function () {
+        loadDashboardData();
+        initializeOrdersChart();
+        loadOrderStatistics(7, 'line');
+
+        initializeCommissionChart();
+        loadCommissionStatistics(7, 'column');
+
+        // Set up periodic refresh
+        setInterval(function () {
+            var period = $('.period-btn.active').data('period');
+            var type = $('.type-btn.active').attr('title').toLowerCase().replace(' chart', '');
+            loadOrderStatistics(period, type);
+
+            // Refresh commission chart too
+            var commPeriod = $('.commission-period-btn.active').data('period');
+            var commType = $('.commission-type-btn.active').attr('title').toLowerCase().split(' ')[0];
+            loadCommissionStatistics(commPeriod, commType);
+        }, 60000); // Refresh every minute
+
+        var now = new Date();
+        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        $("#currentDate").text(now.toLocaleDateString('en-IN', options));
+
+        initializeTodaysChart();
+        loadTodaysOrderStatus();
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadTodaysOrderStatus, 30000);
+
+        // Notification functionality
+        loadNotifications();
+    });
+
+    // Notification Functions
+    let unreadCount = 0;
+    let notificationsLoaded = false;
+
+    function formatNotification(rawMsg) {
+        // Remove [RabbitMQ] or [Redis]
+        rawMsg = rawMsg.replace('[RabbitMQ] ', '').replace('[Redis] ', '');
+
+        const parts = rawMsg.split('|');
+
+        const sender = parts[0];     // System
+        const date = new Date(parts[1]);
+        const message = parts[2];
+
+        const formattedDate = date.toLocaleString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        return `
+        <div class="notification-item">
+            <div style="font-weight:600;">${message}</div>
+            <div style="font-size:11px;color:#64748b;">${formattedDate}</div>
+        </div>
+    `;
+    }
+
+    function loadNotifications() {
+        $.ajax({
+            url: 'http://localhost:5245/api/notifications',
+            type: 'GET',
+            success: function (res) {
+                if (!res.success) return;
+
+                if (res.messages.length > 0) {
+                    unreadCount += res.messages.length;
+                    $("#notificationCount")
+                        .text(unreadCount > 99 ? '99+' : unreadCount)
+                        .removeClass("d-none");
+
+                    const list = $("#notificationList");
+                    list.html("");
+
+                    res.messages.forEach(msg => {
+                        list.prepend(formatNotification(msg));
+                    });
+                }
+            }
+        });
+    }
+
+    // 🔔 Bell click toggle
+    $("#notificationBtn").on("click", function () {
+        $("#notificationDropdown").toggleClass("d-none");
+
+        if (!notificationsLoaded) {
+            loadNotifications();          // ✅ NOW consume Redis
+            notificationsLoaded = true;   // ✅ only once
+        }
+
+        unreadCount = 0;
+        $("#notificationCount").addClass("d-none");
+    });
+
+    // ❌ Close dropdown when clicking outside
+    $(document).on("click", function (e) {
+        if (!$(e.target).closest(".notification-wrapper").length) {
+            $("#notificationDropdown").addClass("d-none");
+        }
+    });
+
+    function openNotificationDetails() {
+        window.location.href = "/Admin/NotificationDetails";
+    }
+
+    // Dashboard Functions
+    function loadDashboardData() {
+        var token = "@Context.Session.GetString("Token")";
+
+        // Load today's stats
+        $.ajax({
+            url: "http://localhost:5245/api/Admin/getTodayStats",
+            type: "GET",
+            headers: { "Authorization": "Bearer " + token },
+            success: function (data) {
+                console.log(data);
+                $("#todayOrders").text(data.todayOrders || 0);
+                $("#totalRevenue").text("₹" + (data.totalRevenue || 0));
+                $("#activeUsers").text(data.activeUsers || 0);
+                $("#pendingApprovals").text(data.totalOrders || 0);
+            }
+        });
+
+        // Load revenue details
+        $.ajax({
+            url: "http://localhost:5245/api/Admin/getRevenueDetails",
+            type: "GET",
+            headers: { "Authorization": "Bearer " + token },
+            success: function (data) {
+                $("#todayRevenue").text("₹" + (data.todayRevenue || 0));
+                $("#platformFee").text("₹" + (data.platformFee || 0));
+                $("#vendorCommissions").text("₹" + (data.vendorCommissions || 0));
+                $("#deliveryCommissions").text("₹" + (data.deliveryCommissions.toFixed(2) || 0));
+            }
+        });
+    }
+
+    // Chart Functions
+    function initializeOrdersChart() {
+        $("#ordersChart").kendoChart({
+            theme: "material",
+            chartArea: {
+                background: "transparent",
+                margin: {
+                    left: 60,
+                    top: 30,
+                    right: 30,
+                    bottom: 50
+                }
+            },
+            title: {
+                text: "Loading data...",
+                color: "#64748b",
+                font: "14px 'Inter', sans-serif",
+                position: "top"
+            },
+            legend: {
+                position: "top",
+                labels: {
+                    font: "12px 'Inter', sans-serif",
+                    color: "#475569"
+                }
+            },
+            seriesDefaults: {
+                type: "line",
+                style: "smooth",
+                markers: {
+                    visible: true,
+                    size: 6
+                }
+            },
+            series: [],
+            categoryAxis: {
+                labels: {
+                    font: "11px 'Inter', sans-serif",
+                    color: "#64748b"
+                },
+                line: {
+                    color: "#e2e8f0"
+                },
+                majorGridLines: {
+                    visible: true,
+                    color: "#f1f5f9"
+                }
+            },
+            valueAxis: {
+                labels: {
+                    font: "11px 'Inter', sans-serif",
+                    color: "#64748b"
+                },
+                line: {
+                    color: "#e2e8f0"
+                },
+                majorGridLines: {
+                    visible: true,
+                    color: "#f1f5f9"
+                }
+            },
+            tooltip: {
+                visible: true,
+                template: "<div class='k-chart-tooltip'>" +
+                    "<div class='k-tooltip-title'>#= category #</div>" +
+                    "<div class='k-tooltip-content'>" +
+                    "<span style='color:#f97316'>Orders: </span><strong>#= value #</strong><br/>" +
+                    "<span style='color:#10b981'>Revenue: </span><strong>₹#= series.dataItem.revenue #</strong>" +
+                    "</div></div>",
+                shared: true,
+                format: "{0}"
+            },
+            transitions: true
+        });
+    }
+
+    function loadOrderStatistics(days, chartType) {
+        var token = "@Context.Session.GetString("Token")";
+
+        // Show loading state
+        $("#ordersChart").data("kendoChart").setOptions({
+            title: {
+                text: "Loading data..."
+            },
+            series: []
+        });
+
+        $.ajax({
+            url: `http://localhost:5245/api/Admin/getOrderStats?days=${days}`,
+            type: "GET",
+            headers: { "Authorization": "Bearer " + token },
+            success: function (data) {
+                if (data && data.length > 0) {
+                    renderOrdersChart(data, days, chartType);
+                } else {
+                    showEmptyChartState();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading order statistics:", error);
+                showErrorChartState();
+            }
+        });
+    }
+
+    function renderOrdersChart(data, days, chartType) {
+        var chart = $("#ordersChart").data("kendoChart");
+
+        var categories = data.map(item => {
+            var date = new Date(item.date);
+            return days <= 30
+                ? date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+                : date.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+        });
+
+        // Calculate totals for title
+        var totalOrders = data.reduce((sum, item) => sum + item.orders, 0);
+        var totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
+
+        /* ===================== DONUT CHART ===================== */
+        if (chartType === "donut") {
+            chart.setOptions({
+                title: {
+                    text: "Revenue Distribution",
+                    color: "#9a3412",
+                    font: "bold 14px 'Inter'"
+                },
+                legend: {
+                    position: "bottom"
+                },
+                series: [{
+                    type: "donut",
+                    data: data.map(x => ({
+                        category: x.date,
+                        value: x.revenue
+                    })),
+                    labels: {
+                        visible: true,
+                        template: "₹#= kendo.toString(value, 'n0') #"
+                    }
+                }],
+                tooltip: {
+                    visible: true,
+                    template: "₹ #= kendo.toString(value, 'n0') #"
+                }
+            });
+            return;
+        }
+
+        /* ===================== FLAGS ===================== */
+        var isCombo = chartType === "combo";
+        var isStacked = chartType === "stacked";
+        var showRevenue = !isStacked;
+
+        chart.setOptions({
+            title: {
+                text: `${days} Day Order Trends • Total: ${totalOrders} Orders (₹${totalRevenue.toLocaleString('en-IN')})`,
+                color: "#9a3412",
+                font: "bold 14px 'Inter'"
+            },
+
+            seriesDefaults: {
+                type: isCombo ? "column" : (isStacked ? "column" : chartType),
+                stack: isStacked,
+                style: chartType === "line" ? "smooth" : "normal"
+            },
+
+            series: [
+                {
+                    name: "Orders",
+                    data: data.map(x => x.orders),
+                    color: "#f97316",
+                    axis: "orders",
+                    field: "orders",
+                    stack: isStacked ? "orders" : false,
+                    tooltip: {
+                        template: "<div>Orders: <strong>#= value #</strong></div>"
+                    }
+                },
+                {
+                    name: "Revenue (₹)",
+                    data: data.map(x => x.revenue),
+                    color: "#10b981",
+                    axis: "revenue",
+                    visible: showRevenue,
+                    tooltip: {
+                        template: "<div>Revenue: <strong>₹#= value #</strong></div>"
+                    }
+                }
+            ],
+
+            categoryAxis: {
+                categories: categories
+            },
+
+            valueAxis: [
+                {
+                    name: "orders",
+                    title: {
+                        text: "Orders",
+                        color: "#f97316",
+                        font: "bold 12px 'Inter', sans-serif"
+                    },
+                    labels: {
+                        format: "{0}"
+                    }
+                },
+                {
+                    name: "revenue",
+                    title: {
+                        text: "Revenue (₹)",
+                        color: "#10b981",
+                        font: "bold 12px 'Inter', sans-serif"
+                    },
+                    labels: {
+                        format: "₹{0}"
+                    },
+                    opposite: true
+                }
+            ],
+        });
+    }
+
+    function changePeriod(days) {
+        // Update active button
+        $('.period-btn').removeClass('active');
+        $(`.period-btn[data-period="${days}"]`).addClass('active');
+
+        // Get current chart type
+        var chartType = $('.type-btn.active').attr('title').toLowerCase().replace(' chart', '');
+
+        // Reload chart with new period
+        loadOrderStatistics(days, chartType);
+    }
+
+    function changeChartType(type) {
+        // Update active button
+        $('.type-btn').removeClass('active');
+        $(`.type-btn[title="${type.charAt(0).toUpperCase() + type.slice(1)} Chart"]`).addClass('active');
+
+        // Get current period
+        var period = $('.period-btn.active').data('period');
+
+        // Reload chart with new type
+        loadOrderStatistics(period, type);
+    }
+
+    function showEmptyChartState() {
+        var chart = $("#ordersChart").data("kendoChart");
+        chart.setOptions({
+            title: {
+                text: "No Data Available",
+                color: "#94a3b8"
+            },
+            series: []
+        });
+
+        $("#chartStats").html(`
+            <div class="chart-empty-state">
+                <i class="fa-solid fa-chart-line"></i>
+                <p>No order data available for the selected period</p>
+                <button class="retry-btn" onclick="loadOrderStatistics(7, 'line')">
+                    Try Again
+                </button>
+            </div>
+        `);
+    }
+
+    function showErrorChartState() {
+        var chart = $("#ordersChart").data("kendoChart");
+        chart.setOptions({
+            title: {
+                text: "Error Loading Data",
+                color: "#ef4444"
+            },
+            series: []
+        });
+
+        $("#chartStats").html(`
+            <div class="chart-empty-state">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <p>Failed to load order statistics</p>
+                <p style="font-size: 0.9rem;">Please check your connection and try again</p>
+                <button class="retry-btn" onclick="loadOrderStatistics(7, 'line')">
+                    <i class="fa-solid fa-rotate"></i> Retry
+                </button>
+            </div>
+        `);
+    }
+
+    function initializeTodaysChart() {
+        // Create initial empty chart
+        $("#todaysOrdersChart").kendoChart({
+            theme: "material",
+            chartArea: {
+                background: "transparent",
+                margin: {
+                    left: 30,
+                    top: 20,
+                    right: 30,
+                    bottom: 30
+                }
+            },
+            title: {
+                text: "Loading today's orders...",
+                color: "#64748b",
+                font: "14px 'Inter', sans-serif",
+                position: "top"
+            },
+            legend: {
+                visible: false
+            },
+            seriesDefaults: {
+                type: "column",
+                gap: 0.5,
+                spacing: 0.1
+            },
+            series: [],
+            categoryAxis: {
+                labels: {
+                    font: "12px 'Inter', sans-serif",
+                    color: "#64748b"
+                },
+                line: {
+                    color: "transparent"
+                },
+                majorGridLines: {
+                    visible: false
+                }
+            },
+            valueAxis: {
+                labels: {
+                    font: "11px 'Inter', sans-serif",
+                    color: "#64748b"
+                },
+                line: {
+                    color: "#e2e8f0"
+                },
+                majorGridLines: {
+                    visible: true,
+                    color: "#f1f5f9"
+                }
+            },
+            tooltip: {
+                visible: true,
+                template: "<div class='k-chart-tooltip'>" +
+                    "<div class='k-tooltip-title'>#= category #</div>" +
+                    "<div class='k-tooltip-content'>" +
+                    "<strong>#= value # orders</strong><br/>" +
+                    "<span style='color:#64748b'>#= kendo.toString(percentage, 'p1') # of total</span>" +
+                    "</div></div>",
+                format: "{0}"
+            },
+            transitions: true
+        });
+    }
+
+    function loadTodaysOrderStatus() {
+        var token = "@Context.Session.GetString("Token")";
+
+        // Show loading state
+        $("#todaysOrdersChart").data("kendoChart").setOptions({
+            title: {
+                text: "Loading today's orders..."
+            },
+            series: []
+        });
+
+        $.ajax({
+            url: "http://localhost:5245/api/Admin/getTodayOrderStatus",
+            type: "GET",
+            headers: { "Authorization": "Bearer " + token },
+            success: function (data) {
+                console.log("data --- ",data);
+                if (data && data.length > 0) {
+                    renderTodaysChart(data);
+                } else {
+                    showTodaysEmptyState();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading today's order status:", error);
+                // Show demo data
+                var demoData = [
+                    { c_orderstatus: "Delivered", total_orders: 45, color: "#10b981", icon: "fa-check-circle" },
+                    { c_orderstatus: "Out for delivery", total_orders: 25, color: "#f59e0b", icon: "fa-truck" },
+                    { c_orderstatus: "Processing", total_orders: 35, color: "#3b82f6", icon: "fa-cogs" },
+                    { c_orderstatus: "Prepared", total_orders: 15, color: "#8b5cf6", icon: "fa-check" }
+                ];
+                renderTodaysChart(demoData);
+            }
+        });
+    }
+
+    function renderTodaysChart(data) {
+        var chart = $("#todaysOrdersChart").data("kendoChart");
+
+        // Prepare chart data
+        var chartData = prepareTodaysChartData(data);
+
+        // Calculate total orders
+        var totalOrders = chartData.reduce(function (sum, item) {
+            return sum + item.value;
+        }, 0);
+
+        // Update chart
+        chart.setOptions({
+            title: {
+                text: totalOrders > 0 ?
+                    `Today's Orders: ${totalOrders}` :
+                    "No orders today",
+                color: totalOrders > 0 ? "#9a3412" : "#94a3b8",
+                font: "bold 16px 'Inter', sans-serif"
+            },
+            series: [{
+                name: "Orders",
+                data: chartData.map(item => item.value),
+                color: function (point) {
+                    return point.dataItem.color;
+                },
+                labels: {
+                    visible: true,
+                    background: "transparent",
+                    color: "#0f172a",
+                    font: "bold 12px 'Inter', sans-serif",
+                    format: "{0}"
+                }
+            }],
+            categoryAxis: {
+                categories: chartData.map(item => item.category)
+            },
+            valueAxis: {
+                title: {
+                    text: "Number of Orders",
+                    color: "#f97316",
+                    font: "bold 12px 'Inter', sans-serif"
+                }
+            }
+        });
+    }
+
+    function prepareTodaysChartData(data) {
+        // Define status configuration
+        var statusConfig = {
+            "Delivered": {
+                displayName: "Delivered",
+                color: "#10b981",
+                icon: "fa-check-circle"
+            },
+            "Out for delivery": {
+                displayName: "Out for Delivery",
+                color: "#f59e0b",
+                icon: "fa-truck"
+            },
+            "Processing": {
+                displayName: "Processing",
+                color: "#3b82f6",
+                icon: "fa-cogs"
+            },
+            "Prepared": {
+                displayName: "Prepared",
+                color: "#8b5cf6",
+                icon: "fa-check"
+            }
+        };
+
+        // Ensure all statuses are included
+        var allStatuses = Object.keys(statusConfig);
+        var finalData = [];
+
+        allStatuses.forEach(function (status) {
+            var item = data.find(d => d.c_orderstatus === status) || {
+                c_orderstatus: status,
+                total_orders: 0
+            };
+
+            var config = statusConfig[status];
+            finalData.push({
+                category: config.displayName,
+                value: item.total_orders || 0,
+                color: config.color,
+                icon: config.icon
+            });
+        });
+
+        return finalData;
+    }
+
+    function showTodaysEmptyState() {
+        $("#todaysOrdersChart").data("kendoChart").setOptions({
+            title: {
+                text: "No orders today",
+                color: "#94a3b8"
+            },
+            series: []
+        });
+    }
+
+    // Commission Chart Functions
+    function initializeCommissionChart() {
+        $("#commissionChart").kendoChart({
+            theme: "material",
+            chartArea: {
+                background: "transparent",
+                margin: {
+                    left: 60,
+                    top: 30,
+                    right: 60,
+                    bottom: 50
+                }
+            },
+            title: {
+                text: "Loading commission data...",
+                color: "#64748b",
+                font: "14px 'Inter', sans-serif",
+                position: "top"
+            },
+            legend: {
+                position: "top",
+                labels: {
+                    font: "12px 'Inter', sans-serif",
+                    color: "#475569"
+                }
+            },
+            seriesDefaults: {
+                type: "column"
+            },
+            series: [],
+            categoryAxis: {
+                labels: {
+                    font: "11px 'Inter', sans-serif",
+                    color: "#64748b",
+                    rotation: -45
+                },
+                line: {
+                    color: "#e2e8f0"
+                },
+                majorGridLines: {
+                    visible: true,
+                    color: "#f1f5f9"
+                }
+            },
+            valueAxis: {
+                labels: {
+                    font: "11px 'Inter', sans-serif",
+                    color: "#64748b",
+                    format: "₹{0}"
+                },
+                line: {
+                    color: "#e2e8f0"
+                },
+                majorGridLines: {
+                    visible: true,
+                    color: "#f1f5f9"
+                }
+            },
+            tooltip: {
+                visible: true,
+                template: "<div class='k-chart-tooltip'>" +
+                    "<div class='k-tooltip-title'>#= category #</div>" +
+                    "<div class='k-tooltip-content'>" +
+                    "<span style='color:#f97316'>Orders: </span><strong>#= dataItem.orders #</strong><br/>" +
+                    "<span style='color:#8b5cf6'>Platform Fee: </span><strong>₹#= kendo.toString(dataItem.platformFee, 'n0') #</strong><br/>" +
+                    "</div></div>",
+                shared: true
+            },
+            transitions: true
+        });
+    }
+
+    // Load commission statistics
+    function loadCommissionStatistics(days, chartType) {
+        var token = "@Context.Session.GetString("Token")";
+
+        // Show loading state
+        $("#commissionChart").data("kendoChart").setOptions({
+            title: {
+                text: "Loading commission data..."
+            },
+            series: []
+        });
+
+        $.ajax({
+            url: `http://localhost:5245/api/Admin/getCommissionStats?id=${days}`,
+            type: "GET",
+            headers: { "Authorization": "Bearer " + token },
+            success: function (data) {
+                console.log("Commission Data --- ",data);
+                if (data && data.length > 0) {
+                    renderCommissionChart(data, days, chartType);
+                } else {
+                    showCommissionEmptyState();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading commission statistics:", error);
+                showCommissionErrorState();
+            }
+        });
+    }
+
+    // Render commission chart
+    function renderCommissionChart(data, days, chartType) {
+        var chart = $("#commissionChart").data("kendoChart");
+        
+        var categories = data.map(item => {
+            console.log("render ",item.date)
+            if(days >= 90){
+                var d = new Date(item.date);
+                return days <= 30
+                    ? d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+                    : d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+            }else{
+                return item.date;
+            }
+        });
+
+        /* ===================== DONUT ===================== */
+        if (chartType === "donut") {
+            chart.setOptions({
+                title: {
+                    text: "Platform Fee Distribution",
+                    color: "#7c3aed",
+                    font: "bold 14px 'Inter'"
+                },
+                legend: { position: "bottom" },
+                series: [{
+                    type: "donut",
+                    data: data.map(x => ({
+                        category: x.date,
+                        value: x.adminComission
+                    })),
+                    labels: {
+                        visible: true,
+                        template: "₹#= kendo.toString(value, 'n0') #"
+                    }
+                }],
+                tooltip: {
+                    visible: true,
+                    template: "₹ #= kendo.toString(value, 'n0') #"
+                }
+            });
+            return;
+        }
+
+        var isStacked = chartType === "stacked";
+
+        chart.setOptions({
+            title: {
+                text: "Orders vs Platform Fee",
+                color: "#9a3412",
+                font: "bold 14px 'Inter'"
+            },
+
+            seriesDefaults: {
+                type: isStacked ? "column" : chartType,
+                stack: isStacked,
+                style: chartType === "line" ? "smooth" : "normal",
+                markers: {
+                    visible: chartType === "line",
+                    size: 6
+                }
+            },
+
+            series: [
+                {
+                    name: "Orders",
+                    data: data.map(x => x.orders),
+                    axis: "orders",
+                    color: "#f97316",
+                    stack: isStacked ? "orders" : false,
+                    tooltip: {
+                        template: "Orders: <strong>#= value #</strong>"
+                    }
+                },
+                {
+                    name: "Platform Fee (₹)",
+                    data: data.map(x => x.adminComission),
+                    axis: "revenue",
+                    color: "#8b5cf6",
+                    stack: isStacked ? "revenue" : false,
+                    tooltip: {
+                        template: "₹ <strong>#= value #</strong>"
+                    }
+                }
+            ],
+
+            categoryAxis: {
+                categories: categories
+            },
+            valueAxis: [
+                {
+                    name: "orders",
+                    title: {
+                        text: "Orders",
+                        color: "#f97316",
+                        font: "bold 12px 'Inter'"
+                    }
+                },
+                {
+                    name: "revenue",
+                    title: {
+                        text: "Platform Fee (₹)",
+                        color: "#8b5cf6",
+                        font: "bold 12px 'Inter'"
+                    },
+                    labels: {
+                        format: "₹{0}"
+                    },
+                    opposite: true
+                }
+            ]
+        });
+    }
+
+    // Change commission period
+    function changeCommissionPeriod(days) {
+        // Update active button
+        $('.commission-period-btn').removeClass('active');
+        $(`.commission-period-btn[data-period="${days}"]`).addClass('active');
+
+        // Get current chart type
+        console.log($('.commission-type-btn.active').attr('title'));
+        var chartType = $('.commission-type-btn.active').attr('title');
+
+        // Reload chart with new period
+        loadCommissionStatistics(days, chartType);
+    }
+
+    // Change commission chart type
+    function changeCommissionChartType(type) {
+        // Update active button
+        $('.commission-type-btn').removeClass('active');
+        console.log(type);
+        $(`.commission-type-btn[title="${type}"]`).addClass('active');
+
+        // Get current period
+        var period = $('.commission-period-btn.active').data('period');
+
+        // Reload chart with new type
+        loadCommissionStatistics(period, type);
+    }
+
+    // Show empty state for commission chart
+    function showCommissionEmptyState() {
+        var chart = $("#commissionChart").data("kendoChart");
+        chart.setOptions({
+            title: {
+                text: "No Commission Data Available",
+                color: "#94a3b8"
+            },
+            series: []
+        });
+    }
+
+    // Show error state for commission chart
+    function showCommissionErrorState() {
+        var chart = $("#commissionChart").data("kendoChart");
+        chart.setOptions({
+            title: {
+                text: "Error Loading Commission Data",
+                color: "#ef4444"
+            },
+            series: []
+        });
+    }
+
+    // Message Form Submission
+    $("#messageForm").submit(function (e) {
+        e.preventDefault();
+
+        var token = "@Context.Session.GetString("Token")";
+        var formData = {
+            recipientType: $("#recipientType").val(),
+            recipient: $("#recipient").val(),
+            subject: $("#subject").val(),
+            message: $("#message").val()
+        };
+
+        if (!formData.recipientType) {
+            Swal.fire("Error", "Please select recipient type", "error");
+            return;
+        }
+
+        $.ajax({
+            url: "http://localhost:5245/api/Admin/sendMessage",
+            type: "POST",
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            },
+            data: JSON.stringify(formData),
+            success: function (response) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Message Sent!",
+                    text: "Your message has been sent successfully.",
+                    timer: 1800,
+                    showConfirmButton: false
+                });
+                $("#messageForm")[0].reset();
+            },
+            error: function () {
+                Swal.fire("Error", "Failed to send message", "error");
+            }
+        });
+    });
+</script>

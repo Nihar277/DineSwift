@@ -1,0 +1,969 @@
+@{
+  ViewData["Title"] = "Delivery Boy Profile";
+  int customerId = Context.Session.GetInt32("CustomerId") ?? 0;
+  Layout = "_deliveryLayout";
+}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@if (customerId == 0)
+{
+  <script>
+    window.location.href = "http://localhost:5030/";
+  </script>
+}
+<style>
+  :root {
+    /* Switched to orange dashboard palette */
+    --delivery-primary: #f97316;
+    /* primary orange */
+    --delivery-primary-dark: #ea580c;
+    /* darker orange */
+    --delivery-primary-light: #fff7ed;
+    /* pale orange background */
+    --text-dark: #1e293b;
+    --text-medium: #64748b;
+    --border-color: #fde8d6;
+    --bg-light: #fffaf0;
+  }
+
+  * {
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: linear-gradient(135deg, #fffaf0 0%, #ffffff 50%, #fff7ed 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Delivery specific background */
+  .delivery-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .delivery-3d {
+    position: absolute;
+    font-size: 70px;
+    opacity: 0.1;
+    animation: floatDelivery 20s ease-in-out infinite;
+  }
+
+  .delivery-3d:nth-child(1) {
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+  }
+
+  .delivery-3d:nth-child(2) {
+    top: 70%;
+    right: 15%;
+    animation-delay: 5s;
+  }
+
+  .delivery-3d:nth-child(3) {
+    top: 40%;
+    right: 5%;
+    animation-delay: 10s;
+  }
+
+  @@keyframes floatDelivery {
+
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+      transform: translateY(-20px) rotate(5deg);
+    }
+  }
+
+  .profile-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .profile-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 50px rgba(249, 115, 22, 0.08);
+    animation: cardSlide 0.6s ease-out;
+    border: 1px solid rgba(249, 115, 22, 0.08);
+  }
+
+  @@keyframes cardSlide {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.95) 0%, rgba(234, 88, 12, 0.95) 100%);
+    color: white;
+    padding: 35px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #fb923c 0%, #f97316 50%, #fb923c 100%);
+  }
+
+  .delivery-badge {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.15);
+    padding: 15px 25px;
+    border-radius: 50px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .delivery-badge::before {
+    content: '🚗';
+    font-size: 20px;
+  }
+
+  .header-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+  }
+
+  .brand-logo span {
+    font-size: 36px;
+    animation: logoPulse 3s ease-in-out infinite;
+  }
+
+  .card-header h3 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+  }
+
+  .card-header p {
+    margin: 8px 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 15px;
+  }
+
+  .profile-content {
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  /* Profile Image Section */
+  .profile-image-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: var(--delivery-primary-light);
+    border-radius: 15px;
+    border: 2px dashed var(--delivery-primary);
+  }
+
+  .image-container {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 5px solid white;
+    box-shadow: 0 10px 30px rgba(249, 115, 22, 0.12);
+    margin-bottom: 20px;
+  }
+
+  .profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+
+  .image-container:hover .profile-image {
+    transform: scale(1.05);
+  }
+
+  .image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(37, 99, 235, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    cursor: pointer;
+  }
+
+  .image-container:hover .image-overlay {
+    opacity: 1;
+  }
+
+  .upload-btn {
+    background: white;
+    color: var(--delivery-primary);
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+  }
+
+  .upload-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+  }
+
+  #profileUpload {
+    display: none;
+  }
+
+  .image-hint {
+    color: var(--text-medium);
+    font-size: 13px;
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  /* Form Styles */
+  .k-form {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .k-form .k-form-field {
+    margin-bottom: 25px;
+  }
+
+  .k-form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+  }
+
+  /* ===== KENDO INPUT WRAPPER ===== */
+  #deliveryProfileForm .k-input,
+  #deliveryProfileForm .k-textbox,
+  #deliveryProfileForm .k-dropdown,
+  #deliveryProfileForm .k-textarea {
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 4px;
+    background: white;
+    transition: all 0.25s ease;
+  }
+
+  /* ===== INNER INPUT (CLEAN) ===== */
+  #deliveryProfileForm .k-input-inner,
+  #deliveryProfileForm textarea {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 12px 14px;
+    font-size: 15px;
+    color: var(--text-dark);
+    width: 100%;
+  }
+
+  /* ===== FOCUS ONLY ON WRAPPER ===== */
+  #deliveryProfileForm .k-input:focus-within,
+  #deliveryProfileForm .k-dropdown:focus-within,
+  #deliveryProfileForm .k-textarea:focus-within {
+    border-color: var(--delivery-primary);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+  }
+
+  .k-textbox:focus,
+  .k-textarea:focus,
+  .k-dropdown:focus {
+    border-color: var(--delivery-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+  }
+
+  /* Email field - read only */
+  .email-readonly {
+    background: #f8f8f8;
+    color: #666;
+    cursor: not-allowed;
+  }
+
+  /* Gender Options */
+  .gender-options {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .gender-option {
+    flex: 1;
+    position: relative;
+  }
+
+  .gender-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .gender-option label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+    color: var(--text-medium);
+    background: white;
+    text-align: center;
+  }
+
+  .gender-option:nth-child(1) label::before {
+    content: '👨';
+  }
+
+  .gender-option:nth-child(2) label::before {
+    content: '👩';
+  }
+
+  .gender-option:nth-child(3) label::before {
+    content: '🧑';
+  }
+
+  .gender-option input[type="radio"]:checked+label {
+    background: var(--delivery-primary-light);
+    border-color: var(--delivery-primary);
+    color: var(--delivery-primary-dark);
+    font-weight: 600;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .k-button {
+    padding: 14px 30px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: var(--delivery-primary);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--delivery-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(249, 115, 22, 0.18);
+  }
+
+  .btn-secondary {
+    background: #6c757d;
+    color: white;
+    border-color: #6c757d;
+  }
+
+  .btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+  }
+
+  .btn-change-password {
+    background: linear-gradient(135deg, #fb923c, #f97316);
+    color: white;
+    border-color: #f97316;
+  }
+
+  .btn-change-password:hover {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    transform: translateY(-2px);
+  }
+
+  /* Notification */
+  .k-notification {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  /* Responsive */
+  @@media (max-width: 768px) {
+    .profile-container {
+      margin: 15px auto;
+      padding: 0 15px;
+    }
+
+    .profile-content {
+      padding: 20px;
+    }
+
+    .card-header {
+      padding: 25px 20px;
+    }
+
+    .delivery-badge {
+      position: relative;
+      right: auto;
+      top: auto;
+      transform: none;
+      margin-top: 15px;
+      display: inline-flex;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .gender-options {
+      flex-direction: column;
+    }
+
+    .image-container {
+      width: 140px;
+      height: 140px;
+    }
+  }
+</style>
+
+<!-- Delivery Boy Background -->
+<div class="delivery-background">
+  <div class="delivery-3d">🚗</div>
+  <div class="delivery-3d">📦</div>
+  <div class="delivery-3d">🚴</div>
+</div>
+
+<div class="profile-container">
+  <div class="profile-card">
+    <div class="card-header">
+      <div class="header-content">
+        <div class="brand-logo">
+          <span>🚗</span>
+          <h3>Delivery Partner Profile</h3>
+        </div>
+        <p>Manage your personal information and settings</p>
+      </div>
+      <div class="delivery-badge">Verified Delivery Partner</div>
+    </div>
+
+    <div class="profile-content">
+      <!-- Profile Image Upload -->
+      <div class="profile-image-section">
+        <div class="image-container">
+          <img id="previewProfile" class="profile-image" src="/Images/no-profile.png" alt="Profile Image" />
+          <div class="image-overlay">
+            <label for="profileUpload" class="upload-btn">
+              <i class="k-icon k-i-upload"></i> Change Photo
+            </label>
+          </div>
+        </div>
+        <input type="file" id="profileUpload" accept="image/*" />
+        <p class="image-hint">Max size: 2MB, Formats: JPG, PNG, JPEG</p>
+      </div>
+      <input type="hidden" id="c_customerid" value="@customerId" />
+
+      <!-- Profile Form -->
+      <div id="notification"></div>
+      <form id="deliveryProfileForm" onsubmit="return false;"></form>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button type="button" id="btnCancel" class="btn-secondary k-button">
+          <i class="k-icon k-i-cancel"></i> Cancel
+        </button>
+        <button type="button" id="btnChangePassword" class="btn-change-password k-button">
+          <i class="k-icon k-i-lock"></i> Change Password
+        </button>
+        <button type="button" id="btnUpdate" class="btn-primary k-button">
+          <i class="k-icon k-i-save"></i> Update Profile
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+@section Scripts {
+  <script>
+    // Using global orange "swellFire" notifications from layout for consistent UI
+  </script>
+
+  <script>
+    $(document).ready(function () {
+      const customerId = @customerId;
+      if (!customerId || customerId === 0) {
+        window.location.href = "http://localhost:5030/";
+        return;
+      }
+
+      function swellFire(message, options = {}) {
+        Swal.fire({
+          title: options.title || 'Message',
+          text: message,
+          icon: options.icon || 'info',
+          toast: options.toast || false,
+          position: options.position || 'center',
+          timer: options.timer || null,
+          showConfirmButton: !options.toast
+        });
+      }
+
+
+      // ================= Notification =================
+      $("#notification").kendoNotification({
+        position: { top: 20, right: 20 },
+        autoHideAfter: 3000,
+        stacking: "down"
+      });
+
+      // ================= LOAD PROFILE =================
+      loadDeliveryProfile();
+
+      function loadDeliveryProfile() {
+        // Cache-busting to ensure fresh data after updates
+        $.ajax({
+          url: "http://localhost:5245/api/delivery/" + customerId + "?_=" + new Date().getTime(),
+          type: "GET",
+          success: function (res) {
+            const profile = res && res.data ? res.data : res;
+            if (profile) {
+              // Support multiple possible response shapes
+              updateProfileImage(profile.c_image_url || profile.c_image || profile.c_profile_image_path);
+              initializeDeliveryForm(profile);
+            } else {
+              showNotification("Failed to load profile", "error");
+            }
+          },
+          error: function () {
+            showNotification("Profile load error", "error");
+          }
+        });
+      }
+
+      // ================= IMAGE PREVIEW =================
+      function updateProfileImage(imageNameOrUrl) {
+        if (!imageNameOrUrl) {
+          $("#previewProfile").attr("src", "/Images/no-profile.png");
+          return;
+        }
+
+        // If the API returned a full path or URL, use it directly
+        if (imageNameOrUrl.startsWith('/') || imageNameOrUrl.startsWith('http')) {
+          $("#previewProfile").attr("src", imageNameOrUrl + "?v=" + new Date().getTime());
+        } else {
+          $("#previewProfile").attr(
+            "src",
+            "/Images/customer/" + imageNameOrUrl + "?v=" + new Date().getTime()
+          );
+        }
+      }
+
+      // ================= KENDO FORM =================
+      function initializeDeliveryForm(data) {
+        // Destroy existing form
+        const existingForm = $("#deliveryProfileForm").data("kendoForm");
+        if (existingForm) {
+          existingForm.destroy();
+          $("#deliveryProfileForm").empty();
+        }
+
+        $("#deliveryProfileForm").kendoForm({
+          formData: data,
+          buttonsTemplate: "",
+          validatable: {
+            validateOnBlur: true,
+            validationSummary: false,
+            errorTemplate: "<span class='k-invalid-msg'>#: message #</span>"
+          },
+          items: [
+            {
+              type: "group",
+              layout: "grid",
+              grid: { cols: 2 },
+              items: [
+                {
+                  field: "c_fname",
+                  label: "First Name",
+                  validation: {
+                    required: { message: "First Name is required" }
+                  }
+                },
+                {
+                  field: "c_lname",
+                  label: "Last Name",
+                  validation: {
+                    required: { message: "Last Name is required" }
+                  }
+                }
+              ]
+            },
+            {
+              field: "c_email",
+              label: "Email",
+              editor: (c, o) =>
+                $("<input readonly class='k-textbox email-readonly' />")
+                  .attr("name", o.field)
+                  .val(o.model.c_email || "")
+                  .appendTo(c)
+            },
+            {
+              field: "c_phonenumber",
+              label: "Phone",
+              validation: {
+                required: { message: "Phone Number is required" },
+                pattern: { value: "^[6-9]\\d{9}$", message: "Invalid phone number" }
+              }
+            },
+            {
+              field: "c_gender",
+              label: "Gender",
+              editor: function (container, options) {
+                const genders = ["Male", "Female", "Other"];
+                const div = $('<div class="gender-options"></div>').appendTo(container);
+                genders.forEach(g => {
+                  div.append(
+                    `<div class="gender-option">
+                                                                    <input type="radio" name="${options.field}" value="${g}" id="gender_${g}" ${data.c_gender === g ? 'checked' : ''}>
+                                                                    <label for="gender_${g}"><span>${g}</span></label>
+                                                                </div>`
+                  );
+                });
+              },
+              validation: { required: { message: "Please select gender" } }
+            },
+            {
+              field: "c_address",
+              label: "Address",
+              editor: "TextArea",
+              validation: {
+                required: { message: "Address is required" }
+              }
+            },
+            {
+              type: "group",
+              layout: "grid",
+              grid: { cols: 2 },
+              items: [
+                // ================= STATE DROPDOWN =================
+                {
+                  field: "c_state",
+                  label: "State",
+                  editor: function (container, options) {
+                    $('<input name="' + options.field + '" data-bind="value:' + options.field + '" required data-required-msg="State is required" />')
+                      .appendTo(container)
+                      .kendoDropDownList({
+                        optionLabel: "Select State",
+                        dataTextField: "c_sname",
+                        dataValueField: "c_sname",
+                        dataSource: {
+                          transport: {
+                            read: "http://localhost:5245/api/restaurant/states"
+                          }
+                        },
+                        change: function () {
+                          const cityDDL = $("[name='c_city']").data("kendoDropDownList");
+                          if (cityDDL) {
+                            cityDDL.value("");
+                            cityDDL.enable(true);
+                            cityDDL.dataSource.read();
+                          }
+                        }
+                      });
+                  },
+                  validation: { required: true }
+                },
+                // ================= CITY DROPDOWN =================
+                {
+                  field: "c_city",
+                  label: "City",
+                  editor: function (container, options) {
+                    $('<input name="' + options.field + '" data-bind="value:' + options.field + '" required data-required-msg="City is required" />')
+                      .appendTo(container)
+                      .kendoDropDownList({
+                        optionLabel: "Select City",
+                        dataTextField: "cityname",
+                        dataValueField: "cityname",
+                        autoBind: false,
+                        enable: false,
+                        dataSource: {
+                          transport: {
+                            read: {
+                              url: function () {
+                                const stateDDL = $("[name='c_state']").data("kendoDropDownList");
+                                const stateData = stateDDL.dataSource.data();
+                                const selectedItem = stateData.find(s => s.c_sname === stateDDL.value());
+                                return "http://localhost:5245/api/restaurant/cities/" + (selectedItem ? selectedItem.id : 0);
+                              },
+                              dataType: "json"
+                            }
+                          }
+                        }
+                      });
+                  },
+                  validation: { required: true }
+                }
+              ]
+            },
+            {
+              field: "c_pincode",
+              label: "Pincode",
+              validation: {
+                required: { message: "Pincode is required" },
+                pattern: { value: "^\\d{6}$", message: "6 digit pincode required" }
+              }
+            }
+          ]
+        });
+
+        // Set State and City values after form initialization and bind data when widget is ready
+        setTimeout(() => {
+          const stateDDL = $("[name='c_state']").data("kendoDropDownList");
+          const cityDDL = $("[name='c_city']").data("kendoDropDownList");
+
+          if (stateDDL && data.c_state) {
+            stateDDL.value(data.c_state);
+
+            if (cityDDL && data.c_city) {
+              cityDDL.enable(true);
+              cityDDL.dataSource.read().then(function () {
+                cityDDL.value(data.c_city);
+              });
+            }
+          }
+
+          // Data bind after create (ensure the Kendo Form widget is initialized and supports value)
+          function bindFormWithRetry(attemptsLeft) {
+            const form = $("#deliveryProfileForm").data("kendoForm");
+            if (form && typeof form.value === 'function') {
+              try {
+                form.value(data);
+                return;
+              } catch (e) {
+                console.warn('Failed to apply form.value:', e);
+              }
+            }
+
+            if (attemptsLeft > 0) {
+              setTimeout(() => bindFormWithRetry(attemptsLeft - 1), 150);
+            } else {
+              console.warn('Unable to bind Kendo form after retries');
+            }
+          }
+
+          bindFormWithRetry(5);
+        }, 800);
+      }
+
+      // ================= IMAGE UPLOAD =================
+      $("#profileUpload").change(function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+          showNotification("Max 2MB allowed", "warning");
+          this.value = "";
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = e => $("#previewProfile").attr("src", e.target.result);
+        reader.readAsDataURL(file);
+      });
+
+      // ================= UPDATE PROFILE =================
+      $("#btnUpdate").click(function () {
+        // Disable immediately to prevent duplicate clicks
+        $("#btnUpdate").prop('disabled', true).addClass('k-state-disabled');
+
+        const form = $("#deliveryProfileForm").data("kendoForm");
+
+        if (!form || !form.validate()) {
+          showNotification("Fix validation errors", "warning");
+          $("#btnUpdate").prop('disabled', false).removeClass('k-state-disabled');
+          return;
+        }
+
+        // Build a FormData payload compatible with ProfileApi (expects multipart/form-data)
+        const fd = new FormData();
+
+        // Collect values from the kendo form / inputs
+        const firstName = $("[name='c_fname']").val() || "";
+        const lastName = $("[name='c_lname']").val() || "";
+        const email = $("[name='c_email']").val() || "";
+        const phone = $("[name='c_phonenumber']").val() || "";
+        const gender = $("input[name='c_gender']:checked").val() || "";
+        const address = $("[name='c_address']").val() || "";
+        const pincode = $("[name='c_pincode']").val() || "";
+
+        const stateDDL = $("[name='c_state']").data("kendoDropDownList");
+        const cityDDL = $("[name='c_city']").data("kendoDropDownList");
+
+        const stateText = stateDDL ? stateDDL.text() : ($("[name='c_state']").val() || "");
+        const cityText = cityDDL ? cityDDL.text() : ($("[name='c_city']").val() || "");
+
+        fd.append("c_customerid", customerId);
+        fd.append("c_fname", firstName);
+        fd.append("c_lname", lastName);
+        fd.append("c_email", email);
+        fd.append("c_phonenumber", phone);
+        fd.append("c_gender", gender);
+        fd.append("c_address", address);
+        fd.append("c_pincode", pincode);
+        fd.append("c_state", stateText);
+        fd.append("c_city", cityText);
+
+        // Image file (don't append to ProfileApi fd; we will upload via delivery endpoint first)
+        const img = $("#profileUpload")[0].files[0];
+
+        function callProfileApi(finalFd) {
+          // Disable update button while request is in-flight
+          $("#btnUpdate").prop('disabled', true).addClass('k-state-disabled');
+
+          $.ajax({
+            url: "http://localhost:5245/api/ProfileApi",
+            type: "POST",
+            data: finalFd,
+            processData: false,
+            contentType: false,
+            success: res => {
+              if (!res || res.success !== true) {
+                const msg = res && res.message ? res.message : 'Profile update failed';
+                swellFire(msg, { title: 'Update Failed', icon: 'error', toast: false });
+                $("#btnUpdate").prop('disabled', false).removeClass('k-state-disabled');
+                return;
+              }
+
+              swellFire(res.message || 'Your profile has been updated successfully.', { title: 'Profile Updated', icon: 'success', toast: true, timer: 1500, position: 'top-end' });
+
+              // Refresh profile image if returned
+              if (res.c_image_url || res.c_image || res.image) {
+                updateProfileImage(res.c_image_url || res.c_image || res.image);
+              }
+
+              // Immediately reload profile to reflect latest values (no artificial timeout)
+              loadDeliveryProfile();
+            },
+            error: xhr => {
+              let err = 'Validation failed. Please check all fields.';
+              if (xhr && xhr.responseJSON && xhr.responseJSON.message) err = xhr.responseJSON.message;
+              swellFire(err, { title: 'Update Failed', icon: 'error', toast: false });
+            },
+            complete: () => {
+              $("#btnUpdate").prop('disabled', false).removeClass('k-state-disabled');
+            }
+          });
+        }
+
+        if (img) {
+          // First upload the image to delivery endpoint which saves the file to MVC/wwwroot and updates DB
+          const imgFd = new FormData();
+          imgFd.append('CustomerId', customerId);
+          imgFd.append('ImageFile', img);
+
+          $.ajax({
+            url: "http://localhost:5245/api/delivery/update-image",
+            type: "POST",
+            data: imgFd,
+            processData: false,
+            contentType: false,
+            success: function (r) {
+              const deliveryResp = r && r.data ? r.data : r;
+
+              // Update preview if delivery API returned image info
+              if (deliveryResp && (deliveryResp.c_image_url || deliveryResp.c_image)) {
+                updateProfileImage(deliveryResp.c_image_url || deliveryResp.c_image);
+              }
+
+              // Now call ProfileApi to update other fields (without sending the file)
+              callProfileApi(fd);
+            },
+            error: function (err) {
+              console.warn('Delivery update-image failed', err);
+
+              // Even if image upload failed, proceed to update profile so other fields are saved
+              callProfileApi(fd);
+            }
+          });
+        } else {
+          // No image — just call ProfileApi directly
+          callProfileApi(fd);
+        }
+      });
+
+      // ================= CANCEL BUTTON =================
+      $("#btnCancel").click(() => {
+        location.reload();
+      });
+
+      // ================= CHANGE PASSWORD BUTTON =================
+      $("#btnChangePassword").click(() => {
+        // TODO: Implement change password page or modal
+        showNotification("Change password feature coming soon", "info");
+      });
+
+      // ================= NOTIFICATION HELPER =================
+      function showNotification(msg, type) {
+        $("#notification").data("kendoNotification").show(msg, type);
+      }
+    });
+  </script>
+}

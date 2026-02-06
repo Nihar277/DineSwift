@@ -1,0 +1,1237 @@
+@using Microsoft.Extensions.Configuration
+@{
+    Layout = "_Vendor";
+    var apiBaseUrl = ViewBag.ApiBaseUrl as string ?? "";
+    var restaurantId = ViewBag.RestaurantId ?? 0;
+}
+
+
+
+@section Styles {
+    <style>
+        /* =============================
+                                                                                       GLOBAL THEME
+                                                                                    ============================= */
+        :root {
+            @* --primary: #f97316;
+            --primary-dark: #ea580c;
+            --primary-soft: #fff7ed; *@
+
+                                                    --bg-page: #fffaf5;
+            --bg-card: #ffffff;
+
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+
+            --border-soft: #e5e7eb;
+            
+
+            --radius-lg: 18px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.25);
+
+            --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(180deg, #ffffff 0%, var(--bg-page) 100%);
+            color: var(--text-main);
+        }
+
+        /* =============================
+                                                                                       PAGE LAYOUT
+                                                                                    ============================= */
+        .menu-page {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding-bottom: 40px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* =============================
+                                                                                       HEADER
+                                                                                    ============================= */
+        .menu-header {
+            padding: 24px;
+            border-bottom: 1px solid #fde68a;
+        }
+
+        .menu-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .menu-title-block h2 {
+            margin: 0;
+            font-size: 1.85rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .menu-title-block span {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .menu-header-actions .btn-primary {
+            background: linear-gradient(135deg,
+                    hsl(var(--primary)) 0%,
+                    hsl(var(--primary-dark)) 100%) !important;
+            border: none !important;
+            color: #fff !important;
+            box-shadow: 0 6px 18px rgba(var(--primary-rgb), 0.35);
+        }
+
+        .menu-header-actions .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 26px rgba(var(--primary-rgb), 0.45);
+        }
+
+        /* =============================
+                                                                                       STATS
+                                                                                    ============================= */
+        .menu-header-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .menu-stat-card {
+            flex: 1;
+            background: linear-gradient(135deg, #fff7ed, #ffedd5);
+            border-radius: var(--radius-md);
+            padding: 16px 18px;
+        }
+
+        .menu-stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9a3412;
+            font-weight: 600;
+        }
+
+        .menu-stat-value {
+            margin-top: 6px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* =============================
+                                                                                       BODY GRID
+                                                                                    ============================= */
+        .menu-body {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 24px;
+        }
+
+        @@media(max - width: 992px) {
+            .menu-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* =============================
+                                                                                           FILTER PANEL
+                                                                                        ============================= */
+        .filter-panel {
+            background: linear-gradient(180deg, #fff7ed, #ffedd5);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            border: 1px solid #fed7aa;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .filter-header-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-header-subtitle {
+            font-size: 0.8rem;
+            color: #a16207;
+            margin-bottom: 14px;
+        }
+
+        .filter-section-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            border: 1px solid var(--primary);
+            background: #fff;
+            color: #9a3412;
+            cursor: pointer;
+            margin: 0 6px 6px 0;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-chip:hover {
+            transform: translateY(-1px);
+        }
+
+        .filter-chip.active {
+            background: hsl(var(--primary));
+            color: white;
+            box-shadow: 0 6px 14px rgba(249, 115, 22, 0.35);
+        }
+
+        /* =============================
+                                                                                           SEARCH
+                                                                                        ============================= */
+        /* SEARCH WRAPPER */
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        /* SEARCH INPUT */
+        .menu-search-input {
+            width: 100%;
+            padding: 12px 44px 12px 44px;
+            /* equal left & right spacing */
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-soft);
+            font-size: 0.95rem;
+            background: linear-gradient(#fff, #f9fafb);
+            transition: all 0.25s ease;
+        }
+
+        /* SEARCH ICON (LEFT) */
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            pointer-events: none;
+            /* IMPORTANT */
+        }
+
+        /* CLEAR BUTTON (RIGHT ❌) */
+        .search-clear {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: none;
+            background: #f3f4f6;
+            color: #6b7280;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        /* SHOW CLEAR BUTTON */
+        .search-clear.show {
+            display: flex;
+        }
+
+        /* HOVER EFFECT */
+        .search-clear:hover {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+
+
+        /* =============================
+                                                                                           GRID
+                                                                                        ============================= */
+        #grid-menu-items {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        /* Remove default borders */
+        #grid-menu-items,
+        #grid-menu-items * {
+            border: none !important;
+        }
+
+        /* Header */
+        #grid-menu-items .k-header {
+            background: transparent;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        /* Rows */
+        #grid-menu-items tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        #grid-menu-items tbody tr:hover {
+            background: #fff3e0;
+        }
+
+        /* Cells */
+        #grid-menu-items .k-table-td {
+            padding: 16px;
+            font-size: 0.9rem;
+        }
+
+        /* Alternate rows */
+        #grid-menu-items tbody tr:nth-child(even) {
+            background: #fffaf5;
+        }
+
+        /* =============================
+                                                                                           FOOD IMAGE
+                                                                                        ============================= */
+        .grid-food-img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #grid-menu-items tr:hover .grid-food-img {
+            transform: scale(1.03);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+        }
+
+        /* =============================
+                                                                                           ACTION BUTTONS
+                                                                                        ============================= */
+        .btn-edit-row,
+        .btn-delete-row {
+            background: #fff;
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-sm);
+            padding: 6px 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit-row:hover {
+            background: var(--primary-soft);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-delete-row:hover {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        /* =============================
+                                                                                           TOGGLE SWITCH
+                                                                                        ============================= */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: #e5e7eb;
+            border-radius: 999px;
+            transition: background 0.25s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        .toggle-slider::before {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            top: 3px;
+            left: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.25s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background: hsl(var(--primary));
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+        }
+
+        .toggle-switch input:checked+.toggle-slider::before {
+            transform: translateX(20px);
+        }
+
+        /* =============================
+                                                                                           MODALS
+                                                                                        ============================= */
+        .modal-content {
+            border-radius: var(--radius-lg);
+            border: none;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header,
+        .modal-footer {
+            border-color: var(--border-soft);
+        }
+
+        /* =============================
+                                                                                           VEG / NON-VEG DOT
+                                                                                        ============================= */
+        .veg-dot,
+        .nonveg-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .veg-dot {
+            background: #22c55e;
+        }
+
+        .nonveg-dot {
+            background: #ef4444;
+        }
+    </style>
+}
+
+
+<div class="menu-page">
+    <div class="card menu-header">
+        <div class="menu-header-top">
+            <div class="menu-title-block">
+                <h2>Menu items</h2>
+                <span>Manage all the dishes in your restaurant in a clear, modern panel.</span>
+            </div>
+            <div class="menu-header-actions">
+                <button class="btn btn-primary" id="btn-open-add">
+                    <i class="fa-solid fa-plus me-1"></i> Add new dish
+                </button>
+            </div>
+        </div>
+        <div class="menu-header-stats">
+            <div class="menu-stat-card">
+                <div class="menu-stat-label">Total dishes</div>
+                <div class="menu-stat-value">
+                    <i class="fa-solid fa-bowl-food"></i>
+                    <span class="summary-badge" id="summary-total">
+                        <span>0 items</span>
+                    </span>
+                </div>
+            </div>
+            <div class="menu-stat-card">
+                <div class="menu-stat-label">Available now</div>
+                <div class="menu-stat-value">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span class="summary-badge" id="summary-available">
+                        <span>0 available</span>
+                    </span>
+                </div>
+            </div>
+            <div class="menu-stat-card d-none d-md-flex">
+                <div class="menu-stat-label">Highlights</div>
+                <div class="menu-stat-value">
+                    <i class="fa-solid fa-sparkles"></i>
+                    <span>Image-rich, grid-based control</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="menu-body">
+        <div class="filter-panel">
+            <div class="filter-header">
+                <div class="filter-header-title">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Filters</span>
+                </div>
+                <div class="filter-header-subtitle">
+                    Refine items by type, availability and cuisine.
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="filter-section-title">Food type</label>
+                <div>
+                    <button class="filter-chip active" data-type="">
+                        All
+                    </button>
+                    <button class="filter-chip" data-type="Veg">
+                        Veg
+                    </button>
+                    <button class="filter-chip" data-type="Non-Veg">
+                        Non-Veg
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="filter-section-title">Availability</label>
+                <div>
+                    <button class="filter-chip active" data-availability="">
+                        All
+                    </button>
+                    <button class="filter-chip" data-availability="true">
+                        Available
+                    </button>
+                    <button class="filter-chip" data-availability="false">
+                        Unavailable
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="filter-section-title d-flex align-items-center justify-content-between">
+                    <span>Cuisines</span>
+                    <span class="text-muted" style="font-size:0.75rem;">(optional)</span>
+                </label>
+                <div id="cuisine-chips" class="d-flex flex-wrap">
+                    <!-- dynamically filled -->
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="menu-list-header">
+                <div>
+                    <strong>All dishes</strong>
+                    <div class="text-muted" style="font-size:0.8rem;">Professional menu management grid. Click on the
+                        name for full details.</div>
+                </div>
+                <div class="search-wrapper" style="min-width:260px;">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="search-box" class="menu-search-input"
+                        placeholder="Search dishes by name or ingredient..." />
+                    <button type="button" class="search-clear" id="search-clear-btn" title="Clear search">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="grid-menu-items" style="min-height:500px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Add / Edit Dish Modal -->
+<div class="modal fade" id="dishModal" tabindex="-1" aria-labelledby="dishModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dishModalLabel">Add dish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="dish-form">
+                <div class="modal-body">
+                    <input type="hidden" id="dish-id" name="c_itemid" value="0" />
+                    <input type="hidden" id="restaurant-id" name="c_restaurantid" value="@restaurantId" />
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <div class="mb-2">
+                                <label class="form-label">Dish name</label>
+                                <input class="form-control" name="c_name" id="c_name" required maxlength="100" />
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Cuisine</label>
+                                <select class="form-select" name="c_category" id="c_category" required>
+                                    <option value="">Select cuisine</option>
+                                </select>
+                                <small class="text-muted d-block mt-1" style="font-size:0.75rem;">
+                                    Choose from available cuisines only.
+                                </small>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="c_description" id="c_description" rows="3" required
+                                    maxlength="500" placeholder="Describe the dish in a tasty way"></textarea>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Ingredients</label>
+                                <textarea class="form-control" name="c_ingredients" id="c_ingredients" rows="2" required
+                                    maxlength="300" placeholder="e.g. Paneer, Onion, Capsicum"></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-2">
+                                    <label class="form-label">Price (₹)</label>
+                                    <input type="number" class="form-control" name="c_price" id="c_price" min="1"
+                                        max="100000" required />
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label class="form-label">Type</label>
+                                    <select class="form-select" name="c_type" id="c_type" required>
+                                        <option value="">Select type</option>
+                                        <option value="Veg">Veg</option>
+                                        <option value="Non-Veg">Non-Veg</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-2 d-flex align-items-end">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="c_isavailable"
+                                            name="c_isavailable" checked>
+                                        <label class="form-check-label" for="c_isavailable">Available</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Food image</label>
+                            <div class="mb-2">
+                                <img id="image-preview" src="https://picsum.photos/260/180" class="img-preview w-100" />
+                            </div>
+                            <input type="file" class="form-control" id="c_imageurlPicture" name="c_imageurlPicture"
+                                accept="image/*" />
+                            <small class="text-muted d-block mt-1" style="font-size:0.75rem;">
+                                JPG/PNG/WEBP, max 2MB. A bright, clear photo works best.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="dish-submit-btn">
+                        Save dish
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Dish Detail Modal -->
+<div class="modal fade" id="dishDetailModal" tabindex="-1" aria-labelledby="dishDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dishDetailModalLabel">Dish details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <img id="detail-image" src="https://picsum.photos/320/220"
+                            class="img-fluid rounded-3 shadow-sm" />
+
+                    </div>
+                    <div class="col-md-7">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <div id="detail-type-dot"></div>
+                            <h5 id="detail-name" class="mb-0"></h5>
+                        </div>
+                        <div class="text-muted mb-1" id="detail-category" style="font-size:0.85rem;"></div>
+                        <div class="fw-semibold mb-2">
+                            <span id="detail-price"></span>
+                        </div>
+                        <p id="detail-description" class="mb-2" style="font-size:0.9rem;"></p>
+                        <div class="mb-2">
+                            <strong>Ingredients:</strong>
+                            <div id="detail-ingredients" style="font-size:0.85rem;"></div>
+                        </div>
+                        <div id="detail-availability" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+
+        const OrangeSwal = Swal.mixin({
+            reverseButtons: false,
+            confirmButtonColor: '#f97316',
+            cancelButtonColor: '#64748b',
+            background: '#fff7ed',
+            color: '#1f2937',
+            iconColor: '#f97316',
+            customClass: {
+                popup: 'swal-orange-popup',
+                confirmButton: 'swal-orange-confirm',
+                cancelButton: 'swal-orange-cancel'
+            }
+        });
+
+        (function () {
+            const apiBase = "@apiBaseUrl".replace(/\/+$/, "");
+            const restaurantId = parseInt("@restaurantId");
+
+            let grid;
+            let cuisinesList = []; // Store cuisines globally
+
+            const $summaryTotal = $("#summary-total span");
+            const $summaryAvailable = $("#summary-available span");
+
+            @* function buildImageUrl(item) {
+                if (!item.c_imageurl) {
+                    return "https://picsum.photos/300/200";
+                }
+                return `/Images/restaurant/dishes/${item.c_restaurantid}/${item.c_imageurl}`;
+            } *@
+
+                                    function buildImageUrl(item) {
+                    if (!item.c_imageurl) {
+                        return "https://picsum.photos/300/200";
+                    }
+
+                    return `/Images/restaurant/dishes/${item.c_restaurantid}/${item.c_imageurl}?v=${new Date().getTime()}`;
+                }
+
+            function refreshSummary() {
+                if (!grid) return;
+                const data = grid.dataSource.data().toJSON();
+                const total = data.length;
+                const available = data.filter(x => x.c_isavailable).length;
+                $summaryTotal.text(`${total} item${total !== 1 ? "s" : ""}`);
+                $summaryAvailable.text(`${available} available`);
+            }
+
+            function applyFilters() {
+                if (!grid) return;
+                const ds = grid.dataSource;
+                const search = $("#search-box").val().toLowerCase();
+                const type = $(".filter-chip[data-type].active").attr("data-type") || "";
+                const availabilityStr = $(".filter-chip[data-availability].active").attr("data-availability");
+                const cuisine = $(".filter-chip[data-cuisine].active").attr("data-cuisine") || "";
+
+                const filters = [];
+
+                if (search) {
+                    filters.push({
+                        logic: "or",
+                        filters: [
+                            { field: "c_name", operator: "contains", value: search },
+                            { field: "c_ingredients", operator: "contains", value: search }
+                        ]
+                    });
+                }
+                if (type) {
+                    filters.push({ field: "c_type", operator: "eq", value: type });
+                }
+                // Handle availability filter - only apply if not "All" (empty string)
+                if (availabilityStr !== undefined && availabilityStr !== "" && availabilityStr !== null) {
+                    // Convert string "true"/"false" to boolean - handle both string and boolean values
+                    let isAvailable;
+                    if (typeof availabilityStr === "string") {
+                        isAvailable = availabilityStr.toLowerCase() === "true";
+                    } else {
+                        isAvailable = Boolean(availabilityStr);
+                    }
+                    filters.push({ field: "c_isavailable", operator: "eq", value: isAvailable });
+                }
+                if (cuisine) {
+                    filters.push({ field: "c_category", operator: "contains", value: cuisine });
+                }
+
+                // Apply filters or clear all filters
+                if (filters.length > 0) {
+                    ds.filter({ logic: "and", filters: filters });
+                } else {
+                    ds.filter({});
+                }
+            }
+
+            function fetchCuisines() {
+                if (!apiBase) return;
+                $.ajax({
+                    url: `${apiBase}/FoodItem/cuisines`,
+                    method: "GET",
+                    success: function (data) {
+                        if (!Array.isArray(data)) return;
+
+                        // Store cuisines globally
+                        cuisinesList = data;
+
+                        // Populate filter chips
+                        const $wrap = $("#cuisine-chips");
+                        $wrap.empty();
+                        data.forEach(c => {
+                            const chip = $(`<button class="filter-chip" data-cuisine="${c}">${c}</button>`);
+                            $wrap.append(chip);
+                        });
+
+                        // Populate cuisine dropdown in form
+                        populateCuisineDropdown();
+                    }
+                });
+            }
+
+            function populateCuisineDropdown(selectedValue = "") {
+                const $categorySelect = $("#c_category");
+                $categorySelect.empty();
+                $categorySelect.append('<option value="">Select cuisine</option>');
+                cuisinesList.forEach(c => {
+                    const selected = c === selectedValue ? 'selected' : '';
+                    $categorySelect.append(`<option value="${c}" ${selected}>${c}</option>`);
+                });
+            }
+
+            function resetDishForm() {
+                // Reset cuisine dropdown to empty selection
+                populateCuisineDropdown();
+
+                $("#dish-id").val(0);
+                $("#c_name").val("");
+                $("#c_description").val("");
+                $("#c_ingredients").val("");
+                $("#c_price").val("");
+                $("#c_type").val("");
+                $("#c_isavailable").prop("checked", true);
+                $("#c_imageurlPicture").val("");
+                $("#image-preview").attr("src", "https://picsum.photos/260/180");
+                $("#dishModalLabel").text("Add dish");
+                $("#dish-submit-btn").text("Save dish");
+            }
+
+            function openEditModal(itemId) {
+                if (!grid) return;
+                const item = grid.dataSource.get(itemId);
+                if (!item) return;
+
+                // Ensure cuisine dropdown is populated before setting value
+                populateCuisineDropdown(item.c_category);
+
+                $("#dish-id").val(item.c_itemid);
+                $("#c_name").val(item.c_name);
+                $("#c_description").val(item.c_description);
+                $("#c_ingredients").val(item.c_ingredients);
+                $("#c_price").val(item.c_price);
+                $("#c_type").val(item.c_type);
+                $("#c_isavailable").prop("checked", item.c_isavailable);
+                $("#image-preview").attr("src", buildImageUrl(item));
+                $("#dishModalLabel").text("Edit dish");
+                $("#dish-submit-btn").text("Update dish");
+                const modal = new bootstrap.Modal(document.getElementById("dishModal"));
+                modal.show();
+            }
+
+            function openDetailsModal(itemId) {
+                if (!grid) return;
+                const item = grid.dataSource.get(itemId);
+                if (!item) return;
+                $("#detail-name").text(item.c_name);
+                $("#detail-category").text(item.c_category);
+                $("#detail-price").text(`₹${item.c_price}`);
+                $("#detail-description").text(item.c_description);
+                $("#detail-ingredients").text(item.c_ingredients);
+                $("#detail-image").attr("src", buildImageUrl(item));
+
+                const $typeDot = $("#detail-type-dot");
+                $typeDot.removeClass().addClass(item.c_type === "Veg" ? "veg-dot" : "nonveg-dot");
+
+                $("#detail-availability").html(
+                    item.c_isavailable
+                        ? '<span class="badge bg-success-subtle text-success">Available</span>'
+                        : '<span class="badge bg-danger-subtle text-danger">Currently unavailable</span>'
+                );
+
+                const modal = new bootstrap.Modal(document.getElementById("dishDetailModal"));
+                modal.show();
+            }
+
+            function submitDishForm(e) {
+                e.preventDefault();
+                const id = parseInt($("#dish-id").val());
+                const formData = new FormData();
+                formData.append("c_itemid", id || 0);
+                formData.append("c_restaurantid", restaurantId);
+                formData.append("c_name", $("#c_name").val());
+                formData.append("c_description", $("#c_description").val());
+                formData.append("c_ingredients", $("#c_ingredients").val());
+                formData.append("c_category", $("#c_category").val());
+                formData.append("c_price", $("#c_price").val());
+                formData.append("c_type", $("#c_type").val());
+                formData.append("c_isavailable", $("#c_isavailable").is(":checked"));
+
+                const fileInput = $("#c_imageurlPicture")[0];
+                if (fileInput.files.length > 0) {
+                    formData.append("c_imageurlPicture", fileInput.files[0]);
+                } else if (!id) {
+                    alert("Please select a food image.");
+                    return;
+                }
+
+                const isEdit = !!id;
+                const url = `${apiBase}/FoodItem`;
+                const method = isEdit ? "PUT" : "POST";
+
+                $("#dish-submit-btn").prop("disabled", true);
+                @* success: function () {
+                        $("#dish-submit-btn").prop("disabled", false);
+                        bootstrap.Modal.getInstance(document.getElementById("dishModal")).hide();
+                        if (grid) {
+                            grid.dataSource.read();
+                        }
+                    }, *@
+                    $.ajax({
+                        url: url,
+                        method: method,
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function () {
+                            $("#dish-submit-btn").prop("disabled", false);
+                            bootstrap.Modal.getInstance(document.getElementById("dishModal")).hide();
+
+                            OrangeSwal.fire({
+                                icon: 'success',
+                                title: id ? 'Dish Updated' : 'Dish Added',
+                                text: id
+                                    ? 'Dish updated successfully'
+                                    : 'Dish added successfully',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+
+                            if (grid) grid.dataSource.read();
+                        },
+                        error: function (xhr) {
+                            $("#dish-submit-btn").prop("disabled", false);
+
+                            OrangeSwal.fire({
+                                icon: 'error',
+                                title: 'Update Failed',
+                                text: xhr.responseText || 'Something went wrong'
+                            });
+                        }
+                    });
+            }
+
+            function deleteItem(itemId) {
+                OrangeSwal.fire({
+                    title: 'Delete Item?',
+                    text: 'Are you Sure ?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Delete',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (!result.isConfirmed) return;
+                    
+
+                    $.ajax({
+                        url: `${apiBase}/FoodItem?id=${itemId}`,
+                        method: "DELETE",
+                        success: function () {
+                            if (grid) {
+                                grid.dataSource.read();
+                            }
+                        },
+                        error: function () {
+                            alert("Failed to delete dish.");
+                        }
+                    });
+                });
+            }
+
+                    function toggleConfirm(isEnable, callback, rollback) {
+
+                        OrangeSwal.fire({
+                            title: 'Change Status?',
+                            text: isEnable
+                                ? 'Do you want to enable this item?'
+                                : 'Do you want to disable this item?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                callback();
+                            } else {
+                                rollback(); // checkbox revert
+                            }
+                        });
+                    }
+
+                                function toggleAvailability(itemId, newValue, $checkbox) {
+                        $.ajax({
+                            url: `${apiBase}/FoodItem/availability/${itemId}?isAvailable=${newValue}`,
+                            method: "PATCH",
+                            success: function () {
+                                if (grid) {
+                                    grid.dataSource.read();
+                                }
+                            },
+                            error: function () {
+                                alert("Failed to update availability.");
+                                $checkbox.prop("checked", !newValue);
+                            }
+                        });
+                    }
+
+                                function initGrid() {
+                        if (!apiBase || !restaurantId) {
+                            console.error("ApiBaseUrl or RestaurantId not configured.");
+                            return;
+                        }
+
+                        const dataSource = new kendo.data.DataSource({
+                            transport: {
+                                read: {
+                                    url: `${apiBase}/FoodItem/${restaurantId}`,
+                                    dataType: "json"
+                                }
+                            },
+                            schema: {
+                                model: {
+                                    id: "c_itemid",
+                                    fields: {
+                                        c_itemid: { type: "number" },
+                                        c_restaurantid: { type: "number" },
+                                        c_name: { type: "string" },
+                                        c_description: { type: "string" },
+                                        c_ingredients: { type: "string" },
+                                        c_category: { type: "string" },
+                                        c_imageurl: { type: "string" },
+                                        c_price: { type: "number" },
+                                        c_isavailable: { type: "boolean" },
+                                        c_type: { type: "string" }
+                                    }
+                                }
+                            },
+                            pageSize: 10
+                        });
+
+                        $("#grid-menu-items").kendoGrid({
+                            dataSource: dataSource,
+                            sortable: true,
+                            filterable: false,
+                            resizable: true,
+                            pageable: {
+                                pageSizes: [10, 25, 50],
+                                buttonCount: 3,
+                                refresh: true
+                            },
+                            dataBound: function () {
+                                refreshSummary();
+                            },
+                            noRecords: {
+                                template: "No dishes yet. Use 'Add new dish' to create your first item."
+                            },
+                            columns: [
+                                {
+                                    title: "Image",
+                                    width: 120,
+                                    template: function (dataItem) {
+                                        const url = buildImageUrl(dataItem);
+                                        return `
+                                                                                                                                    <img src="${url}"
+                                                                                                                                         class="grid-food-img"
+                                                                                                                                         alt="${kendo.htmlEncode(dataItem.c_name || '')}" />`;
+                                    }
+
+                                },
+                                {
+                                    field: "c_name",
+                                    title: "Dish",
+                                    template: function (dataItem) {
+                                        return `<div class="d-flex flex-column">
+                                                                                                                                                                                    <a href="javascript:void(0);" class="link-detail dish-name-link" data-id="${dataItem.c_itemid}">
+                                                                                                                                                                                        ${kendo.htmlEncode(dataItem.c_name || "")}
+                                                                                                                                                                                    </a>
+                                                                                                                                                                                    <span class="food-category">${kendo.htmlEncode(dataItem.c_category || "")}</span>
+                                                                                                                                                                                </div>`;
+                                    }
+                                },
+                                {
+                                    field: "c_description",
+                                    title: "Description",
+                                    width: 250,
+                                    template: function (dataItem) {
+                                        const text = dataItem.c_description || "";
+                                        const short = text.length > 90 ? text.substring(0, 87) + "..." : text;
+                                        return `<span class="food-meta-small" title="${kendo.htmlEncode(text)}">
+                                                                                                                                                                                    ${kendo.htmlEncode(short)}
+                                                                                                                                                                                </span>`;
+                                    }
+                                },
+                                {
+                                    field: "c_ingredients",
+                                    title: "Ingredients",
+                                    width: 230,
+                                    template: function (dataItem) {
+                                        const text = dataItem.c_ingredients || "";
+                                        const short = text.length > 90 ? text.substring(0, 87) + "..." : text;
+                                        return `<span class="food-meta-small text-muted" title="${kendo.htmlEncode(text)}">
+                                                                                                                                                                                    ${kendo.htmlEncode(short)}
+                                                                                                                                                                                </span>`;
+                                    }
+                                },
+                                {
+                                    field: "c_price",
+                                    title: "Price",
+                                    width: 100,
+                                    template: function (dataItem) {
+                                        return `₹${dataItem.c_price || 0}`;
+                                    }
+                                },
+                                {
+                                    field: "c_type",
+                                    title: "Type",
+                                    width: 110,
+                                    template: function (dataItem) {
+                                        const type = dataItem.c_type || "";
+                                        const icon = type === "Veg"
+                                            ? "/Images/icons/veg.png"
+                                            : "/Images/icons/nonveg.png";
+                                        return `<div class="d-flex align-items-center gap-2">
+                                                                                                                                                                                    <img src="${icon}" alt="${kendo.htmlEncode(type)}" class="veg-type-icon" width="35px" />
+                                                                                                                                                                                    <span>${kendo.htmlEncode(type)}</span>
+                                                                                                                                                                                </div>`;
+                                    }
+                                },
+                                {
+                                    field: "c_isavailable",
+                                    title: "Available",
+                                    width: 120,
+                                    template: function (dataItem) {
+                                        const checked = dataItem.c_isavailable ? "checked" : "";
+                                        return `
+                                                                                                                    <label class="toggle-switch">
+                                                                                                                        <input type="checkbox"
+                                                                                                                               class="kendo-availability"
+                                                                                                                               data-id="${dataItem.c_itemid}"
+                                                                                                                               ${checked}>
+                                                                                                                        <span class="toggle-slider"></span>
+                                                                                                                    </label>`;
+                                    }
+                                },
+                                {
+                                    title: "Actions",
+                                    width: 140,
+                                    template: function (dataItem) {
+                                        return `<button type="button" class="btn btn-sm btn-light btn-edit-row" data-id="${dataItem.c_itemid}">
+                                                                                                                                                                                    <i class="fa-solid fa-pen"></i>
+                                                                                                                                                                                </button>
+                                                                                                                                                                                <button type="button" class="btn btn-sm btn-light text-danger btn-delete-row" data-id="${dataItem.c_itemid}">
+                                                                                                                                                                                    <i class="fa-solid fa-trash"></i>
+                                                                                                                                                                                </button>`;
+                                    }
+                                }
+                            ]
+                        });
+
+                        grid = $("#grid-menu-items").data("kendoGrid");
+                    }
+
+                                $(document).ready(function () {
+                        $("#btn-open-add").on("click", function () {
+                            resetDishForm();
+                            const modal = new bootstrap.Modal(document.getElementById("dishModal"));
+                            modal.show();
+                        });
+
+                        $("#c_imageurlPicture").on("change", function (evt) {
+                            const file = evt.target.files[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                $("#image-preview").attr("src", e.target.result);
+                            };
+                            reader.readAsDataURL(file);
+                        });
+
+                        $("#search-box").on("input", function () {
+                            const hasValue = $(this).val().length > 0;
+                            $("#search-clear-btn").toggleClass("show", hasValue);
+                            applyFilters();
+                        });
+
+                        $("#search-clear-btn").on("click", function () {
+                            $("#search-box").val("");
+                            $(this).removeClass("show");
+                            applyFilters();
+                            $("#search-box").focus();
+                        });
+
+                        $(document).on("click", ".filter-chip[data-type]", function () {
+                            $(".filter-chip[data-type]").removeClass("active");
+                            $(this).addClass("active");
+                            applyFilters();
+                        });
+
+                        $(document).on("click", ".filter-chip[data-availability]", function () {
+                            $(".filter-chip[data-availability]").removeClass("active");
+                            $(this).addClass("active");
+                            applyFilters();
+                        });
+
+                        $(document).on("click", ".filter-chip[data-cuisine]", function () {
+                            const alreadyActive = $(this).hasClass("active");
+                            $(".filter-chip[data-cuisine]").removeClass("active");
+                            if (!alreadyActive) {
+                                $(this).addClass("active");
+                            }
+                            applyFilters();
+                        });
+
+                        $("#dish-form").on("submit", submitDishForm);
+
+                        $("#grid-menu-items").on("click", ".link-detail", function () {
+                            const id = parseInt($(this).data("id"));
+                            openDetailsModal(id);
+                        });
+
+                        $("#grid-menu-items").on("click", ".btn-edit-row", function () {
+                            const id = parseInt($(this).data("id"));
+                            openEditModal(id);
+                        });
+
+                        $("#grid-menu-items").on("click", ".btn-delete-row", function () {
+                            const id = parseInt($(this).data("id"));
+                            deleteItem(id);
+                        });
+
+                        $("#grid-menu-items").on("change", ".kendo-availability", function () {
+                            const id = parseInt($(this).data("id"));
+                            const isChecked = $(this).is(":checked");
+                            toggleAvailability(id, isChecked, $(this));
+                        });
+
+                        initGrid();
+                        fetchCuisines();
+                    });
+            }) ();
+    </script>
+}

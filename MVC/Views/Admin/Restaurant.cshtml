@@ -1,0 +1,1117 @@
+@{
+    Layout = "_Admin";
+}
+
+<style>
+    :root {
+        /* Professional Orange Color Palette */
+        --primary-orange: #f97316;
+        --deep-orange: #ea580c;
+        --orange-light: #fff7ed;
+        --primary-gradient: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+        --text-heading: #0f172a;
+        --text-body: #475569;
+        --border-color: #e2e8f0;
+        --accent-success: #10b981;
+        --accent-danger: #ef4444;
+        --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    }
+
+    body {
+        background-color: #f8fafc;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+
+
+    /* Header Design */
+    .menu-list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 30px;
+        background: white;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .menu-list-header strong {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-heading);
+        letter-spacing: -0.02em;
+        display: block;
+    }
+
+    .header-subtitle {
+        color: var(--text-body);
+        font-size: 0.875rem;
+        margin-top: 2px;
+    }
+
+    /* Professional Search Bar */
+    .search-wrapper {
+        position: relative;
+        background: #f1f5f9;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        width: 300px;
+    }
+
+    .search-wrapper:focus-within {
+        border-color: var(--primary-orange);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
+        width: 340px;
+    }
+
+    .search-icon {
+        color: #94a3b8;
+        margin-right: 10px;
+    }
+
+    .menu-search-input {
+        border: none;
+        background: transparent;
+        font-weight: 500;
+        outline: none;
+        width: 100%;
+        color: var(--text-heading);
+    }
+
+    /* Kendo Grid Theming */
+    #grid-menu-items {
+        border: none !important;
+    }
+
+    .k-grid-header {
+        background: #fff !important;
+    }
+
+    .k-grid-header th.k-header {
+        color: #64748b !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.05em;
+        padding: 15px 20px !important;
+        border-bottom: 2px solid #f1f5f9 !important;
+    }
+
+    .k-grid td {
+        padding: 16px 20px !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+    }
+
+    .k-grid tr:hover {
+        background-color: var(--orange-light) !important;
+    }
+
+    /* Custom UI Components */
+    .res-identity {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .restaurant-img {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        object-fit: cover;
+        border: 1px solid var(--border-color);
+    }
+
+    .status-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .tag-open {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .tag-closed {
+        background: #d2e8fe;
+        color: #475569;
+    }
+
+    /* Action Buttons */
+    .btn-detail-group {
+        display: flex;
+        gap: 6px;
+    }
+
+    .btn-icon-alt {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: white;
+        color: #64748b;
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .btn-icon-alt:hover {
+        border-color: var(--primary-orange);
+        color: var(--primary-orange);
+        background: var(--orange-light);
+    }
+
+    .btn-status-toggle {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 12px;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+        min-width: 100px;
+    }
+
+    .btn-active-state {
+        background: #d2e8fe;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-active-state:hover {
+        background: #e2e8f0;
+        color: #1f2937;
+        transform: translateY(-1px);
+    }
+
+    .btn-active-state:hover {
+        @* border-color: #f97316; *@
+        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.08);
+    }
+
+
+    @@media (max-width: 768px) {
+        .menu-list-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .search-wrapper {
+            width: 100% !important;
+        }
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 18px;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+        margin: 24px;
+        overflow: hidden;
+        border: none;
+    }
+
+    .menu-list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 26px;
+        background: linear-gradient(135deg, #fff7ed, #ffedd5);
+        border-bottom: 1px solid #fed7aa;
+    }
+
+    .menu-list-header strong {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #9a3412;
+    }
+
+    .header-subtitle {
+        font-size: 0.85rem;
+        color: #92400e;
+    }
+
+    .search-wrapper {
+        position: relative;
+        width: 280px;
+        background: #ffffff;
+        border-radius: 999px;
+        padding: 8px 16px;
+        border: 2px solid #fed7aa;
+        display: flex;
+        align-items: center;
+        transition: all 0.25s ease;
+    }
+
+    .search-wrapper:focus-within {
+        border-color: #f97316;
+        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15);
+    }
+
+    .menu-search-input {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 0.9rem;
+        width: 100%;
+        margin-left: 8px;
+    }
+
+    .k-grid-header th.k-header {
+        background: transparent !important;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6b7280 !important;
+        padding: 14px 18px !important;
+    }
+
+    .k-grid td {
+        padding: 16px 18px !important;
+        font-size: 0.9rem;
+    }
+
+    .k-grid tr:hover {
+        background: #fff7ed !important;
+        transform: scale(1.002);
+        transition: all 0.2s ease;
+    }
+
+    .k-grid tbody tr:nth-child(even) {
+        background: #fffaf5;
+    }
+
+    .status-tag {
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .tag-open {
+        background: linear-gradient(135deg, #ffedd5, #fed7aa);
+        color: #9a3412;
+    }
+
+    .btn-icon-alt {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #fff7ed;
+        border: 1px solid #f97316;
+        color: #ea580c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.25s ease;
+    }
+
+    .btn-icon-alt:hover {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    .btn-status-toggle {
+        border-radius: 999px;
+        padding: 8px 18px;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    .btn-active-state {
+        linear-gradient(135deg, #22c55e, #f1f5f9)
+        color: ##475569;
+    }
+
+    .btn-inactive-state {
+        background: linear-gradient(135deg, #fb923c, #ea580c);
+        color: #fff;
+    }
+
+
+    .k-window-titlebar {
+        background: linear-gradient(135deg, #f97316, #ea580c) !important;
+        color: #fff !important;
+        font-weight: 700;
+    }
+
+
+    .k-form input[readonly] {
+        background: #fff7ed !important;
+        border-radius: 12px !important;
+        border: 1px solid #fed7aa !important;
+    }
+
+    /* ===============================
+   DELIVERY PARTNER STATUS
+================================ */
+
+.delivery-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* AVAILABLE */
+.delivery-status.available {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    color: #15803d;
+}
+
+.delivery-status.available .status-dot {
+    width: 10px;
+    height: 10px;
+    background: #22c55e;
+    border-radius: 50%;
+    position: relative;
+}
+
+/* Pulsing animation */
+.delivery-status.available .status-dot::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.35);
+    animation: pulse 1.6s infinite;
+}
+
+/* NOT AVAILABLE */
+.delivery-status.offline {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.delivery-status.offline .status-dot {
+    width: 10px;
+    height: 10px;
+    background: #94a3b8;
+    border-radius: 50%;
+}
+
+/* Pulse animation */
+@@keyframes pulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.7;
+    }
+    70% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* ===============================
+   DASHBOARD CARDS (RESTAURANT)
+================================ */
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* ✅ 3 cards per row */
+    gap: 18px;
+    padding: 20px 26px;
+}
+
+@@media (max-width: 1024px) {
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr); /* tablet */
+    }
+}
+
+@@media (max-width: 600px) {
+    .stats-row {
+        grid-template-columns: 1fr; /* mobile */
+    }
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #ffffff, #fff7ed);
+    border-radius: 16px;
+    padding: 20px;
+    border-left: 6px solid var(--primary-orange);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    transition: 0.25s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+}
+
+.stat-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.stat-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #fff7ed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: #ea580c;
+}
+
+.stat-title {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #9a3412;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 900;
+}
+
+/* Card variants */
+.stat-card.total .stat-value { color: #f97316; }
+.stat-card.success { border-color: #ea580c; }
+.stat-card.success .stat-value { color: #c2410c; }
+
+.stat-card.warning { border-color: #9a3412; }
+.stat-card.warning .stat-value { color: #9a3412; }
+
+.stat-card.info { border-color: #fb923c; }
+.stat-card.info .stat-value { color: #ea580c; }
+
+.stat-card.muted {
+    background: linear-gradient(135deg, #ffffff, #f1f5f9);
+    border-color: #e2e8f0;
+}
+.stat-card.muted .stat-value { color: #475569; }
+
+.stat-card.new {
+    border-color: #f97316;
+    background: linear-gradient(135deg, #ffffff, #ffedd5);
+}
+.stat-card.new .stat-value { color: #c2410c; }
+
+/* Responsive */
+@@media (max-width: 1200px) {
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+/* ===============================
+   SWEETALERT2 THEME (ORANGE UI)
+================================ */
+
+/* Popup container */
+.swal2-popup {
+    border-radius: 18px !important;
+    background: linear-gradient(135deg, #fff7ed, #ffffff) !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid #fed7aa !important;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Title */
+.swal2-title {
+    color: #9a3412 !important;
+    font-weight: 800 !important;
+    font-size: 1.4rem !important;
+}
+
+/* Text */
+.swal2-html-container,
+.swal2-content {
+    color: #475569 !important;
+    font-size: 0.95rem !important;
+}
+
+/* Icons */
+.swal2-icon.swal2-warning {
+    border-color: #f97316 !important;
+    color: #f97316 !important;
+}
+
+.swal2-icon.swal2-success {
+    border-color: #22c55e !important;
+    color: #22c55e !important;
+}
+
+.swal2-icon.swal2-error {
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+}
+
+/* Confirm Button (Primary – Orange) */
+.swal2-confirm {
+    background: linear-gradient(135deg, #f97316, #ea580c) !important;
+    color: #ffffff !important;
+    border-radius: 999px !important;
+    padding: 10px 24px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 8px 18px rgba(249, 115, 22, 0.35) !important;
+    transition: all 0.25s ease !important;
+}
+
+.swal2-confirm:hover {
+    background: linear-gradient(135deg, #ea580c, #c2410c) !important;
+    transform: translateY(-1px);
+}
+
+/* Cancel Button (Neutral) */
+.swal2-cancel {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    border-radius: 999px !important;
+    padding: 10px 22px !important;
+    font-weight: 700 !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+.swal2-cancel:hover {
+    background: #e2e8f0 !important;
+}
+
+/* Footer spacing */
+.swal2-actions {
+    gap: 12px !important;
+}
+
+/* Backdrop blur */
+.swal2-backdrop-show {
+    backdrop-filter: blur(6px);
+    background: rgba(15, 23, 42, 0.4) !important;
+}
+
+
+
+</style>
+
+
+<!-- RESTAURANT STATS -->
+<div class="stats-row">
+
+    <div class="stat-card total">
+        <div class="stat-header">
+            <i class="fa-solid fa-store stat-icon"></i>
+            <div class="stat-title">Total Restaurants</div>
+        </div>
+        <div class="stat-value" id="totalRestaurant">0</div>
+    </div>
+
+    <div class="stat-card success">
+        <div class="stat-header">
+            <i class="fa-solid fa-circle-check stat-icon"></i>
+            <div class="stat-title">Active</div>
+        </div>
+        <div class="stat-value" id="activeRestaurant">0</div>
+    </div>
+
+    <div class="stat-card warning">
+        <div class="stat-header">
+            <i class="fa-solid fa-circle-xmark stat-icon"></i>
+            <div class="stat-title">Inactive</div>
+        </div>
+        <div class="stat-value" id="inactiveRestaurant">0</div>
+    </div>
+
+    <div class="stat-card info">
+        <div class="stat-header">
+            <i class="fa-solid fa-door-open stat-icon"></i>
+            <div class="stat-title">Open</div>
+        </div>
+        <div class="stat-value" id="openRestaurant">0</div>
+    </div>
+
+    <div class="stat-card muted">
+        <div class="stat-header">
+            <i class="fa-solid fa-door-closed stat-icon"></i>
+            <div class="stat-title">Closed</div>
+        </div>
+        <div class="stat-value" id="closedRestaurant">0</div>
+    </div>
+
+    <div class="stat-card new">
+        <div class="stat-header">
+            <i class="fa-solid fa-calendar-day stat-icon"></i>
+            <div class="stat-title">Today Registered</div>
+        </div>
+        <div class="stat-value" id="todayRestaurant">0</div>
+    </div>
+
+</div>
+
+
+<div class="card">
+    <div class="menu-list-header">
+        <div>
+            <strong>Restaurant Network</strong>
+            <div class="header-subtitle">Manage partner status and business profiles</div>
+        </div>
+        <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="search-box" class="menu-search-input" placeholder="Search by name, city..." />
+            <button type="button" id="search-clear-btn"
+                style="display:none; border:none; background:none; cursor:pointer; color: #94a3b8;">
+                <i class="fa-solid fa-circle-xmark"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="grid-menu-items"></div>
+</div>
+
+<div id="addressModel">
+    <form id="addressFrm" class="p-4"></form>
+</div>
+<div id="accountModel">
+    <form id="accountFrm" class="p-4"></form>
+</div>
+<div id="ownerModel">
+    <form id="ownerFrm" class="p-4"></form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        loadGrid();
+        loadWindow();
+        loadFrm();
+
+        // Search Implementation
+        $("#search-box").on("keyup", function () {
+            var val = $(this).val();
+            var grid = $("#grid-menu-items").data("kendoGrid");
+            if (!grid) return;
+
+            if (val) {
+                grid.dataSource.filter({
+                    logic: "or",
+                    filters: [
+                        { field: "c_r_name", operator: "contains", value: val },
+                        { field: "c_r_email", operator: "contains", value: val },
+                        { field: "c_city", operator: "contains", value: val }
+                    ]
+                });
+                $("#search-clear-btn").show();
+            } else {
+                grid.dataSource.filter({});
+                $("#search-clear-btn").hide();
+            }
+        });
+
+        $("#search-clear-btn").click(function () {
+            $("#search-box").val("").focus();
+            $(this).hide();
+            $("#grid-menu-items").data("kendoGrid").dataSource.filter({});
+        });
+    });
+
+    function loadGrid() {
+        var token = "@Context.Session.GetString("Token")";
+        $.ajax({
+            url: "http://localhost:5245/api/Admin/getAllRestaurant",
+            type: "GET",
+            headers: { "Authorization": "Bearer " + token },
+            success: function (data) {
+                console.log(data);
+                // ---------- RESTAURANT CARD CALCULATIONS ----------
+                var total = data.length;
+
+                var active = data.filter(x => x.c_r_status === "active").length;
+                var inactive = data.filter(x => x.c_r_status !== "active").length;
+
+                var open = data.filter(x => x.c_r_isavailable === "yes").length;
+                var closed = data.filter(x => x.c_r_isavailable !== "yes").length;
+
+                // Today registered
+                var today = new Date().toISOString().split("T")[0];
+                var todayRegistered = data.filter(x =>
+                    x.c_created_time && x.c_created_time.startsWith(today)
+                ).length;
+
+                // ---------- UPDATE UI ----------
+                $("#totalRestaurant").text(total);
+                $("#activeRestaurant").text(active);
+                $("#inactiveRestaurant").text(inactive);
+                $("#openRestaurant").text(open);
+                $("#closedRestaurant").text(closed);
+                $("#todayRestaurant").text(todayRegistered);
+
+
+
+                $("#grid-menu-items").kendoGrid({
+                    dataSource: { data: data, schema: { model: { id: "c_r_id" } }, pageSize: 5 },
+                    sortable: true,
+                    filterable: true,
+                    groupable: true,
+                    pageable: { refresh: true, pageSizes: [5, 10, 25], buttonCount: 3 },
+                    columns: [
+                        {
+                            field: "c_r_name", title: "Restaurant Details", width: 280,
+                            template: function (d) {
+                                return `<div class="res-identity">
+                                    <img src="/Images/restaurant/restaurantimages/${d.c_r_image}" class="restaurant-img" onerror="this.src='https://ui-avatars.com/api/?background=fff7ed&color=f97316&name=${d.c_r_name}'">
+                                    <div>
+                                        <div style="font-weight:700; color:var(--text-heading); font-size:14px;">${d.c_r_name}</div>
+                                        <div style="font-size:12px; color:var(--text-body);">${d.c_r_email}</div>
+                                    </div>
+                                </div>`;
+                            }
+                        },
+                        {
+                            field: "c_city", title: "Location", width: 150,
+                            template: (d) => `<div style="font-weight:600; color:var(--text-heading);">${d.c_city}</div><div style="font-size:11px; color:var(--text-body);">${d.c_state}</div>`
+                        },
+                        {
+                            field: "c_r_isavailable", title: "Open / Close", width: 120,
+                            template: (d) => {
+                                const isOpen = d.c_r_isavailable == "yes";
+                                return `
+                                <div class="delivery-status ${isOpen ? 'available' : 'offline'}">
+                                    <span class="status-dot"></span>
+                                    <span class="status-text">${isOpen ? 'Open' : 'Close'}</span>
+                                </div>`;
+                            }
+                        },
+                        {
+                            title: "Business Profiles", width: 160,
+                            template: (d) => `
+                                <div class="btn-detail-group">
+                                    <button class="btn-icon-alt" title="Location" onclick="showAddress(${d.c_r_id})"><i class="fa-solid fa-location-dot"></i></button>
+                                    <button class="btn-icon-alt" title="Banking" onclick="showAccount(${d.c_r_id})"><i class="fa-solid fa-building-columns"></i></button>
+                                    <button class="btn-icon-alt" title="Legal" onclick="showOwner(${d.c_r_id})"><i class="fa-solid fa-id-card"></i></button>
+                                </div>`
+                        },
+                         {
+                            title: "Status", width: 140,
+                            template: (d) => {
+                                const isOpen = d.c_r_status == "active";
+                                return `<span class="status-tag ${isOpen ? 'tag-open' : 'tag-closed'}">${isOpen ? 'Active' : 'Inactive'}</span>`;
+                            }
+                        },
+                        {
+                            title: "Actions", width: 140,
+                            template: (d) => d.c_r_status == "active"
+                                ? `<button class="btn-status-toggle btn-inactive-state" onclick="inactive(${d.c_customerid})">Suspend</button>`
+                                : `<button class="btn-status-toggle btn-active-state" onclick="active(${d.c_customerid})">Approve</button>`
+                        }
+                    ]
+                });
+            }
+        });
+    }
+
+    function loadWindow() {
+        $("#addressModel").kendoWindow({
+            width: "500px",
+            title: "Restaurant Address",
+            visible: false,
+            actions: [
+                "Close"
+            ],
+            modal: true
+        });
+
+        $("#accountModel").kendoWindow({
+            width: "500px",
+            title: "Restaurant Account",
+            visible: false,
+            actions: [
+                "Close"
+            ],
+            modal: true
+        });
+        $("#ownerModel").kendoWindow({
+            width: "500px",
+            title: "Restaurant Owner",
+            visible: false,
+            actions: [
+                "Close"
+            ],
+            modal: true
+        });
+    }
+
+
+    function loadFrm() {
+        $("#addressFrm").kendoForm({
+            items: [
+                {
+                    field: "c_r_name",
+                    label: "Restaurant Name",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+                {
+                    field: "c_r_state",
+                    label: "State",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+                {
+                    field: "c_r_city",
+                    label: "City",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+                {
+                    field: "c_pincode",
+                    label: "Pincode",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+                {
+                    field: "c_phonenumber",
+                    label: "Phone Number",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+            ],
+            buttonsTemplate: " "
+        });
+
+        $("#accountFrm").kendoForm({
+            items: [
+                {
+                    field: "c_r_name",
+                    label: "Restaurant Name",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+                {
+                    field: "c_r_ac",
+                    label: "Account No.",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+                {
+                    field: "c_r_ifsc",
+                    label: "IFSC Code",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+                {
+                    field: "c_r_gst",
+                    label: "GST No.",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+                {
+                    field: "c_r_aadhar",
+                    label: "Aadhar No.",
+                     editor: function(container, options) {
+                        $(`<center><img src="/Images/restaurant/aadhar/${options.model.c_r_aadhar}" width="300" height="150"/></center>`)
+                            .appendTo(container);
+                    }
+                },
+            ],
+            buttonsTemplate: " "
+        });
+
+
+        $("#ownerFrm").kendoForm({
+            items: [
+                {
+                    field: "c_r_name",
+                    label: "Restaurant Name",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+                {
+                    field: "c_o_name",
+                    label: "Owner Name",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+                {
+                    field: "c_address",
+                    label: "Address",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+                {
+                    field: "c_state",
+                    label: "State",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+                {
+                    field: "c_city",
+                    label: "City",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+                {
+                    field: "c_email",
+                    label: "Email",
+                    editor: "TextBox",
+                    editorOptions: { readonly: true }
+                },
+            ],
+            buttonsTemplate: " "
+        });
+    }
+
+    function showAddress(rid) {
+        var grid = $("#grid-menu-items").data("kendoGrid");
+        var dataItem = grid.dataSource.get(rid);
+
+        var window = $("#addressModel").data("kendoWindow");
+
+        console.log(dataItem)
+        $("#addressFrm").data("kendoForm").setOptions({
+            formData: {
+                c_r_name: dataItem.c_r_name,
+                c_r_address: dataItem.c_r_address,
+                c_r_state: dataItem.c_r_state,
+                c_r_city: dataItem.c_r_city,
+                c_pincode: dataItem.c_pincode,
+                c_phonenumber: dataItem.c_phonenumber,
+            }
+        });
+
+        window.center().open();
+    }
+
+    function showAccount(rid) {
+        var grid = $("#grid-menu-items").data("kendoGrid");
+        var dataItem = grid.dataSource.get(rid);
+
+        var window = $("#accountModel").data("kendoWindow");
+
+        console.log(dataItem)
+        $("#accountFrm").data("kendoForm").setOptions({
+            formData: {
+                c_r_name: dataItem.c_r_name,
+                c_r_ac: dataItem.c_r_ac,
+                c_r_ifsc: dataItem.c_r_ifsc,
+                c_r_gst: dataItem.c_r_gst,
+                c_r_aadhar: dataItem.c_r_aadhar,
+            }
+        });
+
+        window.center().open();
+
+    }
+    function showOwner(rid) {
+        var grid = $("#grid-menu-items").data("kendoGrid");
+        var dataItem = grid.dataSource.get(rid);
+
+        var window = $("#ownerModel").data("kendoWindow");
+
+        console.log(dataItem)
+        $("#ownerFrm").data("kendoForm").setOptions({
+            formData: {
+                c_r_name: dataItem.c_r_name,
+                c_o_name: dataItem.c_fname + " " + dataItem.c_lname,
+                c_address: dataItem.c_address,
+                c_state: dataItem.c_state,
+                c_city: dataItem.c_city,
+                c_email: dataItem.c_email,
+            }
+        });
+
+        window.center().open();
+
+    }
+
+
+   
+    function active(id) {
+        var token = "@Context.Session.GetString("Token")";
+
+        Swal.fire({
+            title: "Activate Restaurant?",
+            text: "This restaurant will start accepting orders.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Activate",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "http://localhost:5245/api/Admin/activeRestaurant?id=" + id,
+                    type: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    },
+                    success: function () {
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Activated!",
+                            text: "Restaurant is now active.",
+                            timer: 1800,
+                            showConfirmButton: false
+                        });
+
+                        loadGrid();
+                    },
+                    error: function () {
+                        Swal.fire("Error", "Something went wrong!", "error");
+                    }
+                });
+            }
+        });
+    }
+
+
+    function inactive(id) {
+        var token = "@Context.Session.GetString("Token")";
+
+        Swal.fire({
+            title: "Deactivate Restaurant?",
+            text: "This restaurant will stop accepting orders.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Deactivate",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "http://localhost:5245/api/Admin/inactiveRestaurant?id=" + id,
+                    type: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    },
+                    success: function () {
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Deactivated!",
+                            text: "Restaurant is now inactive.",
+                            timer: 1800,
+                            showConfirmButton: false
+                        });
+
+                        loadGrid();
+                    },
+                    error: function () {
+                        Swal.fire("Error", "Something went wrong!", "error");
+                    }
+                });
+            }
+        });
+    }
+    
+
+</script>

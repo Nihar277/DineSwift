@@ -1,0 +1,121 @@
+# ------------------------------------------------------------
+# Production-ready .gitignore for .NET (ASP.NET Core/MVC) + VS
+# Repo: DineSwift
+# ------------------------------------------------------------
+
+# --- OS / Editor ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# --- Visual Studio / Rider / VS Code ---
+.vs/
+.vscode/.ropeproject
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+
+# --- Build outputs ---
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
+**/TestResults/
+**/*.pdb
+**/*.cache
+
+# --- NuGet ---
+**/packages/
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# --- ASP.NET / tooling ---
+**/wwwroot/lib/
+**/wwwroot/dist/
+**/wwwroot/bundle/
+**/wwwroot/bundles/
+
+# --- Logs / temp ---
+*.log
+logs/
+*.tmp
+*.temp
+
+# --- Secrets / local config ---
+.env
+.env.*
+# NOTE: This workspace blocks committing `.env.example`, so we keep a template file:
+!example.env
+
+# appsettings often contains secrets (ConnectionStrings / keys).
+# Keep only example templates in git.
+**/appsettings.json
+**/appsettings.*.json
+!**/appsettings.json.example
+!**/appsettings.*.json.example
+
+# Local launch profiles can contain local URLs and secrets.
+**/Properties/launchSettings.json
+
+# Data Protection keys (must NEVER be committed)
+**/DataProtection-Keys/
+**/DineSwift-DataProtection-Keys/
+
+# Certificate / key material
+*.pfx
+*.p12
+*.pem
+*.key
+*.cer
+
+# --- Databases / dumps ---
+*.mdf
+*.ldf
+*.sqlite
+*.db
+*.bak
+*.dump
+
+# --- Uploads / user-generated content ---
+# Project-specific large/static image folders you don't want to push
+dishes/
+**/wwwroot/Images/
+**/wwwroot/images/
+**/wwwroot/uploads/
+**/wwwroot/Uploads/
+
+# Additionally ignore all images & media anywhere in repo (per request)
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.bmp
+*.tiff
+*.ico
+*.svg
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.wav
+*.mp3
+
+# --- Environment-specific files ---
+appsettings.Local.json
+appsettings.Staging.json
+appsettings.Production.json
+
+

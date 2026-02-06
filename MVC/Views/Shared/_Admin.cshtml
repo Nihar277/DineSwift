@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - DineSwift</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+
+    <!-- Bootstrap (grid only) -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <!-- Kendo -->
+    <link rel="stylesheet" href="~/kendo/kendo.default-v2.min.css" />
+
+    <!-- Vendor + Page CSS -->
+    <link rel="stylesheet" href="~/css/_Admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/RestaurantProfileUpdate.css" asp-append-version="true" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/kendo/kendo.all.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    @RenderSection("Styles", required: false)
+</head>
+
+<body>
+
+    <div class="app-wrapper">
+
+        <!-- ================= SIDEBAR ================= -->
+        <aside class="sidebar">
+
+            <div class="sidebar-logo">
+                <div class="logo-icon">🍽️</div>
+                <div class="logo-text">
+                    <h3>DineSwift</h3>
+                    <span>Admin Panel</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+
+                <a asp-controller="Admin" asp-action="Dashboard"
+                    class="menu-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a asp-controller="Admin" asp-action="Customer"
+                    class="menu-item @(ViewContext.RouteData.Values["action"]?.ToString() == "RestaurantProfileUpdate" ? "active" : "")">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Customer</span>
+                </a>
+
+                <a asp-controller="Admin" asp-action="Restaurant"
+                    class="menu-item @(ViewContext.RouteData.Values["action"]?.ToString() == "VendorProfile" ? "active" : "")">
+                    <i class="fa-solid fa-utensils"></i>
+                    <span>Restaurant</span>
+                </a>
+
+                <a asp-controller="Admin" asp-action="Delivery"
+                    class="menu-item @(ViewContext.RouteData.Values["action"]?.ToString() == "MenuItems" ? "active" : "")">
+                    <i class="fa-solid fa-motorcycle"></i>
+                    <span>Dilevery Boy</span>
+                </a>
+
+                @* <a asp-controller="Admin" asp-action="Deshboard2"
+                    class="menu-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Orders" ? "active" : "")">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>Deshboard 2</span>
+                </a> *@
+
+            </nav>
+
+            <div class="sidebar-footer">
+                <a id="logout" class="menu-item logout" onclick="logoutConfirm()">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+
+        </aside>
+
+        <!-- ================= MAIN ================= -->
+        <main class="main-content">
+            @RenderBody()
+        </main>
+
+    </div>
+
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+
+<script>
+    function logoutConfirm() {
+        Swal.fire({
+            title: 'Logout Confirmation',
+            text: 'Are you sure you want to logout?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Logout',
+            cancelButtonText: 'Cancel',
+
+            // 🔥 IMPORTANT CHANGE
+            reverseButtons: false,
+
+            // 🎨 ORANGE THEME
+            confirmButtonColor: '#f97316',
+            cancelButtonColor: '#64748b',
+            background: '#fff7ed',
+            color: '#1f2937',
+            iconColor: '#f97316',
+
+            customClass: {
+                popup: 'swal-orange-popup',
+                confirmButton: 'swal-orange-confirm',
+                cancelButton: 'swal-orange-cancel'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location = '../Admin/Logout';
+            }
+        });
+    }
+</script>
+
+
+
+</html>

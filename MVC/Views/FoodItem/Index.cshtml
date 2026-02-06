@@ -1,0 +1,454 @@
+@{
+    Layout = "~/Views/Shared/_userdashboardLayout.cshtml";
+    ViewData["Title"] = "All Dishes";
+}
+
+<!-- Kendo UI CSS -->
+<link rel="stylesheet" href="https://kendo.cdn.telerik.com/2023.1.117/styles/kendo.common.min.css" />
+<link rel="stylesheet" href="https://kendo.cdn.telerik.com/2023.1.117/styles/kendo.default-v2.min.css" />
+<style>
+    /* Back Button */
+    .back-button {
+        position: absolute;
+        left: 20px;
+        top: 20px;
+        width: 45px;
+        height: 45px;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: 50%;
+        background: rgba(252, 128, 25, 0.2);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(252, 128, 25, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+        color: var(--swiggy-orange-dark);
+        font-size: 20px;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(252, 128, 25, 0.3),
+                    inset 0 1px 3px rgba(255, 255, 255, 0.2);
+        /* Touch-friendly */
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        touch-action: manipulation;
+    }
+
+    .back-button:hover {
+        background: rgba(252, 128, 25, 0.3);
+        border-color: rgba(252, 128, 25, 0.6);
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(252, 128, 25, 0.4),
+                    inset 0 1px 3px rgba(255, 255, 255, 0.3);
+        color: var(--swiggy-orange-dark);
+    }
+
+    .back-button:active {
+        transform: scale(0.95);
+    }
+</style>
+
+
+
+<!-- ================= ALL DISHES ================= -->
+<section id="dishes" class="section light">
+<a href="javascript:history.back()" class="back-button" title="Go Back">
+                ←
+            </a>
+    <div class="page-header text-center mb-4">
+        <h2 class="display-5 fw-bold mb-2">
+            <!-- <span class="header-icon">🏬</span> -->
+            <span class="page-title-main">Discover</span>
+            <span class="page-title-accent">Menu Items</span>
+        </h2>
+        <p class="text-muted">Browse through our curated collection of dining experiences</p>
+    </div>
+
+
+    <div class="container">
+
+
+        <!-- Search Bar -->
+        <div class="search-container" style="margin-bottom: 30px;">
+            <div class="search-box-wrapper" style="max-width: 600px; margin: 0 auto;">
+                <input type="text" id="dish-search" placeholder="Search dishes by name, category, or restaurant..."
+                    class="search-input"
+                    style="width: 100%; padding: 12px 20px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 1rem; outline: none; transition: all 0.3s ease;" />
+                <span class="search-icon"
+                    style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: #9ca3af; pointer-events: none;">🔍</span>
+            </div>
+        </div>
+
+        <!-- Dishes Grid -->
+        <div id="dishes-list" class="dishes-grid"></div>
+    </div>
+</section>
+
+<!-- Kendo Window for Item Details -->
+<div id="item-details-window"></div>
+
+@section scripts {
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Kendo UI JS -->
+    <script src="https://kendo.cdn.telerik.com/2023.1.117/js/kendo.all.min.js"></script>
+
+    <!-- Dish Template -->
+    <script id="dish-template" type="text/x-kendo-template">
+                                            <div class="dish-card">
+                                                <div class="k-card">
+                                                    # var imgUrl = c_imageurl ? "/Images/restaurant/dishes/" + c_restaurantid + "/" + c_imageurl : "/Images/no-image.png"; #
+                                                    <img class="k-card-media"
+                                                         src="#= imgUrl #"
+                                                         onerror="this.src='/Images/no-image.png'"
+                                                         style="height: 184px; width:100%; object-fit: cover;"/>
+                                                    <div class="k-card-body" style="padding: 12px;">
+                                                        <h4 class="k-card-title">#: c_name #</h4>
+                                                        <h5 class="k-card-subtitle">#: typeof c_r_name !== 'undefined' && c_r_name ? c_r_name : 'DineSwift Partner' #</h5>
+            
+                                                        # if (c_category) { #
+                                                        <div class="k-card-category" style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                                                            <span class="badge" style="background-color: \\#fa7414; color: white; font-weight: 600; font-size: 0.75rem; padding: 4px 10px; border-radius: 999px;">
+                                                                #: c_category #
+                                                            </span>
+                                                            <span style="font-size: 1rem; font-weight: 800; color: \\#fa7414;">
+                                                                ₹#: c_price #
+                                                            </span>
+                                                        </div>
+                                                        # } else { #
+                                                        <div style="margin-top: 10px; display: flex; justify-content: flex-end;">
+                                                            <span style="font-size: 1rem; font-weight: 800; color: \\#fa7414;">
+                                                                ₹#: c_price #
+                                                            </span>
+                                                        </div>
+                                                        # } #
+                                                    </div>
+                                                    <div class="k-card-actions k-card-actions-stretched" style="padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+                                                        <div style="display: flex; gap: 8px; width: 100%;">
+                                                            <button class="k-button add-to-cart-btn" onclick="addToCart(#: c_itemid #)" style="flex: 1; background-color: \\#fa7414; color: white; border: none; border-radius: 8px; padding: 8px 5px; font-size: 0.8rem; font-weight: 600;">Add to Cart</button>
+                                                            <button class="k-button" onclick="showItemInfo(#: c_itemid #)" style="flex: 1; border-radius: 8px; border: 1.1px solid \\#fa7414; color: \\#fa7414; background: white; padding: 8px 5px; font-size: 0.8rem; font-weight: 600;">Item Info</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </script>
+
+    <script>
+        var allDishesData = [];
+        var listView;
+
+        $(document).ready(function () {
+            $.ajax({
+                url: "http://localhost:5245/api/FoodItem/all",
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    allDishesData = data;
+                }
+            });
+
+            listView = $("#dishes-list").kendoListView({
+                dataSource: {
+                    transport: {
+                        read: {
+                            url: "http://localhost:5245/api/FoodItem/all",
+                            dataType: "json"
+                        }
+                    },
+                    pageSize: 100000
+                },
+                template: kendo.template($("#dish-template").html()),
+                scrollable: false,
+                pageable: false
+            }).data("kendoListView");
+
+            $("#dish-search").on("keyup", function (e) {
+                var searchValue = $(this).val().toLowerCase().trim();
+
+                if (searchValue === "") {
+
+                    listView.setDataSource(new kendo.data.DataSource({
+                        transport: {
+                            read: {
+                                url: "http://localhost:5245/api/FoodItem/all",
+                                dataType: "json"
+                            }
+                        },
+                        pageSize: 100000
+                    }));
+
+                } else {
+                    $.ajax({
+                        url: `http://localhost:5245/api/ElasticSearchApi/searrchAllFoodByName?value=${e.target.value.toLowerCase()}`,
+                        method: "GET",
+                        success: function (data) {
+                            listView.setDataSource(new kendo.data.DataSource({
+                                data: data,
+                                pageSize: 100000
+                            }));
+                        },
+                        error: function () {
+                            console.error("Search failed.");
+                        }
+                    });
+                }
+            });
+
+            $("#item-details-window").kendoWindow({
+                width: "500px",
+                title: "Dish Information",
+                visible: false,
+                modal: true,
+                actions: ["Close"],
+                draggable: true,
+                resizable: false
+            });
+        });
+
+        function showItemInfo(itemId) {
+            $.ajax({
+                url: "http://localhost:5245/api/userHome/" + itemId,
+                method: "GET",
+                success: function (data) {
+                    const infoImage = data.c_imageurl
+                        ? `/Images/restaurant/dishes/${data.c_restaurantid}/${data.c_imageurl}`
+                        : `/Images/no-image.png`;
+                    var windowContent = `
+                                                            <div style="padding: 20px; font-family: 'Segoe UI', sans-serif;">
+                                                                <div style="display: flex; gap: 20px; align-items: start; margin-bottom: 20px;">
+                                                                    <img src="${infoImage}" 
+                                                                         style="width: 150px; height: 150px; object-fit: cover; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" 
+                                                                         onerror="this.src='/Images/no-image.png'"/>
+                                                                    <div>
+                                                                        <h2 style="color: #fa7414; margin: 0 0 5px 0; font-weight: 700;">${data.c_name}</h2>
+                                                                        <p style="color: #666; font-weight: 500; margin-bottom: 10px;">By ${data.c_r_name || 'DineSwift Partner'}</p>
+                                                                        <span class="badge" style="background-color: #fa7414; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem;">${data.c_category || 'General'}</span>
+                                                                    </div>
+                                                                </div>
+                    
+                                                                <div style="background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                                                                    <h4 style="margin-top: 0; color: #333; font-size: 1rem;">Description</h4>
+                                                                    <p style="color: #666; line-height: 1.5; margin-bottom: 0;">${data.c_description || 'No description available.'}</p>
+                                                                </div>
+
+                                                                <div style="background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                                                                    <h4 style="margin-top: 0; color: #333; font-size: 1rem;">Main Ingredients</h4>
+                                                                    <p style="color: #666; line-height: 1.5; margin-bottom: 0;">${data.c_ingredients || 'Secret ingredients!'}</p>
+                                                                </div>
+
+                                                                <div style="display: flex; justify-content: center; border-top: 1px solid #eee; padding-top: 15px;">
+                                                                    <span style="font-size: 1.8rem; font-weight: 800; color: #fa7414;">₹${data.c_price}</span>
+                                                                </div>
+                                                            </div>
+                                                        `;
+
+                    var dialog = $("#item-details-window").data("kendoWindow");
+                    dialog.content(windowContent);
+                    dialog.center().open();
+
+                    $(".k-overlay").one("click", function () {
+                        dialog.close();
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: "Error fetching item details. Please try again.",
+                        showConfirmButton: true
+                    });
+                }
+            });
+        }
+
+        function addToCart(itemId) {
+            var item = allDishesData.find(function (d) { return d.c_itemid === itemId; });
+
+            if (!item) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: "Item not found.",
+                    showConfirmButton: true
+                });
+                return;
+            }
+
+            let data = new FormData();
+            data.append("c_customerId", "@Context.Session.GetInt32("CustomerId")");
+            data.append("c_itemId", item.c_itemid);
+            data.append("c_restaurantId", item.c_restaurantid);
+            data.append("c_itemname", item.c_name);
+            data.append("c_price", item.c_price);
+            data.append("c_quantity", 1);
+            data.append("c_image", item.c_imageurl);
+
+            if (item.c_imageurlPicture) {
+                data.append("c_imageurlPicture", item.c_imageurlPicture);
+            }
+
+            $.ajax({
+                url: "http://localhost:5245/api/userHome/AddToCart",
+                type: "POST",
+                data: data,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.message || "Item added to cart!",
+                            showConfirmButton: true,
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Oops...',
+                            text: response.message || "Failed to add item to cart.",
+                            showConfirmButton: true
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error adding to cart:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: "An error occurred while adding the item to the cart.",
+                        showConfirmButton: true
+                    });
+                }
+            });
+        }
+    </script>
+
+    <style>
+
+        .section{
+            padding: 100px 0px !important;    
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-box-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input:focus {
+            border-color: #fa7414;
+            box-shadow: 0 0 0 3px rgba(250, 116, 20, 0.1);
+        }
+
+        .dishes-grid {
+            padding: 20px 0;
+            min-height: 400px;
+        }
+
+        .dishes-grid .k-listview-content {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 24px !important;
+        }
+
+        .dishes-grid .k-listview-content .dish-card {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            height: auto !important;
+        }
+
+        @@media (max-width: 1200px) {
+            .dishes-grid .k-listview-content {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .dishes-grid .k-listview-content {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 16px !important;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .dishes-grid .k-listview-content {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        .dish-card {
+            border-radius: 14px;
+            overflow: hidden;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .dish-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .k-card {
+            border: none;
+            box-shadow: none;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .k-card-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #1f2937;
+        }
+
+        .k-card-subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .k-card-media {
+            object-fit: cover;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .page-title-main {
+            color: #2c3e50;
+            /* blackish for 'Discover' */
+        }
+
+        .page-title-accent {
+            color: #fa7414;
+            /* orange for 'Restaurants' */
+        }
+
+        .header-icon {
+            display: inline-block;
+            font-size: 2.5rem;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+    </style>
+}

@@ -1,0 +1,2584 @@
+@{
+    ViewData["Title"] = "Customer Registration";
+    Layout = "~/Views/Shared/_CustLayout.cshtml";
+}
+
+<style>
+
+
+
+    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+    /* Hide Kendo field-name tooltips */
+    .k-tooltip,
+    .k-tooltip-validation {
+        display: none !important;
+    }
+
+    /* Prevent browser autofill icons */
+    input::-webkit-credentials-auto-fill-button {
+        display: none !important;
+    }
+
+    :root {
+        --swiggy-orange: #FC8019;
+        --swiggy-orange-dark: #E67312;
+        --swiggy-orange-light: #FFF4E8;
+        --success-color: #60B246;
+        --danger-color: #E23744;
+        --text-dark: #282C3F;
+        --text-medium: #686B78;
+        --text-light: #93959F;
+        --border-color: #E8E8E8;
+        --bg-light: #F8F8F8;
+        --dark-bg: #0f172a;
+        --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+        font-family: 'Poppins', sans-serif;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #fef0e6 0%, #fef0e6 100%);
+        display: flex;
+        align-items: center;
+        /* Centers vertically */
+        justify-content: center;
+        /* Centers horizontally */
+        padding: 15px;
+        width: 100vw;
+        /* Full viewport width */
+        height: 100vh;
+        /* Full viewport height */
+        overflow: auto;
+        /* Allows scrolling if needed */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        /* Prevent text size adjustment on iOS */
+        -webkit-text-size-adjust: 100%;
+        /* Touch optimization */
+        touch-action: manipulation;
+    }
+
+    /* Hide navbar and footer */
+    .navbar,
+    nav,
+    header,
+    footer {
+        display: none !important;
+    }
+
+    /* Main container for perfect centering */
+    .main-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        min-height: 100%;
+    }
+
+    /* Card Container - Centered */
+    .compact-card-container {
+        display: flex;
+        width: 1100px;
+        max-width: 95%;
+        height: 680px;
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        margin: auto;
+        /* Centers the card */
+        /* Prevent horizontal scroll on mobile */
+        max-width: 100vw;
+        box-sizing: border-box;
+    }
+
+    /* Left Side - Brand Section */
+    .brand-side {
+        width: 40%;
+        background: linear-gradient(135deg, #FC8019 0%, #E67312 100%);
+        color: white;
+        padding: 40px 30px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 8px 0 30px rgba(252, 128, 25, 0.4), 
+                    4px 0 15px rgba(230, 115, 18, 0.3),
+                    inset -2px 0 10px rgba(0, 0, 0, 0.1);
+        border-right: 3px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Decorative elements */
+    .brand-side::before {
+        content: '';
+        position: absolute;
+        top: -100px;
+        right: -100px;
+        width: 300px;
+        height: 300px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+
+    .brand-side::after {
+        content: '';
+        position: absolute;
+        bottom: -150px;
+        left: -100px;
+        width: 300px;
+        height: 300px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+
+    /* Main Logo Section */
+    .logo-section {
+        text-align: center;
+        margin-bottom: 30px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .logo-icon-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .logo-icon {
+        width: auto;
+        height: 70px;
+        max-width: 400px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        display: inline-block;
+        object-fit: contain;
+    }
+
+    .brand-title {
+        font-size: 32px;
+        font-weight: 900;
+        margin: 0 0 5px 0;
+        color: white;
+        text-transform: none;
+        letter-spacing: 1px;
+        display: inline-block;
+    }
+
+    .brand-tagline {
+        font-size: 14px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.95);
+        margin: 0;
+        letter-spacing: 1px;
+        text-transform: none;
+        display: inline-block;
+    }
+
+    /* Chef Illustration Card */
+    .chef-card {
+        background: #FFF8E1;
+        border-radius: 16px;
+        padding: 30px 20px;
+        margin: 20px 0;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .chef-illustration {
+        font-size: 80px;
+        margin: 0;
+        line-height: 1;
+        display: inline-block;
+    }
+
+    /* Customer Image Container */
+    .customer-image-container {
+        margin: 20px 0;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        margin-top: -10px;
+    }
+
+    .customer-image {
+        width: 200px;
+        height: 250px;
+        border-radius: 16px;
+        object-fit: cover;
+        border: 4px solid var(--swiggy-orange);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        animation: bounce 2s ease-in-out infinite;
+        display: inline-block;
+        transition: transform 0.3s ease;
+    }
+
+    .customer-image:hover {
+        transform: scale(1.1);
+        animation-play-state: paused;
+    }
+
+    /* Food Icons */
+    .food-icons {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .food-icon {
+        position: absolute;
+        font-size: 32px;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+        animation: float 3s ease-in-out infinite;
+        display: inline-block;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .food-icon:hover {
+        transform: scale(1.2) translateY(-5px);
+        animation-play-state: paused;
+    }
+
+    .food-icon.burger {
+        top: 15%;
+        left: 5%;
+        animation: float 3s ease-in-out infinite;
+        animation-delay: 0s;
+    }
+
+    .food-icon.ramen {
+        top: 45%;
+        left: 3%;
+        animation: floatReverse 3.5s ease-in-out infinite;
+        animation-delay: 0.5s;
+    }
+
+    .food-icon.pizza {
+        top: 50%;
+        right: 5%;
+        animation: float 4s ease-in-out infinite;
+        animation-delay: 1s;
+    }
+
+    .food-icon.fries {
+        bottom: 20%;
+        right: 8%;
+        animation: floatReverse 3.2s ease-in-out infinite;
+        animation-delay: 1.5s;
+    }
+
+    /* Service Benefits */
+    .service-benefits {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 20px 0;
+        position: relative;
+        z-index: 2;
+    }
+
+    .benefit-badge {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 20px;
+        padding: 8px 15px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .benefit-badge:hover {
+        transform: translateY(-3px);
+        background: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .benefit-icon {
+        font-size: 16px;
+        display: inline-block;
+    }
+
+    /* Stats Grid - Exactly like image */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-top: auto;
+        position: relative;
+        z-index: 2;
+        max-width: 100%;
+    }
+
+    .stat-box {
+        background: linear-gradient(135deg, rgba(255, 200, 150, 0.4) 0%, rgba(255, 180, 120, 0.3) 100%);
+        border-radius: 12px;
+        padding: 15px 12px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        height: 90px;
+        min-height: 90px;
+        max-height: 90px;
+        width: 100%;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .stat-box:hover {
+        transform: translateY(-3px);
+        background: linear-gradient(135deg, rgba(255, 210, 160, 0.5) 0%, rgba(255, 190, 130, 0.4) 100%);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-number {
+        font-size: 20px;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 4px;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .stat-label {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.9);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        max-width: 100%;
+    }
+
+
+    .upload-progress {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+        z-index: 10;
+        border-radius: 50%;
+        flex-direction: column;
+        gap: 10px;
+        backdrop-filter: blur(5px);
+    }
+
+    .progress-spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(255, 255, 255, .3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Animation Keyframes */
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+            transform: translateY(-20px) rotate(5deg);
+        }
+    }
+
+    @@keyframes floatReverse {
+        0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+            transform: translateY(-15px) rotate(-5deg);
+        }
+    }
+
+    @@keyframes floatSlow {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @@keyframes bounce {
+        0%, 100% {
+            transform: translateY(0px) scale(1);
+        }
+        50% {
+            transform: translateY(-15px) scale(1.05);
+        }
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.9;
+        }
+    }
+
+    @@keyframes slideInLeft {
+        0% {
+            transform: translateX(-50px);
+            opacity: 0;
+        }
+        100% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @@keyframes slideInRight {
+        0% {
+            transform: translateX(50px);
+            opacity: 0;
+        }
+        100% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @@keyframes fadeInUp {
+        0% {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @@keyframes rotate {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Right Side - Form Section */
+    .form-side {
+        width: 60%;
+        padding: 25px 30px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* Back Button */
+    .back-button {
+        position: absolute;
+        left: 20px;
+        top: 20px;
+        width: 45px;
+        height: 45px;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: 50%;
+        background: rgba(252, 128, 25, 0.2);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(252, 128, 25, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+        color: var(--swiggy-orange-dark);
+        font-size: 20px;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(252, 128, 25, 0.3),
+                    inset 0 1px 3px rgba(255, 255, 255, 0.2);
+        /* Touch-friendly */
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        touch-action: manipulation;
+    }
+
+    .back-button:hover {
+        background: rgba(252, 128, 25, 0.3);
+        border-color: rgba(252, 128, 25, 0.6);
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(252, 128, 25, 0.4),
+                    inset 0 1px 3px rgba(255, 255, 255, 0.3);
+        color: var(--swiggy-orange-dark);
+    }
+
+    .back-button:active {
+        transform: scale(0.95);
+    }
+
+    .welcome-header {
+        margin-bottom: 12px;
+        text-align: center;
+    }
+
+    .welcome-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0 0 3px 0;
+    }
+
+    .welcome-subtitle {
+        font-size: 10px;
+        color: var(--text-medium);
+        margin: 0;
+    }
+
+    /* Wizard Container */
+    .compact-wizard-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    /* Kendo Wizard */
+    #wizard {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    /* Stepper */
+    .k-wizard .k-stepper {
+        margin-bottom: 10px;
+        flex-shrink: 0;
+    }
+
+    .k-stepper .k-step-indicator {
+        width: 28px;
+        height: 28px;
+        border: 1.5px solid var(--border-color);
+        background: white;
+        font-weight: 600;
+        font-size: 11px;
+    }
+
+    .k-stepper .k-step.k-step-current .k-step-indicator {
+        background: var(--swiggy-orange);
+        border-color: var(--swiggy-orange);
+        color: white;
+    }
+
+    .k-stepper .k-step.k-step-done .k-step-indicator {
+        background: var(--success-color);
+        border-color: var(--success-color);
+        color: white;
+    }
+
+    .k-stepper .k-step-label {
+        font-weight: 600;
+        color: var(--text-medium);
+        font-size: 8px;
+        margin-top: 2px;
+    }
+
+    /* Wizard Content - NO SCROLLBAR */
+    .k-wizard-content {
+        flex: 1;
+        overflow: hidden;
+        min-height: 0;
+        margin-bottom: 4px;
+        padding-right: 0;
+    }
+
+    /* Hide scrollbar completely */
+    .k-wizard-content::-webkit-scrollbar {
+        display: none;
+    }
+
+    .k-wizard-content {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    /* Wizard Buttons - Modified to have step indicator on left */
+    .k-wizard-buttons {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 8px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-color);
+        flex-shrink: 0;
+        min-height: 40px;
+        opacity: 1 !important;
+        visibility: visible !important;
+        padding-right: 10px !important;
+        padding-left: 10px !important;
+        position: relative;
+    }
+
+    /* Step indicator on left */
+    .step-indicator-left {
+        font-size: 12px;
+        color: var(--text-medium);
+        font-weight: 600;
+        margin-right: auto;
+        padding-left: 5px;
+    }
+
+    .k-wizard-buttons>* {
+        display: flex !important;
+        flex: 0 0 auto !important;
+        margin: 0 4px !important;
+    }
+
+    .k-wizard-buttons .k-button {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 120px !important;
+        margin-left: 0 !important;
+    }
+
+    /* Form Elements */
+    .k-form .k-form-field {
+        margin-bottom: 6px;
+    }
+
+    .k-form-label {
+        display: block;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 2px;
+        font-size: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    /* Text inputs */
+    .k-textbox,
+    .k-textarea {
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 5px 8px;
+        font-size: 10px;
+        transition: all 0.2s ease;
+        width: 100%;
+        height: 30px;
+        /* Touch-friendly */
+        min-height: 44px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    /* FIXED DROPDOWN STYLING */
+    .k-dropdown {
+        position: relative !important;
+        width: 100% !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 4px !important;
+        background: white !important;
+        min-height: 30px !important;
+        /* Touch-friendly */
+        min-height: 44px !important;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .k-dropdown .k-dropdown-wrap {
+        border: none !important;
+        background: transparent !important;
+        border-radius: 4px !important;
+        height: 100% !important;
+        padding: 5px 30px 5px 8px !important;
+        min-height: 30px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    /* Hide Kendo's broken arrow */
+    .k-dropdown .k-icon.k-i-arrow-s {
+        display: none !important;
+    }
+
+    /* Add custom dropdown arrow */
+    .k-dropdown .k-dropdown-wrap:after {
+        content: "▼" !important;
+        position: absolute !important;
+        right: 10px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        font-size: 10px !important;
+        color: var(--text-medium) !important;
+        pointer-events: none !important;
+        z-index: 2 !important;
+    }
+
+    .k-dropdown .k-input {
+        flex: 1 !important;
+        font-size: 10px !important;
+        color: var(--text-dark) !important;
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        height: auto !important;
+        line-height: 18px !important;
+        padding: 0 !important;
+    }
+
+    .k-textbox:focus,
+    .k-textarea:focus,
+    .k-dropdown .k-dropdown-wrap.k-state-focused {
+        border-color: var(--swiggy-orange);
+        box-shadow: 0 0 0 2px rgba(252, 128, 25, 0.1);
+        outline: none;
+    }
+
+    /* Gender Options */
+    .gender-options {
+        display: flex;
+        gap: 4px;
+        margin-top: 2px;
+    }
+
+    .gender-option {
+        flex: 1;
+        position: relative;
+    }
+
+    .gender-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .gender-option label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        padding: 3px;
+        border: 1px solid var(--border-color);
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        background: white;
+        font-size: 9px;
+        height: 26px;
+        min-height: 44px;
+        /* Touch-friendly */
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        touch-action: manipulation;
+    }
+
+    .gender-option input[type="radio"]:checked+label {
+        background: var(--swiggy-orange-light);
+        border-color: var(--swiggy-orange);
+        color: var(--swiggy-orange-dark);
+    }
+
+    /* Upload Area */
+    .k-upload {
+        border: 1px dashed var(--border-color);
+        border-radius: 4px;
+        padding: 6px;
+        text-align: center;
+        background: var(--bg-light);
+        font-size: 9px;
+        min-height: 60px;
+    }
+
+    /* Buttons */
+    .k-button {
+        flex: 1;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 10px;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        height: 30px;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        /* Touch-friendly */
+        min-height: 44px;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+    }
+
+    .k-button-primary {
+        background: var(--swiggy-orange);
+        color: white;
+    }
+
+    .k-button-primary:hover {
+        background: var(--swiggy-orange-dark);
+    }
+
+    .k-button-secondary {
+        background: white;
+        color: var(--text-dark);
+        border-color: var(--border-color);
+    }
+
+    .k-button-secondary:hover {
+        background: var(--bg-light);
+        border-color: var(--swiggy-orange);
+    }
+
+    /* Validation Messages */
+    .k-invalid-msg {
+        color: var(--danger-color);
+        font-size: 7px;
+        margin-top: 1px;
+    }
+
+    /* CUSTOM STYLE: Password and Confirm Password in one line */
+    .password-row {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        grid-column: 1 / -1 !important;
+    }
+
+    /* Target the password and confirm password fields specifically */
+    .k-form .k-form-field:nth-last-child(2),
+    .k-form .k-form-field:nth-last-child(1) {
+        grid-column: span 1 !important;
+        margin-bottom: 6px;
+    }
+
+    /* Ensure the grid layout for step 1 */
+    .k-form[data-kendo-grid-cols="2"] {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    /* Make email take full width */
+    .k-form .k-form-field[data-colspan="2"] {
+        grid-column: 1 / -1;
+    }
+
+    /* Textarea specific */
+    .k-textarea {
+        height: 50px;
+        resize: vertical;
+        font-size: 10px;
+        padding: 6px 8px;
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border: 1.5px solid rgba(255, 255, 255, .3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+        margin-right: 4px;
+    }
+
+    /* Dropdown popup styling */
+    .k-animation-container {
+        z-index: 10003 !important;
+    }
+
+    .k-list-container {
+        border: 1px solid var(--border-color) !important;
+        border-radius: 4px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        max-height: 150px !important;
+        overflow-y: auto !important;
+    }
+
+    .k-list .k-item {
+        padding: 6px 10px !important;
+        font-size: 10px !important;
+        color: var(--text-dark) !important;
+        border-bottom: 1px solid var(--bg-light) !important;
+    }
+
+    .k-list .k-item:hover,
+    .k-list .k-item.k-state-selected,
+    .k-list .k-item.k-state-focused {
+        background: var(--swiggy-orange-light) !important;
+        color: var(--swiggy-orange-dark) !important;
+    }
+
+    /* Custom Modal Styles */
+    .k-window {
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .k-window-titlebar {
+        background: var(--dark-bg) !important;
+        color: white !important;
+        border: none !important;
+    }
+
+    .k-window-content {
+        padding: 0 !important;
+        background: white !important;
+    }
+
+    .k-window-actions .k-button {
+        color: white !important;
+    }
+
+    /* ================= RESPONSIVE DESIGN - ALL DISPLAY SIZES ================= */
+    
+    /* Extra Large Screens (1920px and above) */
+    @@media (min-width: 1920px) {
+        .compact-card-container {
+            width: 1200px;
+            height: 720px;
+        }
+
+        .brand-side {
+            padding: 50px 40px;
+        }
+
+        .form-side {
+            padding: 35px 40px;
+        }
+
+        .logo-icon {
+            height: 80px;
+        }
+
+        .customer-image {
+            width: 220px;
+            height: 280px;
+        }
+
+        .stat-box {
+            height: 100px;
+            min-height: 100px;
+            max-height: 100px;
+            padding: 20px 15px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+        }
+    }
+
+    /* Large Screens (1400px - 1919px) */
+    @@media (min-width: 1400px) and (max-width: 1919px) {
+        .compact-card-container {
+            width: 1100px;
+            height: 680px;
+        }
+    }
+
+    /* Medium-Large Screens (1200px - 1399px) */
+    @@media (min-width: 1200px) and (max-width: 1399px) {
+        .compact-card-container {
+            width: 1000px;
+            height: 650px;
+        }
+
+        .brand-side {
+            padding: 35px 25px;
+        }
+
+        .form-side {
+            padding: 25px 25px;
+        }
+
+        .logo-icon {
+            height: 65px;
+        }
+
+        .customer-image {
+            width: 180px;
+            height: 230px;
+        }
+
+        .stat-box {
+            height: 85px;
+            min-height: 85px;
+            max-height: 85px;
+        }
+    }
+
+    /* Tablets Landscape / Small Laptops (1024px - 1199px) */
+    @@media (min-width: 1024px) and (max-width: 1199px) {
+        .compact-card-container {
+            width: 95%;
+            max-width: 980px;
+            height: auto;
+            min-height: 600px;
+        }
+
+        .brand-side {
+            width: 38%;
+            padding: 30px 20px;
+        }
+
+        .form-side {
+            width: 62%;
+            padding: 25px 25px;
+        }
+
+        .logo-icon {
+            height: 60px;
+        }
+
+        .customer-image {
+            width: 160px;
+            height: 200px;
+        }
+
+        .stat-box {
+            height: 80px;
+            min-height: 80px;
+            max-height: 80px;
+            padding: 12px 10px;
+        }
+
+        .stat-number {
+            font-size: 18px;
+        }
+
+        .stat-label {
+            font-size: 9px;
+        }
+    }
+
+    /* Tablets Portrait (768px - 1023px) */
+    @@media (min-width: 768px) and (max-width: 1023px) {
+        body {
+            padding: 10px;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+
+        .main-container {
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 10px 0;
+        }
+
+        .compact-card-container {
+            width: 95%;
+            height: auto;
+            max-height: 95vh;
+            flex-direction: column;
+            margin: 0 auto;
+        }
+
+        .brand-side,
+        .form-side {
+            width: 100%;
+            height: auto;
+        }
+
+        .brand-side {
+            padding: 30px 25px;
+            order: 2;
+            min-height: 400px;
+        }
+
+        .form-side {
+            padding: 20px 25px;
+            max-height: 60vh;
+            order: 1;
+        }
+
+        .back-button {
+            left: 15px;
+            top: 15px;
+            width: 42px;
+            height: 42px;
+            font-size: 19px;
+        }
+
+        .logo-icon {
+            height: 70px;
+            max-width: 300px;
+        }
+
+        .brand-title {
+            font-size: 26px;
+        }
+
+        .brand-tagline {
+            font-size: 13px;
+        }
+
+        .customer-image {
+            width: 170px;
+            height: 210px;
+        }
+
+        .food-icon {
+            font-size: 26px;
+        }
+
+        .service-benefits {
+            gap: 12px;
+        }
+
+        .benefit-badge {
+            padding: 7px 14px;
+            font-size: 11px;
+        }
+
+        .stats-grid {
+            gap: 12px;
+        }
+
+        .stat-box {
+            height: 85px;
+            min-height: 85px;
+            max-height: 85px;
+            padding: 15px 10px;
+        }
+
+        .stat-number {
+            font-size: 19px;
+        }
+
+        .stat-label {
+            font-size: 10px;
+        }
+
+        .k-form[data-kendo-grid-cols="2"] {
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .password-row {
+            grid-template-columns: 1fr 1fr !important;
+        }
+
+        .step-indicator-left {
+            font-size: 11px;
+        }
+
+        .k-wizard-buttons .k-button {
+            width: 130px !important;
+            font-size: 11px;
+        }
+    }
+
+    /* Small Tablets / Large Phones (600px - 767px) */
+    @@media (min-width: 600px) and (max-width: 767px) {
+        body {
+            padding: 8px;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+
+        .main-container {
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 8px 0;
+        }
+
+        .compact-card-container {
+            width: 96%;
+            height: auto;
+            max-height: 92vh;
+            flex-direction: column;
+            border-radius: 14px;
+            margin: 0 auto;
+        }
+
+        .brand-side {
+            padding: 25px 20px;
+            order: 2;
+            min-height: 380px;
+        }
+
+        .form-side {
+            padding: 18px 20px;
+            max-height: 58vh;
+            order: 1;
+        }
+
+        .back-button {
+            left: 12px;
+            top: 12px;
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+
+        .logo-icon {
+            height: 65px;
+            max-width: 280px;
+        }
+
+        .brand-title {
+            font-size: 24px;
+        }
+
+        .brand-tagline {
+            font-size: 12px;
+        }
+
+        .customer-image {
+            width: 150px;
+            height: 190px;
+        }
+
+        .food-icon {
+            font-size: 22px;
+        }
+
+        .service-benefits {
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .benefit-badge {
+            padding: 6px 12px;
+            font-size: 10px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .stat-box {
+            height: 80px;
+            min-height: 80px;
+            max-height: 80px;
+            padding: 12px 8px;
+        }
+
+        .stat-number {
+            font-size: 17px;
+        }
+
+        .stat-label {
+            font-size: 9px;
+        }
+
+        .k-form[data-kendo-grid-cols="2"] {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .password-row {
+            grid-template-columns: 1fr !important;
+        }
+
+        .k-form .k-form-field:nth-last-child(2),
+        .k-form .k-form-field:nth-last-child(1) {
+            grid-column: 1 / -1 !important;
+        }
+
+        .step-indicator-left {
+            font-size: 10px;
+            padding-left: 3px;
+        }
+
+        .k-wizard-buttons {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 8px 0;
+            box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .k-wizard-buttons .k-button {
+            width: 120px !important;
+            font-size: 10px;
+        }
+    }
+
+    /* Mobile Phones (480px - 599px) */
+    @@media (min-width: 480px) and (max-width: 599px) {
+        body {
+            padding: 5px;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+
+        .main-container {
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 5px 0;
+        }
+
+        .compact-card-container {
+            width: 98%;
+            height: auto;
+            max-height: 90vh;
+            border-radius: 12px;
+            margin: 0 auto;
+            flex-direction: column;
+        }
+
+        .brand-side {
+            padding: 20px 15px;
+            order: 2;
+            min-height: 350px;
+        }
+
+        .form-side {
+            padding: 15px;
+            max-height: 55vh;
+            order: 1;
+        }
+
+        .back-button {
+            left: 10px;
+            top: 10px;
+            width: 38px;
+            height: 38px;
+            font-size: 16px;
+        }
+
+        .logo-icon {
+            height: 60px;
+            max-width: 250px;
+        }
+
+        .brand-title {
+            font-size: 22px;
+        }
+
+        .brand-tagline {
+            font-size: 11px;
+        }
+
+        .chef-card {
+            padding: 15px 10px;
+        }
+
+        .chef-illustration {
+            font-size: 50px;
+        }
+
+        .customer-image {
+            width: 130px;
+            height: 165px;
+        }
+
+        .food-icon {
+            font-size: 20px;
+        }
+
+        .service-benefits {
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .benefit-badge {
+            padding: 5px 10px;
+            font-size: 9px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .stat-box {
+            height: 75px;
+            min-height: 75px;
+            max-height: 75px;
+            padding: 12px 8px;
+        }
+
+        .stat-number {
+            font-size: 16px;
+        }
+
+        .stat-label {
+            font-size: 8px;
+        }
+
+        .k-form[data-kendo-grid-cols="2"] {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .password-row {
+            grid-template-columns: 1fr !important;
+        }
+
+        .k-form .k-form-field:nth-last-child(2),
+        .k-form .k-form-field:nth-last-child(1) {
+            grid-column: 1 / -1 !important;
+        }
+
+        .step-indicator-left {
+            font-size: 9px;
+            padding-left: 2px;
+        }
+
+        .k-wizard-buttons {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 6px 0;
+            box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .k-wizard-buttons .k-button {
+            width: 110px !important;
+            font-size: 9px;
+        }
+    }
+
+    /* Small Mobile Phones (320px - 479px) */
+    @@media (min-width: 320px) and (max-width: 479px) {
+        body {
+            padding: 5px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-container {
+            align-items: center;
+            justify-content: center;
+        }
+
+        .compact-card-container {
+            border-radius: 10px;
+            width: 98%;
+            height: auto;
+            max-height: 95vh;
+            margin: auto;
+            flex-direction: column;
+        }
+
+        .brand-side {
+            padding: 18px 12px;
+            order: 2;
+            min-height: 320px;
+        }
+
+        .form-side {
+            padding: 12px;
+            max-height: 50vh;
+            order: 1;
+        }
+
+        .back-button {
+            left: 8px;
+            top: 8px;
+            width: 36px;
+            height: 36px;
+            font-size: 15px;
+        }
+
+        .logo-icon {
+            height: 55px;
+            max-width: 220px;
+        }
+
+        .brand-title {
+            font-size: 20px;
+        }
+
+        .brand-tagline {
+            font-size: 10px;
+        }
+
+        .chef-card {
+            padding: 12px 8px;
+        }
+
+        .chef-illustration {
+            font-size: 40px;
+        }
+
+        .customer-image {
+            width: 110px;
+            height: 140px;
+        }
+
+        .food-icon {
+            font-size: 18px;
+        }
+
+        .service-benefits {
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .benefit-badge {
+            padding: 4px 8px;
+            font-size: 8px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .stat-box {
+            padding: 10px 6px;
+            height: 70px;
+            min-height: 70px;
+            max-height: 70px;
+        }
+
+        .stat-number {
+            font-size: 15px;
+        }
+
+        .stat-label {
+            font-size: 7px;
+        }
+
+        .k-form[data-kendo-grid-cols="2"] {
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+
+        .password-row {
+            grid-template-columns: 1fr !important;
+        }
+
+        .k-form .k-form-field:nth-last-child(2),
+        .k-form .k-form-field:nth-last-child(1) {
+            grid-column: 1 / -1 !important;
+        }
+
+        .welcome-title {
+            font-size: 18px;
+        }
+
+        .welcome-subtitle {
+            font-size: 9px;
+        }
+
+        .k-form-label {
+            font-size: 7px;
+        }
+
+        .k-textbox,
+        .k-textarea,
+        .k-dropdown {
+            font-size: 9px;
+            height: 28px;
+            min-height: 36px;
+            padding: 4px 6px;
+        }
+
+        .k-dropdown {
+            min-height: 36px !important;
+        }
+
+        .k-button {
+            min-height: 36px;
+            height: 32px;
+        }
+
+        .gender-option label {
+            min-height: 36px;
+            height: 32px;
+        }
+
+        .k-textarea {
+            height: 45px;
+        }
+
+        .k-button {
+            height: 28px;
+            font-size: 9px;
+            padding: 4px 8px;
+        }
+
+        .step-indicator-left {
+            font-size: 8px;
+            padding-left: 0;
+        }
+
+        .k-wizard-buttons {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 5px 0;
+            box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .k-wizard-buttons .k-button {
+            width: 100px !important;
+            font-size: 8px;
+            height: 28px;
+        }
+
+        .k-stepper .k-step-indicator {
+            width: 24px;
+            height: 24px;
+            font-size: 10px;
+        }
+
+        .k-stepper .k-step-label {
+            font-size: 7px;
+        }
+    }
+
+    /* Extra Small Mobile Phones (below 320px) */
+    @@media (max-width: 319px) {
+        body {
+            padding: 3px;
+        }
+
+        .compact-card-container {
+            width: 100%;
+            border-radius: 8px;
+            margin: 0;
+        }
+
+        .brand-side {
+            padding: 15px 10px;
+            min-height: 280px;
+        }
+
+        .form-side {
+            padding: 10px;
+            max-height: 45vh;
+        }
+
+        .back-button {
+            left: 5px;
+            top: 5px;
+            width: 32px;
+            height: 32px;
+            font-size: 13px;
+        }
+
+        .logo-icon {
+            height: 45px;
+            max-width: 180px;
+        }
+
+        .brand-title {
+            font-size: 18px;
+        }
+
+        .brand-tagline {
+            font-size: 9px;
+        }
+
+        .customer-image {
+            width: 100px;
+            height: 125px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+
+        .stat-box {
+            padding: 8px 5px;
+            height: 65px;
+            min-height: 65px;
+            max-height: 65px;
+        }
+
+        .stat-number {
+            font-size: 14px;
+        }
+
+        .stat-label {
+            font-size: 6px;
+        }
+
+        .k-wizard-buttons .k-button {
+            width: 90px !important;
+            font-size: 7px;
+        }
+    }
+
+    /* Landscape Orientation for Mobile */
+    @@media (max-width: 1024px) and (orientation: landscape) {
+        .compact-card-container {
+            max-height: 98vh;
+        }
+
+        .brand-side {
+            min-height: auto;
+            padding: 20px 15px;
+        }
+
+        .form-side {
+            max-height: 70vh;
+        }
+
+        .customer-image {
+            width: 120px;
+            height: 150px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .stat-box {
+            height: 70px;
+            min-height: 70px;
+            max-height: 70px;
+            padding: 10px 6px;
+        }
+    }
+
+    /* Print Styles */
+    @@media print {
+        body {
+            background: white;
+        }
+
+        .compact-card-container {
+            box-shadow: none;
+            border: 1px solid #ccc;
+        }
+
+        .back-button {
+            display: none;
+        }
+    }
+</style>
+
+<!-- Main Container for Centering -->
+<div class="main-container">
+    <!-- Compact Card Container -->
+    <div class="compact-card-container">
+        <!-- Left Side - Brand Section -->
+        <div class="brand-side">
+            <!-- Food Icons Scattered -->
+            <div class="food-icons">
+                <div class="food-icon burger">🍔</div>
+                <div class="food-icon ramen">🍜</div>
+                <div class="food-icon pizza">🍕</div>
+                <div class="food-icon fries">🍟</div>
+            </div>
+
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <div class="logo-icon-wrapper">
+                    <img src="@Url.Content("~/Images/dineLogo.png")" alt="DineSwift Logo" class="logo-icon" />
+                </div>
+            </div>
+
+
+            <!-- Customer Image Container -->
+            <div class="customer-image-container">
+                <img src="@Url.Content("~/Images/customer.jpeg")" alt="Customer" class="customer-image" />
+            </div>
+
+            <!-- Service Benefits -->
+            <div class="service-benefits">
+                <div class="benefit-badge">
+                    <span class="benefit-icon fast">⚡</span>
+                    <span>Fast</span>
+                </div>
+                <div class="benefit-badge">
+                    <span class="benefit-icon fresh">🌿</span>
+                    <span>Fresh</span>
+                </div>
+                <div class="benefit-badge">
+                    <span class="benefit-icon tasty">😊</span>
+                    <span>Tasty</span>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-number">5K+</div>
+                    <div class="stat-label">Restaurants</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">5K+</div>
+                    <div class="stat-label">Customers</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Cities</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Form Section -->
+        <div class="form-side">
+            <!-- Back Button -->
+            <a href="javascript:history.back()" class="back-button" title="Go Back">
+                ←
+            </a>
+
+            <div class="welcome-header">
+                <h2 class="welcome-title">Customer Registration Page!</h2>
+                <p class="welcome-subtitle">Sign in to your Customer Registration account</p>
+            </div>
+
+            <div class="compact-wizard-container">
+                <!-- Wizard with Stepper -->
+                <div id="wizard"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        /* ================= IMAGE PREVIEW FUNCTIONALITY ================= */
+        function setupImagePreview() {
+            const previewContainer = document.getElementById('imagePreview');
+            
+            // If image preview container doesn't exist, skip setup
+            if (!previewContainer) {
+                return;
+            }
+            
+            const placeholder = previewContainer.querySelector('.preview-placeholder');
+
+            // Listen for file selection
+            $(document).on('change', '[name="c_imagefile"]', function (e) {
+                const file = e.target.files[0];
+                if (!file || !previewContainer) return;
+
+                // Show upload progress
+                previewContainer.innerHTML = `
+                                <div class="upload-progress">
+                                    <span class="progress-spinner"></span>
+                                    Uploading...
+                                </div>
+                            `;
+
+                // Create file reader to preview image
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    if (!previewContainer) return;
+                    setTimeout(() => {
+                        previewContainer.innerHTML = `
+                                        <img src="${e.target.result}" class="preview-image" alt="Profile Preview" />
+                                    `;
+                    }, 500);
+                };
+
+                reader.onerror = function () {
+                    if (!previewContainer) return;
+                    previewContainer.innerHTML = `
+                                    <div class="preview-placeholder" style="color: var(--danger-color);">
+                                        ❌
+                                    </div>
+                                `;
+                    kendo.alert("Failed to load image. Please try again.");
+                };
+
+                reader.readAsDataURL(file);
+            });
+
+            // Reset preview when wizard resets
+            $(document).on('click', '.k-wizard-buttons .k-button-secondary', function () {
+                if (!previewContainer) return;
+                if ($(this).text().includes('Reset') || $(this).text().includes('Cancel')) {
+                    setTimeout(() => {
+                        previewContainer.innerHTML = `
+                                        <div class="preview-placeholder">
+                                            👤
+                                        </div>
+                                    `;
+                    }, 100);
+                }
+            });
+
+            // Reset preview when changing wizard steps back
+            $(document).on('click', '.k-wizard-buttons .k-button:contains("Previous")', function () {
+                if (!previewContainer) return;
+                const fileInput = $('[name="c_imagefile"]')[0];
+                if (fileInput && (!fileInput.files || fileInput.files.length === 0)) {
+                    previewContainer.innerHTML = `
+                                    <div class="preview-placeholder">
+                                        👤
+                                    </div>
+                                `;
+                }
+            });
+        }
+
+        /* ================= CUSTOM VALIDATIONS ================= */
+        kendo.ui.validator.rules.strongPassword = function (input) {
+            if (input.is("[name='c_password']")) {
+                var value = input.val();
+                return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@@$!%*?&]).{8,}$/.test(value);
+            }
+            return true;
+        };
+        kendo.ui.validator.messages.strongPassword = "Password must be at least 8 characters with uppercase, lowercase, number & special character";
+
+        kendo.ui.validator.rules.passwordMatch = function (input) {
+            if (input.is("[name='c_confirmpassword']")) {
+                var password = $("[name='c_password']").val();
+                var confirm = input.val();
+                return password === confirm;
+            }
+            return true;
+        };
+        kendo.ui.validator.messages.passwordMatch = "Passwords do not match";
+
+        kendo.ui.validator.rules.phoneValidation = function (input) {
+            if (input.is("[name='c_phonenumber']")) {
+                return /^[6-9]\d{9}$/.test(input.val());
+            }
+            return true;
+        };
+        kendo.ui.validator.messages.phoneValidation = "Enter a valid 10-digit mobile number (starts with 6-9)";
+
+        kendo.ui.validator.rules.pincodeValidation = function (input) {
+            if (input.is("[name='c_pincode']")) {
+                return /^[1-9][0-9]{5}$/.test(input.val());
+            }
+            return true;
+        };
+        kendo.ui.validator.messages.pincodeValidation = "Enter a valid 6-digit pincode";
+
+        kendo.ui.validator.rules.fileRequired = function (input) {
+            if (input.is("[name='c_imagefile']")) {
+                var upload = input.data("kendoUpload");
+                if (!upload) return true;
+                return upload.getFiles().length > 0;
+            }
+            return true;
+        };
+        kendo.ui.validator.messages.fileRequired = "Please select a profile image";
+
+        kendo.ui.validator.rules.emailExists = function (input) {
+            if (input.is("[name='c_email']")) {
+                var email = input.val();
+                if (!email) return true;
+
+                var emailExists = false;
+                $.ajax({
+                    url: "http://localhost:5245/api/Customer/checkEmailExists?email=" + email,
+                    type: "GET",
+                    async: false,
+                    success: function () {
+                        emailExists = false;
+                    },
+                    error: function () {
+                        emailExists = true;
+                    }
+                });
+
+                return emailExists === false;
+            }
+            return true;
+        };
+        kendo.ui.validator.messages.emailExists = "Email already exists";
+
+        /* ================= WIZARD INITIALIZATION ================= */
+        $(document).ready(function () {
+            // Setup image preview
+            setupImagePreview();
+
+            let wizardData = {};
+
+            $("#wizard").kendoWizard({
+                pager: true,
+                action: function (e) {
+                    if (e.step.options.form && !e.step.options.form.validate()) {
+                        e.preventDefault();
+                    }
+                },
+                steps: [
+                    /* ================= STEP 1: PERSONAL DETAILS ================= */
+                    {
+                        title: "Personal",
+                        icon: "user",
+                        buttons: ["next"], // Only Next button in first step
+                        form: {
+                            validateOnBlur: true,
+                            layout: "grid",
+                            grid: { cols: 2, gutter: 10 },
+                            items: [
+                                {
+                                    field: "c_fname",
+                                    label: "First Name",
+                                    validation: { required: { message: "First name is required" } }
+                                },
+                                {
+                                    field: "c_lname",
+                                    label: "Last Name",
+                                    validation: { required: { message: "Last name is required" } }
+                                },
+                                {
+                                    field: "c_email",
+                                    label: "Email Address",
+                                    colSpan: 2,
+                                    validation: {
+                                        required: { message: "Email is required" },
+                                        email: { message: "Please enter a valid email" },
+                                        emailExists: true
+                                    }
+                                },
+                                {
+                                    field: "c_phonenumber",
+                                    label: "Phone Number",
+                                    validation: { required: { message: "Mobile number is required" }, phoneValidation: true }
+                                },
+                                {
+                                    field: "c_gender",
+                                    label: "Gender",
+                                    editor: function (container, options) {
+                                        const genders = ["Male", "Female", "Other"];
+                                        const div = $('<div class="gender-options"></div>').appendTo(container);
+                                        genders.forEach(g => {
+                                            div.append(
+                                                `<div class="gender-option">
+                                                                        <input type="radio" name="${options.field}" value="${g}" id="gender_${g}" required data-required-msg="please select gender">
+                                                                        <label for="gender_${g}"><span>${g}</span></label>
+                                                                    </div>`
+                                            );
+                                        });
+                                    },
+                                    validation: { required: { message: "Please select gender" } }
+                                },
+                                {
+                                    field: "c_password",
+                                    label: "Password",
+                                    colSpan: 2,
+                                    editor: function (container, options) {
+                                        $(`<input type="password" name="${options.field}" class="k-textbox" required placeholder="Min 8 chars with uppercase, lowercase, number & special char" data-required-msg="Password is required"/>`)
+                                            .appendTo(container);
+                                    },
+                                    validation: { required: { message: "Password is required" }, strongPassword: true }
+                                },
+                                {
+                                    field: "c_confirmpassword",
+                                    label: "Confirm Password",
+                                    colSpan: 2,
+                                    editor: function (container, options) {
+                                        $(`<input type="password" name="${options.field}" class="k-textbox" required placeholder="Re-enter your password" data-required-msg="Please confirm your password"/>`)
+                                            .appendTo(container);
+                                    },
+                                    validation: { required: { message: "Please confirm your password" }, passwordMatch: true }
+                                }
+
+                            ]
+                        }
+                    },
+                    /* ================= STEP 2: ADDRESS & IMAGE ================= */
+                    {
+                        title: "Address",
+                        icon: "home",
+                        buttons: ["previous", "done"],
+                        form: {
+                            validateOnBlur: true,
+                            layout: "grid",
+                            grid: { cols: 2, gutter: 20 },
+                            items: [
+                                {
+                                    field: "c_pincode",
+                                    label: "Pincode",
+                                    validation: { required: { message: "Please Enter your pincode" }, pincodeValidation: true }
+                                },
+                                {
+                                    field: "c_state",
+                                    label: "State",
+                                    editor: function (container, options) {
+                                        $('<input name="' + options.field + '" required data-required-msg="State is required"/>')
+                                            .appendTo(container)
+                                            .kendoDropDownList({
+                                                optionLabel: "Select State",
+                                                dataTextField: "c_sname",
+                                                dataValueField: "id",
+                                                dataSource: {
+                                                    transport: {
+                                                        read: {
+                                                            url: "http://localhost:5245/api/Customer/states",
+                                                            dataType: "json"
+                                                        }
+                                                    }
+                                                },
+                                                change: function () {
+                                                    const cityDropDown = $("[name='c_city']").data("kendoDropDownList");
+                                                    cityDropDown.value("");
+                                                    cityDropDown.dataSource.read();
+                                                    cityDropDown.enable(true);
+                                                }
+                                            });
+                                    },
+                                    validation: { required: { message: "State is required" } }
+                                },
+                                {
+                                    field: "c_city",
+                                    label: "City",
+                                    editor: function (container, options) {
+                                        $('<input name="' + options.field + '" required data-required-msg="City is required" />')
+                                            .appendTo(container)
+                                            .kendoDropDownList({
+                                                optionLabel: "Select City",
+                                                dataTextField: "cityName",
+                                                dataValueField: "cityId",
+                                                enable: false,
+                                                dataSource: {
+                                                    transport: {
+                                                        read: {
+                                                            url: function () {
+                                                                const stateId = $("[name='c_state']").val();
+                                                                return "http://localhost:5245/api/Customer/cities/" + stateId;
+                                                            },
+                                                            dataType: "json"
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                    },
+                                    validation: { required: { message: "City is required" } }
+                                },
+
+                                {
+                                    field: "c_address",
+                                    label: "Delivery Address",
+                                    colSpan: 2,
+                                    editor: function (container, options) {
+                                        $(`<textarea name="${options.field}" class="k-textarea" rows="3" required placeholder="Enter your complete delivery address like 180,vithhal nagar soc.,surat" data-required-msg="Address is required"></textarea>`)
+                                            .appendTo(container);
+                                    },
+                                    validation: { required: { message: "Address is required" } }
+                                },
+                                {
+                                    field: "c_imagefile",
+                                    label: "Profile Image",
+                                    colSpan: 2,
+                                    editor: function (container, options) {
+
+                                        $(`<input type="file" 
+                            name="${options.field}" 
+                            accept=".jpg,.jpeg,.png" />`)
+                                            .appendTo(container)
+                                            .kendoUpload({
+                                                multiple: false,
+                                                localization: {
+                                                    select: "📷 Choose Image",
+                                                    dropFilesHere: "Drop your profile image here"
+                                                },
+                                                validation: {
+                                                    allowedExtensions: [".jpg", ".jpeg", ".png"]
+                                                },
+                                                select: function (e) {
+                                                    const file = e.files[0];
+                                                    const ext = file.extension.toLowerCase();
+
+                                                    if (![".jpg", ".jpeg", ".png"].includes(ext)) {
+                                                        e.preventDefault();
+                                                        kendo.alert("❌ Only JPG, JPEG, and PNG images are allowed.");
+                                                    }
+                                                }
+                                            });
+                                    },
+                                    validation: {
+                                        fileRequired: true
+                                    }
+
+                                }
+
+                            ]
+                        }
+                    }
+                ],
+                /* ================= WHEN USER CLICKS DONE ================= */
+                done: function (e) {
+                    wizardData = { ...e.forms[0]._model.toJSON(), ...e.forms[1]._model.toJSON() };
+
+                    let doneBtn = e.sender.element.find(".k-wizard-buttons .k-button.k-primary");
+                    doneBtn.prop("disabled", true).html('<span class="loading-spinner"></span> Sending OTP...');
+
+                    let sendFormData = new FormData();
+                    sendFormData.append("email", wizardData.c_email);
+
+                    $.ajax({
+                        url: "http://localhost:5245/api/Otp/send",
+                        type: "POST",
+                        data: sendFormData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+
+                            console.log("send Otyp response:", response);
+                            if (response.success) {
+                                doneBtn.prop("disabled", false).text("Done");
+                                showOtpVerificationModal(wizardData.c_email, wizardData.c_fname);
+                            } else {
+                                kendo.alert(response.message || "Failed to send OTP.");
+                                doneBtn.prop("disabled", false).text("Done");
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log("send OTP error:", xhr);
+                            let msg = xhr.responseJSON?.message || "Failed to send OTP. Please try again.";
+                            kendo.alert(msg);
+                            doneBtn.prop("disabled", false).text("Done");
+                        }
+                    });
+                }
+            });
+
+            /* ================= ADD STEP INDICATOR TO LEFT SIDE ================= */
+            // Function to update step indicator text
+            function updateStepIndicator() {
+                var wizard = $("#wizard").data("kendoWizard");
+                if (!wizard) return;
+
+                var currentStep = wizard.currentStepIndex() + 1;
+                var totalSteps = wizard.steps().length;
+                var stepText = "Step " + currentStep + " of " + totalSteps;
+
+                // Find the wizard buttons container
+                var buttonsContainer = $(".k-wizard-buttons");
+                if (buttonsContainer.length === 0) return;
+
+                // Check if step indicator already exists
+                var stepIndicator = buttonsContainer.find(".step-indicator-left");
+                if (stepIndicator.length === 0) {
+                    // Create and add step indicator
+                    stepIndicator = $('<span class="step-indicator-left"></span>');
+                    buttonsContainer.prepend(stepIndicator);
+                }
+
+                // Update the text
+                stepIndicator.text(stepText);
+            }
+
+            // Update step indicator on wizard events
+            $("#wizard").on("activate", updateStepIndicator);
+            $("#wizard").on("done", updateStepIndicator);
+
+            // Initial update
+            setTimeout(updateStepIndicator, 100);
+
+            /* ================= OTP VERIFICATION MODAL ================= */
+            function showOtpVerificationModal(email, firstName) {
+                if ($("#otpModal").data("kendoWindow")) {
+                    $("#otpModal").data("kendoWindow").destroy();
+                }
+
+                const modalContent = `
+                <div style="padding: 35px; text-align: center; min-width: 350px;">
+                    <div style="width: 60px; height: 60px; margin: 0 auto 20px; background: var(--swiggy-orange-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--swiggy-orange); border: 3px solid var(--swiggy-orange-light);">
+                        📱
+                    </div>
+                    <h4 style="font-size: 18px; margin-bottom: 10px; color: var(--text-dark); font-weight: 700;">Verify Your Email</h4>
+                    <p style="color: var(--text-medium); margin-bottom: 25px; font-size: 13px; line-height: 1.5;">
+                        We've sent a 6-digit OTP to<br>
+                        <strong style="color: var(--text-dark); font-weight: 600;">${email}</strong>
+                    </p>
+                    <div style="margin-bottom: 25px;">
+                        <input type="text" id="otpInput" style="width: 220px; height: 50px; font-size: 22px; letter-spacing: 8px; text-align: center; border: 2px solid var(--border-color); border-radius: 8px; margin: 0 auto; display: block; background: var(--bg-light); color: var(--text-dark); font-weight: 600;" maxlength="6" placeholder="••••••" autocomplete="off" />
+                    </div>
+                    <!-- CHANGED: Center the button properly -->
+                    <div style="margin-bottom: 20px; display: flex; justify-content: center; align-items: center; width: 100%;">
+                        <button id="verifyOtpBtn" class="k-button k-button-primary" style="padding: 10px 30px; font-size: 14px; font-weight: 600; height: 42px; min-width: 180px; display: inline-block;">Verify & Continue</button>
+                    </div>
+                    <div style="margin-top: 20px; font-size: 12px; color: var(--text-medium); padding-top: 15px; border-top: 1px solid var(--border-color);">
+                        Didn't receive the code? 
+                        <a href="javascript:void(0)" id="resendOtpBtn" style="color: var(--swiggy-orange); text-decoration: none; font-weight: 700; margin-left: 5px;">Resend OTP</a>
+                    </div>
+                </div>`;
+
+                const otpWindow = $("<div id='otpModal'></div>").kendoWindow({
+                    title: false,
+                    modal: true,
+                    width: 400,
+                    resizable: false,
+                    actions: ["Close"],
+                    close: function () {
+                        this.destroy();
+                    }
+                }).data("kendoWindow");
+
+                otpWindow.content(modalContent).center().open();
+
+                // Force center on screen
+                setTimeout(() => {
+                    otpWindow.center();
+                }, 100);
+
+                $("#otpInput").focus();
+
+                $("#otpInput").on("input", function () {
+                    this.value = this.value.replace(/\D/g, '');
+                    if (this.value.length === 6) {
+                        setTimeout(verifyOtp, 300);
+                    }
+                });
+
+                let canResend = true;
+
+                function verifyOtp() {
+                    const otp = $("#otpInput").val().trim();
+                    if (otp.length !== 6) {
+                        kendo.alert("Please enter a valid 6-digit OTP");
+                        return;
+                    }
+
+                    $("#verifyOtpBtn").prop("disabled", true)
+                        .html('<span style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s linear infinite; margin-right: 8px;"></span> Verifying...');
+
+                    let verifyFormData = new FormData();
+                    verifyFormData.append("email", email);
+                    verifyFormData.append("otp", otp);
+
+                    $.ajax({
+                        url: "http://localhost:5245/api/Otp/verify",
+                        type: "POST",
+                        data: verifyFormData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            console.log("verify OTP response:", response);
+                            if (response.success) {
+                                performRegistration();
+                            } else {
+                                kendo.alert(response.message || "Invalid OTP");
+                                $("#verifyOtpBtn").prop("disabled", false).text("Verify & Continue");
+                            }
+                        },
+                        error: function () {
+                            console.log("verify OTP error:", xhr);
+                            kendo.alert("Verification failed. Please try again.");
+                            $("#verifyOtpBtn").prop("disabled", false).text("Verify & Continue");
+                            $("#otpInput").val("").focus();
+                        }
+                    });
+                }
+
+                function performRegistration() {
+                    let fd = new FormData();
+
+                    // Append image file if selected
+                    let fileInput = $("[name='c_imagefile']")[0];
+                    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+                        fd.append("c_imagefile", fileInput.files[0]);
+                    }
+
+
+                    // Get state and city text values
+                    wizardData.c_state = $("[name='c_state']").data("kendoDropDownList").text();
+                    wizardData.c_city = $("[name='c_city']").data("kendoDropDownList").text();
+
+                    // Append wizard data
+                    Object.entries(wizardData).forEach(([key, value]) => {
+                        if (value !== "" && value !== null && value !== undefined) {
+                            fd.append(key, value);
+                        }
+                    });
+
+                    $.ajax({
+                        url: "http://localhost:5245/api/Customer/register",
+                        type: "POST",
+                        data: fd,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            console.log("registration response:", response);
+                            if (response.success) {
+                                showSuccessModal(firstName);
+                            } else {
+                                kendo.alert(response.message || "Registration failed.");
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log("registration error:", xhr);
+                            let msg = "Registration failed.";
+                            if (xhr.responseJSON?.message) msg = xhr.responseJSON.message;
+                            kendo.alert(msg);
+                        }
+                    });
+                }
+
+                function resendOtp() {
+                    if (!canResend) return;
+
+                    canResend = false;
+                    $("#resendOtpBtn").css("opacity", "0.5");
+
+                    $.ajax({
+                        url: "http://localhost:5245/api/Otp/resend",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ email: email }),
+                        success: function (response) {
+                            console.log("resend OTP response:", response);
+                            if (response.success) {
+                                kendo.alert("New OTP has been sent!");
+                                $("#otpInput").val("").focus();
+
+                                setTimeout(() => {
+                                    canResend = true;
+                                    $("#resendOtpBtn").css("opacity", "1");
+                                }, 30000);
+                            } else {
+                                kendo.alert(response.message || "Failed to resend OTP");
+                                canResend = true;
+                                $("#resendOtpBtn").css("opacity", "1");
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log("resend OTP error:", xhr);
+                            kendo.alert("Failed to resend OTP.");
+                            canResend = true;
+                            $("#resendOtpBtn").css("opacity", "1");
+                        }
+                    });
+                }
+
+                $("#verifyOtpBtn").on("click", verifyOtp);
+                $("#resendOtpBtn").on("click", resendOtp);
+
+                $("#otpInput").on("keypress", function (e) {
+                    if (e.which === 13) {
+                        verifyOtp();
+                    }
+                });
+            }
+
+            /* ================= SUCCESS MODAL ================= */
+            function showSuccessModal(firstName) {
+                $("#otpModal").data("kendoWindow")?.close();
+
+                const successContent = `
+            <div style="padding: 40px; text-align: center; min-width: 350px;">
+                <div style="width: 70px; height: 70px; margin: 0 auto 20px; background: linear-gradient(135deg, var(--success-color) 0%, #4A9F3A 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; color: white; border: 4px solid var(--swiggy-orange-light); box-shadow: 0 10px 25px rgba(96, 178, 70, 0.3);">
+                    ✓
+                </div>
+                <h4 style="color: var(--success-color); font-size: 20px; margin-bottom: 12px; font-weight: 800;">Welcome to DineSwift! 🎉</h4>
+                <p style="color: var(--text-medium); margin-bottom: 30px; font-size: 14px; line-height: 1.6;">
+                    Hey <strong style="color: var(--text-dark); font-weight: 700;">${firstName}</strong>!<br>
+                    Your account is ready to use.
+                </p>
+                <!-- CHANGED: Center the button properly -->
+                <div style="display: flex; justify-content: center; align-items: center; width: 100%; margin-bottom: 10px;">
+                    <button id="goToLoginBtn" class="k-button k-button-primary" style="padding: 12px 35px; font-size: 14px; font-weight: 700; height: 45px; min-width: 200px; display: inline-block;">Start Exploring</button>
+                </div>
+                <div style="margin-top: 25px; font-size: 12px; color: var(--text-light);">
+                    Redirecting to login page...
+                </div>
+            </div>`;
+
+                const successWindow = $("<div id='successModal'></div>").kendoWindow({
+                    title: false,
+                    modal: true,
+                    width: 420,
+                    resizable: false,
+                    actions: [],
+                    close: function () {
+                        this.destroy();
+                        window.location.href = "/Auth/Login";
+                    }
+                }).data("kendoWindow");
+
+                successWindow.content(successContent).center().open();
+
+                // Force center on screen
+                setTimeout(() => {
+                    successWindow.center();
+                }, 100);
+
+                $("#goToLoginBtn").on("click", function () {
+                    window.location.href = "/Auth/Login";
+                });
+            }
+
+            // Clean Kendo fields
+            function cleanKendoFields(container) {
+                $(container)
+                    .find("input, textarea, select")
+                    .each(function () {
+                        $(this)
+                            .removeAttr("title")
+                            .removeAttr("aria-label")
+                            .attr("autocomplete", "off");
+                    });
+            }
+
+            $(document).ready(function () {
+                cleanKendoFields(document);
+            });
+
+            $(document).on("focusin", ".k-form input, .k-form textarea, .k-form select", function () {
+                $(this).removeAttr("title").removeAttr("aria-label");
+            });
+
+            $(document).on("kendoStepperActivate", function (e) {
+                try { cleanKendoFields(e.sender.element); } catch (err) { }
+            });
+        });
+    </script>
+}

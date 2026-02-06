@@ -1,0 +1,113 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+
+
+/* ===============================
+   SWEETALERT2 THEME (ORANGE UI)
+================================ */
+
+/* Popup container */
+.swal2-popup {
+    border-radius: 18px !important;
+    background: linear-gradient(135deg, #fff7ed, #ffffff) !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid #fed7aa !important;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Title */
+.swal2-title {
+    color: #9a3412 !important;
+    font-weight: 800 !important;
+    font-size: 1.4rem !important;
+}
+
+/* Text */
+.swal2-html-container,
+.swal2-content {
+    color: #475569 !important;
+    font-size: 0.95rem !important;
+}
+
+/* Icons */
+.swal2-icon.swal2-warning {
+    border-color: #f97316 !important;
+    color: #f97316 !important;
+}
+
+.swal2-icon.swal2-success {
+    border-color: #22c55e !important;
+    color: #22c55e !important;
+}
+
+.swal2-icon.swal2-error {
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+}
+
+/* Confirm Button (Primary – Orange) */
+.swal2-confirm {
+    background: linear-gradient(135deg, #f97316, #ea580c) !important;
+    color: #ffffff !important;
+    border-radius: 999px !important;
+    padding: 10px 24px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 8px 18px rgba(249, 115, 22, 0.35) !important;
+    transition: all 0.25s ease !important;
+}
+
+.swal2-confirm:hover {
+    background: linear-gradient(135deg, #ea580c, #c2410c) !important;
+    transform: translateY(-1px);
+}
+
+/* Cancel Button (Neutral) */
+.swal2-cancel {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    border-radius: 999px !important;
+    padding: 10px 22px !important;
+    font-weight: 700 !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+.swal2-cancel:hover {
+    background: #e2e8f0 !important;
+}
+
+/* Footer spacing */
+.swal2-actions {
+    gap: 12px !important;
+}
+
+/* Backdrop blur */
+.swal2-backdrop-show {
+    backdrop-filter: blur(6px);
+    background: rgba(15, 23, 42, 0.4) !important;
+}

@@ -1,0 +1,2850 @@
+@{
+    ViewData["Title"] = "Order History Page";
+    Layout = "~/Views/Shared/_userdashboardLayout.cshtml";
+}
+<link rel="stylesheet" href="~/lib/kendo/kendo.default-v2.min.css">
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Playfair+Display:wght@600;700&display=swap');
+
+    :root {
+        --background: #FDF9F6;
+        --foreground: #2E2621;
+        --primary: #E9622A;
+        --primary-glow: #EF8456;
+        --secondary: #F5F0E8;
+        --accent: #DF4423;
+        --success: #22B55B;
+        --warning: #F59E0B;
+        --danger: #EF4444;
+        --muted: #EDE9E5;
+        --muted-text: #7A716A;
+        --border: #E5DFD9;
+        --destructive: #EF4444;
+        --card-bg: #FFFFFF;
+        --rating-color: #FFC107;
+        --spacing-xs: 0.5rem;
+        --spacing-sm: 1rem;
+        --spacing-md: 1.5rem;
+        --spacing-lg: 2rem;
+        --spacing-xl: 3rem;
+        --border-radius: 16px;
+        --border-radius-sm: 12px;
+        --shadow-sm: 0 2px 8px rgba(46, 38, 33, 0.04);
+        --shadow-md: 0 4px 20px rgba(46, 38, 33, 0.08);
+        --shadow-lg: 0 8px 40px rgba(46, 38, 33, 0.12);
+        --shadow-glow: 0 0 40px rgba(233, 98, 42, 0.15);
+        --gradient-primary: linear-gradient(135deg, #E9622A, #DF4423);
+        --gradient-warm: linear-gradient(180deg, #FDF9F6, #F5F0E8);
+        --gradient-danger: linear-gradient(135deg, #EF4444, #DC2626);
+        --gradient-rating: linear-gradient(135deg, #FFD700, #FFC107);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--gradient-warm);
+        color: var(--foreground);
+        line-height: 1.6;
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    /* Decorative background blurs */
+    .bg-decoration {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(80px);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .bg-decoration-1 {
+        width: 400px;
+        height: 400px;
+        background: rgba(233, 98, 42, 0.1);
+        top: -150px;
+        right: -150px;
+        animation: pulse-bg 4s ease-in-out infinite;
+    }
+
+    .bg-decoration-2 {
+        width: 350px;
+        height: 350px;
+        background: rgba(223, 68, 35, 0.08);
+        top: 50%;
+        left: -150px;
+        animation: pulse-bg 5s ease-in-out infinite 1s;
+    }
+
+    .bg-decoration-3 {
+        width: 300px;
+        height: 300px;
+        background: rgba(245, 158, 11, 0.08);
+        bottom: -100px;
+        right: 30%;
+        animation: pulse-bg 6s ease-in-out infinite 2s;
+    }
+
+    @@keyframes pulse-bg {
+
+        0%,
+        100% {
+            opacity: 0.6;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: var(--spacing-lg);
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Enhanced Header Styles with Animations */
+    .header {
+        margin-bottom: var(--spacing-xl);
+        padding-bottom: var(--spacing-lg);
+        border-bottom: 1px solid var(--border);
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    .header-content {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        flex: 1;
+    }
+
+    .header-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: var(--border-radius);
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px rgba(233, 98, 42, 0.25);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: bounceIn 0.8s ease-out 0.2s both;
+    }
+
+    .header-icon:hover {
+        transform: scale(1.05) rotate(5deg);
+        box-shadow: 0 12px 32px rgba(233, 98, 42, 0.3);
+    }
+
+    .header-icon .k-icon {
+        font-size: 1.75rem;
+        color: white;
+        animation: spinIn 0.6s ease-out 0.4s both;
+    }
+
+    .header-text {
+        animation: slideInLeft 0.6s ease-out 0.3s both;
+    }
+
+    .header-text h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(1.75rem, 5vw, 2.5rem);
+        font-weight: 700;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+        position: relative;
+        display: inline-block;
+    }
+
+    .header-text h1::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 3px;
+        background: var(--gradient-primary);
+        border-radius: 2px;
+        animation: underlineExpand 0.8s ease-out 0.8s forwards;
+    }
+
+    .header-text p {
+        color: var(--muted-text);
+        font-size: 0.9375rem;
+        margin-top: 0.25rem;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeInUp 0.5s ease-out 0.6s forwards;
+    }
+
+    /* Order Statistics */
+    .order-stats {
+        display: flex;
+        gap: var(--spacing-md);
+        flex-wrap: wrap;
+        animation: fadeInUp 0.6s ease-out 0.7s both;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        background: linear-gradient(135deg, var(--secondary), rgba(245, 240, 232, 0.8));
+        border-radius: var(--border-radius-sm);
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--foreground);
+        border: 1px solid var(--border);
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .stat-item:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-glow);
+        background: linear-gradient(135deg, #F9F4EC, rgba(245, 240, 232, 0.9));
+    }
+
+    .stat-item .k-icon {
+        color: var(--primary);
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-item:hover .k-icon {
+        transform: scale(1.1);
+    }
+
+    .stat-value {
+        font-weight: 700;
+        color: var(--primary);
+        margin-left: 0.25rem;
+        font-size: 1rem;
+    }
+
+    /* Animations */
+    @@keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes bounceIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.3);
+        }
+
+        50% {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        70% {
+            transform: scale(0.9);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    @@keyframes spinIn {
+        from {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0.5);
+        }
+
+        to {
+            opacity: 1;
+            transform: rotate(0) scale(1);
+        }
+    }
+
+    @@keyframes underlineExpand {
+        from {
+            width: 0;
+        }
+
+        to {
+            width: 100%;
+        }
+    }
+
+    /* Loading Styles */
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+        gap: var(--spacing-md);
+    }
+
+    .loading-spinner {
+        position: relative;
+        width: 48px;
+        height: 48px;
+    }
+
+    .loading-spinner::before,
+    .loading-spinner::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 3px solid transparent;
+    }
+
+    .loading-spinner::before {
+        border-top-color: var(--primary);
+        animation: spin 1s linear infinite;
+    }
+
+    .loading-spinner::after {
+        border-bottom-color: var(--accent);
+        animation: spin 1.5s linear infinite reverse;
+    }
+
+    .loading-text {
+        color: var(--muted-text);
+        font-size: 0.9375rem;
+        animation: fadeIn 0.5s ease-out 0.5s both;
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Error Styles */
+    .error-message {
+        background: linear-gradient(135deg, #FEE2E2, #FECACA);
+        border: 1px solid #F87171;
+        color: #991B1B;
+        padding: var(--spacing-md);
+        border-radius: var(--border-radius);
+        text-align: center;
+        margin: var(--spacing-lg) 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        animation: shake 0.5s ease-out;
+    }
+
+    @@keyframes shake {
+
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-5px);
+        }
+
+        75% {
+            transform: translateX(5px);
+        }
+    }
+
+    /* Orders Container */
+    .orders-container {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-xl);
+    }
+
+    /* Order Card Styles */
+    .order-row {
+        background: var(--card-bg);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: slideUp 0.5s ease-out forwards;
+    }
+
+    .order-row:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .order-row:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .order-row:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .order-row:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    .order-row:nth-child(5) {
+        animation-delay: 0.5s;
+    }
+
+    @@keyframes slideUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .order-main-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    @@media (min-width: 768px) {
+        .order-main-content {
+            flex-direction: row;
+            align-items: center;
+        }
+    }
+
+    .order-row:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-glow);
+    }
+
+    .order-row.active {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-lg), var(--shadow-glow);
+    }
+
+    /* Image Section */
+    .order-image-section {
+        flex: 0 0 auto;
+        padding: var(--spacing-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .food-image-wrapper {
+        position: relative;
+        transition: transform 0.3s ease;
+    }
+
+    .order-row:hover .food-image-wrapper {
+        transform: scale(1.05);
+    }
+
+    .food-image {
+        width: 96px;
+        height: 96px;
+        border-radius: var(--border-radius-sm);
+        object-fit: cover;
+        background-color: var(--muted);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .food-image-ring {
+        position: absolute;
+        inset: 0;
+        border-radius: var(--border-radius-sm);
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+    }
+
+    @@media (min-width: 768px) {
+        .food-image {
+            width: 112px;
+            height: 112px;
+        }
+    }
+
+    /* Details Section */
+    .order-details-section {
+        flex: 1;
+        padding: var(--spacing-md);
+        border-top: 1px solid var(--border);
+    }
+
+    @@media (min-width: 768px) {
+        .order-details-section {
+            border-top: none;
+            border-left: 1px solid var(--border);
+        }
+    }
+
+    .dish-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--foreground);
+        margin-bottom: var(--spacing-sm);
+        line-height: 1.3;
+    }
+
+    .order-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-md);
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .meta-item .k-icon {
+        color: var(--primary);
+        font-size: 1rem;
+        width: 18px;
+        flex-shrink: 0;
+    }
+
+    .meta-label {
+        color: var(--muted-text);
+    }
+
+    .meta-value {
+        font-weight: 600;
+        color: var(--foreground);
+    }
+
+    /* Status Section */
+    .order-status-section {
+        flex: 0 0 auto;
+        padding: var(--spacing-md);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--spacing-sm);
+        border-top: 1px solid var(--border);
+    }
+
+    @@media (min-width: 768px) {
+        .order-status-section {
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            border-top: none;
+            border-left: 1px solid var(--border);
+            min-width: 180px;
+        }
+    }
+
+    .price-display {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .status-and-chevron {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.5rem;
+    }
+
+    .status-badge {
+        padding: 0.375rem 1rem;
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+    }
+
+    .status-processing {
+        background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+        color: #92400E;
+    }
+
+    .status-prepared {
+        background: linear-gradient(135deg, #DBEAFE, #BFDBFE);
+        color: #1E40AF;
+    }
+
+    .status-outfordelivery {
+        background: linear-gradient(135deg, #E0E7FF, #C7D2FE);
+        color: #3730A3;
+    }
+
+    .status-delivered {
+        background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+        color: #065F46;
+    }
+
+    .chevron-icon {
+        transition: transform 0.3s ease;
+        color: var(--muted-text);
+    }
+
+    .order-row.active .chevron-icon {
+        transform: rotate(180deg);
+    }
+
+    /* Rate and Review Button */
+    .rate-review-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: var(--gradient-rating);
+        color: #7A4504;
+        border: none;
+        border-radius: 100px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        margin-top: 0.5rem;
+        opacity: 0;
+        transform: translateY(-10px);
+        animation: slideInUp 0.4s ease-out forwards;
+        animation-delay: 0.3s;
+    }
+
+    @@keyframes slideInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .rate-review-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+    }
+
+    .rate-review-btn:active {
+        transform: translateY(0);
+    }
+
+    .rate-review-btn .k-icon {
+        font-size: 1rem;
+    }
+
+    /* Cancel Order Button */
+    .cancel-order-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--gradient-danger);
+        color: white;
+        border: none;
+        border-radius: 100px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        margin-top: 0.5rem;
+        opacity: 0;
+        transform: translateY(-10px);
+        animation: slideInUp 0.4s ease-out forwards;
+        animation-delay: 0.3s;
+    }
+
+    .cancel-order-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .cancel-order-btn:active {
+        transform: translateY(0);
+    }
+
+    .cancel-order-btn .k-icon {
+        font-size: 0.875rem;
+    }
+
+    /* Collapse Panel - Now at the bottom */
+    .collapse-panel {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+            padding 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+            opacity 0.4s ease;
+        background: linear-gradient(180deg, var(--secondary), rgba(245, 240, 232, 0.5));
+        border-top: 0 solid var(--border);
+        opacity: 0;
+    }
+
+    .collapse-panel.active {
+        max-height: 400px;
+        padding: var(--spacing-lg);
+        border-top-width: 1px;
+        opacity: 1;
+    }
+
+    /* Progress Section */
+    .progress-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: var(--spacing-lg);
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeInUp 0.4s ease-out forwards;
+    }
+
+    .collapse-panel.active .progress-header {
+        animation-delay: 0.1s;
+    }
+
+    .progress-header-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: bounceIn 0.6s ease-out;
+    }
+
+    .progress-header-icon .k-icon {
+        color: white;
+        font-size: 1rem;
+    }
+
+    .progress-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--foreground);
+    }
+
+    /* Progress Steps */
+    .progress-container {
+        position: relative;
+        padding: 0 20px;
+    }
+
+    /* Progress line background with shimmer */
+    .progress-line {
+        position: absolute;
+        top: 20px;
+        left: 40px;
+        right: 40px;
+        height: 3px;
+        background-color: var(--border);
+        z-index: 1;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-line::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(122, 113, 106, 0.2), transparent);
+        animation: shimmer 2s ease-in-out infinite;
+    }
+
+    @@keyframes shimmer {
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    /* Animated Progress fill */
+    .progress-fill {
+        position: absolute;
+        top: 20px;
+        left: 40px;
+        height: 4px;
+        background: var(--gradient-primary);
+        z-index: 2;
+        border-radius: 4px;
+        box-shadow: 0 0 20px rgba(233, 98, 42, 0.4);
+        overflow: hidden;
+        width: 0;
+        animation: progressGrow 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @@keyframes progressGrow {
+        0% {
+            width: 0;
+            opacity: 0;
+        }
+
+        20% {
+            opacity: 1;
+        }
+
+        100% {
+            width: var(--progress-width);
+            opacity: 1;
+        }
+    }
+
+    /* Shimmer effect on progress fill */
+    .progress-fill::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    /* Glowing dot at the end */
+    .progress-fill::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.7);
+        filter: blur(3px);
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @@keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 0.5;
+            transform: translateY(-50%) scale(1);
+        }
+
+        50% {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.3);
+        }
+    }
+
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        z-index: 3;
+    }
+
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    .collapse-panel.active .step {
+        animation: stepFadeIn 0.5s ease-out forwards;
+    }
+
+    .collapse-panel.active .step:nth-child(1) {
+        animation-delay: 0.2s;
+    }
+
+    .collapse-panel.active .step:nth-child(2) {
+        animation-delay: 0.35s;
+    }
+
+    .collapse-panel.active .step:nth-child(3) {
+        animation-delay: 0.5s;
+    }
+
+    .collapse-panel.active .step:nth-child(4) {
+        animation-delay: 0.65s;
+    }
+
+    @@keyframes stepFadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--border);
+        background-color: var(--card-bg);
+        transition: all 0.4s ease;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .step-icon .k-icon {
+        font-size: 1.125rem;
+        color: var(--muted-text);
+        transition: all 0.3s ease;
+    }
+
+    .step.active .step-icon {
+        background: var(--gradient-primary);
+        border-color: var(--primary);
+        animation: pulseRing 2s infinite;
+    }
+
+    .step.active .step-icon .k-icon {
+        color: white;
+    }
+
+    .step.completed .step-icon {
+        background: var(--success);
+        border-color: var(--success);
+        animation: scaleIn 0.5s ease;
+    }
+
+    .step.completed .step-icon .k-icon {
+        color: white;
+    }
+
+    .step-label {
+        font-size: 0.8125rem;
+        color: var(--muted-text);
+        text-align: center;
+        max-width: 80px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .step.active .step-label,
+    .step.completed .step-label {
+        color: var(--foreground);
+        font-weight: 600;
+    }
+
+    .step-done-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-top: 0.25rem;
+        font-size: 0.6875rem;
+        color: var(--success);
+        font-weight: 600;
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    .collapse-panel.active .step.completed .step-done-badge {
+        animation: badgePop 0.3s ease forwards;
+        animation-delay: 0.8s;
+    }
+
+    @@keyframes badgePop {
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* SMALLER Rating Popup Styles */
+    .rating-popup-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(46, 38, 33, 0.8);
+        backdrop-filter: blur(8px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease-out;
+        padding: var(--spacing-md);
+    }
+
+    .rating-popup-container {
+        background: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-lg), 0 0 60px rgba(233, 98, 42, 0.2);
+        width: 100%;
+        max-width: 380px;
+        /* Smaller width */
+        overflow: hidden;
+        animation: slideUpScale 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    @@keyframes slideUpScale {
+        0% {
+            opacity: 0;
+            transform: translateY(40px) scale(0.9);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .rating-popup-header {
+        background: var(--gradient-primary);
+        padding: var(--spacing-md);
+        /* Smaller padding */
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .rating-popup-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        animation: shimmer 3s infinite;
+    }
+
+    .rating-popup-header h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        /* Smaller font */
+        color: white;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .rating-popup-header p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.875rem;
+        /* Smaller font */
+        margin-top: 0.25rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .rating-popup-content {
+        padding: var(--spacing-lg);
+        /* Smaller padding */
+    }
+
+    .rating-section {
+        margin-bottom: var(--spacing-md);
+        /* Smaller margin */
+    }
+
+    .rating-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.125rem;
+        /* Smaller font */
+        color: var(--foreground);
+        margin-bottom: var(--spacing-sm);
+        text-align: center;
+    }
+
+    .stars-container {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        /* Smaller gap */
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .star-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.25rem;
+        /* Smaller padding */
+        transition: all 0.3s ease;
+        transform: scale(1);
+    }
+
+    .star-btn:hover {
+        transform: scale(1.1);
+        /* Smaller scale */
+    }
+
+    .star-btn .k-icon {
+        font-size: 1.75rem;
+        /* Smaller stars */
+        color: var(--border);
+        transition: all 0.3s ease;
+    }
+
+    .star-btn.selected .k-icon,
+    .star-btn:hover .k-icon {
+        color: var(--rating-color);
+        filter: drop-shadow(0 0 6px rgba(255, 193, 7, 0.4));
+    }
+
+    .star-btn.selected .k-icon {
+        animation: starPop 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @@keyframes starPop {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.2);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .rating-value-display {
+        text-align: center;
+        font-size: 0.875rem;
+        /* Smaller font */
+        color: var(--muted-text);
+        margin-top: 0.25rem;
+    }
+
+    .rating-value {
+        font-weight: 700;
+        color: var(--rating-color);
+        background: rgba(255, 193, 7, 0.1);
+        padding: 0.125rem 0.5rem;
+        /* Smaller padding */
+        border-radius: 100px;
+        display: inline-block;
+        margin-left: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    .review-section {
+        margin-bottom: var(--spacing-md);
+    }
+
+    .review-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1rem;
+        /* Smaller font */
+        color: var(--foreground);
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .review-textarea {
+        width: 100%;
+        min-height: 80px;
+        /* Smaller height */
+        padding: var(--spacing-sm);
+        /* Smaller padding */
+        border: 2px solid var(--border);
+        border-radius: var(--border-radius-sm);
+        background: var(--secondary);
+        color: var(--foreground);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.875rem;
+        /* Smaller font */
+        line-height: 1.5;
+        resize: vertical;
+        transition: all 0.3s ease;
+    }
+
+    .review-textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(233, 98, 42, 0.1);
+        background: var(--card-bg);
+    }
+
+    .review-textarea::placeholder {
+        color: var(--muted-text);
+        font-size: 0.875rem;
+    }
+
+    .rating-buttons {
+        display: flex;
+        gap: var(--spacing-sm);
+        margin-top: var(--spacing-md);
+    }
+
+    .rating-submit-btn {
+        flex: 1;
+        padding: 0.75rem;
+        /* Smaller padding */
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius-sm);
+        font-size: 0.875rem;
+        /* Smaller font */
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(233, 98, 42, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .rating-submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(233, 98, 42, 0.4);
+    }
+
+    .rating-submit-btn:active {
+        transform: translateY(0);
+    }
+
+    .rating-submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .rating-cancel-btn {
+        flex: 1;
+        padding: 0.75rem;
+        background: var(--secondary);
+        color: var(--muted-text);
+        border: 2px solid var(--border);
+        border-radius: var(--border-radius-sm);
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .rating-cancel-btn:hover {
+        background: var(--muted);
+        color: var(--foreground);
+    }
+
+    /* Status Update Notification Styles */
+    .status-toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        padding: 16px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-lg);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease-out;
+        max-width: 300px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-left: 4px solid var(--primary);
+    }
+
+    @@keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes slideOutRight {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        to {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+    }
+
+    @@keyframes pulseStatus {
+        0% {
+            box-shadow: 0 0 0 0 rgba(233, 98, 42, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(233, 98, 42, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(233, 98, 42, 0);
+        }
+    }
+
+    .status-updated {
+        animation: pulseStatus 1.5s ease-out;
+    }
+
+    /* Real-time indicator */
+    .realtime-indicator {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        background: rgba(34, 181, 91, 0.1);
+        border: 1px solid rgba(34, 181, 91, 0.3);
+        border-radius: 100px;
+        font-size: 0.75rem;
+        color: var(--success);
+        font-weight: 600;
+        margin-top: 8px;
+    }
+
+    .realtime-indicator .pulse-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--success);
+        border-radius: 50%;
+        animation: pulseDot 2s infinite;
+    }
+
+    @@keyframes pulseDot {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.7;
+            transform: scale(1.2);
+        }
+    }
+
+    /* Refresh button */
+    .refresh-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius-sm);
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-left: auto;
+    }
+
+    .refresh-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(233, 98, 42, 0.4);
+    }
+
+    .refresh-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Polling controls */
+    .polling-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        padding: 8px 12px;
+        background: var(--secondary);
+        border-radius: var(--border-radius-sm);
+        font-size: 0.875rem;
+    }
+
+    .polling-toggle {
+        display: flex;
+        gap: 4px;
+    }
+
+    /* Animations */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes pulseRing {
+        0% {
+            box-shadow: 0 0 0 0 rgba(233, 98, 42, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 12px rgba(233, 98, 42, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(233, 98, 42, 0);
+        }
+    }
+
+    @@keyframes scaleIn {
+        0% {
+            transform: scale(0);
+        }
+
+        60% {
+            transform: scale(1.15);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    /* No Orders State */
+    .no-orders {
+        text-align: center;
+        padding: var(--spacing-xl) var(--spacing-md);
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .no-orders-icon {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        background: var(--secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto var(--spacing-md);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .no-orders-icon .k-icon {
+        font-size: 2.5rem;
+        color: var(--muted-text);
+    }
+
+    @@keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .no-orders h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--foreground);
+        margin-bottom: 0.5rem;
+    }
+
+    .no-orders p {
+        color: var(--muted-text);
+        max-width: 300px;
+        margin: 0 auto var(--spacing-md);
+    }
+
+    .browse-menu-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: 100px;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 16px rgba(233, 98, 42, 0.3);
+    }
+
+    .browse-menu-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(233, 98, 42, 0.4);
+    }
+
+    /* Footer Hint */
+    .footer-hint {
+        text-align: center;
+        color: var(--muted-text);
+        font-size: 0.875rem;
+        margin-top: var(--spacing-lg);
+        opacity: 0;
+        animation: fadeIn 0.5s ease-out 0.8s forwards;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 640px) {
+        .container {
+            padding: var(--spacing-md);
+        }
+
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+        }
+
+        .order-stats {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .stat-item {
+            flex: 1;
+            justify-content: center;
+            min-width: 120px;
+        }
+
+        .order-meta {
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .step-label {
+            font-size: 0.6875rem;
+            max-width: 60px;
+        }
+
+        .step-icon {
+            width: 36px;
+            height: 36px;
+        }
+
+        .progress-line {
+            top: 18px;
+        }
+
+        .progress-fill {
+            top: 18px;
+        }
+
+        .status-and-chevron {
+            align-items: stretch;
+        }
+
+        .cancel-order-btn,
+        .rate-review-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .rating-popup-content {
+            padding: var(--spacing-md);
+        }
+
+        .stars-container {
+            gap: 0.25rem;
+        }
+
+        .star-btn .k-icon {
+            font-size: 1.5rem;
+        }
+
+        .rating-buttons {
+            flex-direction: column;
+        }
+
+        .rating-popup-container {
+            max-width: 320px;
+        }
+
+        .status-toast {
+            max-width: 250px;
+            right: 10px;
+            left: 10px;
+        }
+    }
+</style>
+
+<!-- Rating Popup -->
+<div id="ratingPopup" class="rating-popup-overlay">
+    <div class="rating-popup-container">
+        <div class="rating-popup-header">
+            <h2>Rate Your Order</h2>
+            <p>Share your experience to help us improve</p>
+        </div>
+        <div class="rating-popup-content">
+            <div class="rating-section">
+                <h3 class="rating-title">How was your experience?</h3>
+                <div class="stars-container">
+                    <button class="star-btn" data-value="1">
+                        <span class="k-icon k-i-star"></span>
+                    </button>
+                    <button class="star-btn" data-value="2">
+                        <span class="k-icon k-i-star"></span>
+                    </button>
+                    <button class="star-btn" data-value="3">
+                        <span class="k-icon k-i-star"></span>
+                    </button>
+                    <button class="star-btn" data-value="4">
+                        <span class="k-icon k-i-star"></span>
+                    </button>
+                    <button class="star-btn" data-value="5">
+                        <span class="k-icon k-i-star"></span>
+                    </button>
+                </div>
+                <div class="rating-value-display">
+                    Selected rating: <span class="rating-value" id="selectedRatingValue">0/5</span>
+                </div>
+            </div>
+
+            <div class="review-section">
+                <h3 class="review-title">Share your thoughts (optional)</h3>
+                <textarea class="review-textarea" id="reviewText"
+                    placeholder="What did you like about your order? Any suggestions for improvement?"
+                    maxlength="500"></textarea>
+                <div style="text-align: right; margin-top: 0.5rem; font-size: 0.75rem; color: var(--muted-text);">
+                    <span id="charCount">0</span>/500 characters
+                </div>
+            </div>
+
+            <div class="rating-buttons">
+                <button class="rating-cancel-btn" id="cancelRating">Cancel</button>
+                <button class="rating-submit-btn" id="submitRating" disabled>
+                    <span class="k-icon k-i-check"></span>
+                    Submit Rating
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Decorative background elements -->
+<div class="bg-decoration bg-decoration-1"></div>
+<div class="bg-decoration bg-decoration-2"></div>
+<div class="bg-decoration bg-decoration-3"></div>
+
+<div class="container">
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-icon">
+                    <span class="k-icon k-i-shopping-cart"></span>
+                </div>
+                <div class="header-text">
+                    <h1>Order History</h1>
+                    <p>Track and view all your past orders</p>
+                    <div class="realtime-indicator" id="realtimeIndicator" style="display: none;">
+                        <div class="pulse-dot"></div>
+                        <span>Live Updates Active</span>
+                    </div>
+                </div>
+            </div>
+            <div class="order-stats" id="orderStats">
+                <!-- Stats will be populated by JavaScript -->
+                <div class="stat-item">
+                    <span class="k-icon k-i-check-outline"></span>
+                    Total: <span class="stat-value" id="totalOrders">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="k-icon k-i-check-circle"></span>
+                    Delivered: <span class="stat-value" id="deliveredOrders">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="k-icon k-i-clock"></span>
+                    Pending: <span class="stat-value" id="pendingOrders">0</span>
+                </div>
+            </div>
+            <button class="refresh-btn" id="manualRefreshBtn" style="display: none;">
+                <span class="k-icon k-i-refresh"></span>
+                Refresh
+            </button>
+        </div>
+        <div class="polling-controls" id="pollingControls" style="display: none;">
+            <div style="display: flex; align-items: center; gap: 4px;">
+                <span class="k-icon k-i-refresh" style="color: var(--primary);"></span>
+                <span>Live updates:</span>
+            </div>
+            <div class="polling-toggle">
+                <button id="enablePolling" style="
+                    padding: 4px 12px;
+                    background: var(--primary);
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    font-size: 0.8125rem;
+                    cursor: pointer;
+                ">On</button>
+                <button id="disablePolling" style="
+                    padding: 4px 12px;
+                    background: var(--muted);
+                    color: var(--muted-text);
+                    border: none;
+                    border-radius: 4px;
+                    font-size: 0.8125rem;
+                    cursor: pointer;
+                ">Off</button>
+            </div>
+            <div id="pollingStatus" style="
+                padding: 4px 8px;
+                background: var(--success);
+                color: white;
+                border-radius: 4px;
+                font-size: 0.75rem;
+                font-weight: 600;
+            ">Active</div>
+        </div>
+    </div>
+
+    <div id="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading your orders...</p>
+    </div>
+
+    <div id="errorContainer" style="display: none;"></div>
+
+    <div class="orders-container" id="ordersContainer"></div>
+
+    <p class="footer-hint" id="footerHint" style="display: none;">
+        Click on any order to view detailed progress
+    </p>
+</div>
+
+<!-- SweetAlert CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+@section Scripts {
+    <script src="~/lib/kendo/kendo.all.min.js"></script>
+    <!-- SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function () {
+            const customerId = "@Context.Session.GetInt32("CustomerId")";
+            var currentOpenCard = null;
+            var progressCache = {};
+            var currentRatingOrder = null;
+            var selectedRating = 0;
+            var allOrders = [];
+
+            // Real-time polling variables
+            var lastCheckTime = new Date();
+            var isPollingActive = true;
+            var pollingInterval = null;
+
+            // Store rated orders in localStorage
+            function getRatedOrders() {
+                const rated = localStorage.getItem('ratedOrders');
+                return rated ? JSON.parse(rated) : [];
+            }
+
+            function saveRatedOrder(orderId) {
+                const rated = getRatedOrders();
+                if (!rated.includes(orderId)) {
+                    rated.push(orderId);
+                    localStorage.setItem('ratedOrders', JSON.stringify(rated));
+                }
+            }
+
+            function isOrderRated(orderId) {
+                const rated = getRatedOrders();
+                return rated.includes(orderId);
+            }
+
+            function getStatusBadgeClass(status) {
+                const statusMap = {
+                    'Processing': 'status-processing',
+                    'Prepared': 'status-prepared',
+                    'Out for delivery': 'status-outfordelivery',
+                    'Out for Delivery': 'status-outfordelivery',
+                    'Delivered': 'status-delivered'
+                };
+                return statusMap[status] || 'status-processing';
+            }
+
+            function formatDateTime(dateString, timeString) {
+                let date = new Date(dateString);
+                if (isNaN(date.getTime())) {
+                    date = new Date();
+                }
+
+                const formattedDate = date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+
+                let formattedTime = '';
+                if (timeString) {
+                    const timeParts = timeString.toString().split(':');
+                    if (timeParts.length >= 2) {
+                        let hours = parseInt(timeParts[0]);
+                        const minutes = timeParts[1];
+                        const ampm = hours >= 12 ? 'PM' : 'AM';
+                        hours = hours % 12;
+                        hours = hours ? hours : 12;
+                        formattedTime = `${hours}:${minutes.padStart(2, '0')} ${ampm}`;
+                    } else {
+                        formattedTime = timeString;
+                    }
+                } else {
+                    formattedTime = date.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                }
+
+                return {
+                    date: formattedDate,
+                    time: formattedTime
+                };
+            }
+
+            function formatCurrency(amount) {
+                return '₹' + new Intl.NumberFormat('en-IN', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(amount);
+            }
+
+            function updateOrderStats() {
+                const totalOrders = allOrders.length;
+                const deliveredOrders = allOrders.filter(order =>
+                    order.c_orderstatus === 'Delivered'
+                ).length;
+                const pendingOrders = allOrders.filter(order =>
+                    order.c_orderstatus !== 'Delivered' &&
+                    order.c_orderstatus !== 'Cancelled'
+                ).length;
+
+                $('#totalOrders').text(totalOrders);
+                $('#deliveredOrders').text(deliveredOrders);
+                $('#pendingOrders').text(pendingOrders);
+            }
+
+            function loadOrders() {
+                $('#loading').show();
+                $('#errorContainer').hide();
+                $('#ordersContainer').empty();
+                $('#footerHint').hide();
+                $('#orderStats').hide();
+                $('#manualRefreshBtn').hide();
+                $('#pollingControls').hide();
+
+                $.ajax({
+                    url: 'http://localhost:5245/api/OrderHistory/' + customerId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (orders) {
+                        $('#loading').hide();
+                        allOrders = orders;
+
+                        if (orders.length === 0) {
+                            $('#ordersContainer').html(`
+                                    <div class="no-orders">
+                                        <div class="no-orders-icon">
+                                            <span class="k-icon k-i-cart"></span>
+                                        </div>
+                                        <h3>No orders yet</h3>
+                                        <p>Your order history will appear here once you place your first order</p>
+                                        <a href="/UserHome/Index">
+                                        <button class="browse-menu-btn">
+                                            <span class="k-icon k-i-grid"></span>
+                                            Browse Menu
+                                        </button>
+                                        </a>
+                                    </div>
+                                `);
+                            return;
+                        }
+
+                        renderOrderRows(orders);
+                        $('#footerHint').show();
+                        $('#orderStats').show();
+                        $('#manualRefreshBtn').show();
+                        $('#pollingControls').show();
+                        updateOrderStats();
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error);
+                        $('#loading').hide();
+                        showError('Failed to load orders. Please try again later.');
+                    }
+                });
+            }
+
+            function renderOrderRows(orders) {
+                const container = $('#ordersContainer');
+                const ratedOrders = getRatedOrders();
+
+                orders.forEach((order, index) => {
+                    const showCancelButton = order.c_orderstatus === 'Processing';
+                    const isRated = isOrderRated(order.c_orderid);
+                    const showRateButton = order.c_orderstatus === 'Delivered' && !isRated;
+
+                    const dateTime = formatDateTime(order.c_orderdate, order.c_ordertime);
+                    const fooditemId = order.c_fooditemid != null ? order.c_fooditemid : 0;
+                    const restaurantId = order.c_restaurantid || 0;
+
+                    const row = $(`
+                            <div class="order-row" data-booking-id="${order.c_bookingid}" data-order-id="${order.c_orderid}" style="animation-delay: ${0.1 + index * 0.1}s">
+                                <div class="order-main-content">
+                                    <div class="order-image-section">
+                                       <div class="food-image-wrapper">
+        ${order.c_foodimage ?
+                            `<img src="/Images/restaurant/dishes/${order.c_restaurantid}/${order.c_foodimage}"
+                  alt="${order.c_dishname || 'Order image'}"
+                  class="food-image"
+                  onerror="this.src='/Images/no-image.png'" />`
+                            :
+                            '<div class="food-image"></div>'}
+        <div class="food-image-ring"></div>
+    </div>
+
+                                    </div>
+                                
+                                    <div class="order-details-section">
+                                        <div class="dish-name">${order.c_dishname || 'Order Items'}</div>
+                                    
+                                        <div class="order-meta">
+                                            <div class="meta-item">
+                                                <span class="k-icon k-i-hashtag"></span>
+                                                <span class="meta-label">Order ID:</span>
+                                                <span class="meta-value">#${order.c_orderid}</span>
+                                            </div>
+                                        
+                                            <div class="meta-item">
+                                                <span class="k-icon k-i-calendar"></span>
+                                                <span class="meta-label">Date:</span>
+                                                <span class="meta-value">${dateTime.date}</span>
+                                            </div>
+                                        
+                                            <div class="meta-item">
+                                                <span class="k-icon k-i-clock"></span>
+                                                <span class="meta-label">Time:</span>
+                                                <span class="meta-value">${dateTime.time}</span>
+                                            </div>
+                                        
+                                            <div class="meta-item">
+                                                <span class="k-icon k-i-aggregate-fields"></span>
+                                                <span class="meta-label">Items:</span>
+                                                <span class="meta-value">${order.c_quantity}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                                    <div class="order-status-section">
+                                        <div class="price-display">${formatCurrency(order.c_totalprice)}</div>
+                                        <div class="status-and-chevron">
+                                            <div class="status-badge ${getStatusBadgeClass(order.c_orderstatus)}">
+                                                ${order.c_orderstatus}
+                                            </div>
+                                            <span class="k-icon k-i-arrow-chevron-down chevron-icon"></span>
+                                            ${showCancelButton ? `
+                                                <button class="cancel-order-btn" data-booking-id="${order.c_bookingid}" data-order-id="${order.c_orderid}">
+                                                    <span class="k-icon k-i-delete"></span>
+                                                    Cancel Order
+                                                </button>
+                                            ` : ''}
+                                            ${isRated ? `
+                                                <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--success); font-weight: 600;">
+                                                    <span class="k-icon k-i-check"></span> Rated
+                                                </div>
+                                            ` : ''}
+                                            ${showRateButton ? `
+                                                <button class="rate-review-btn" data-order-id="${order.c_orderid}" 
+                                                        data-booking-id="${order.c_bookingid}"
+                                                        data-restaurant-id="${restaurantId}"
+                                                        data-fooditem-id="${fooditemId}">
+                                                    <span class="k-icon k-i-star"></span>
+                                                    Rate & Review
+                                                </button>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <div class="collapse-panel" id="panel-${order.c_bookingid}"></div>
+                            </div>
+                        `);
+
+                    container.append(row);
+                });
+
+                attachRowEvents();
+                attachCancelButtonEvents();
+                attachRateButtonEvents();
+            }
+
+            function attachRowEvents() {
+                $('.order-row').on('click', function (e) {
+                    if ($(e.target).closest('.cancel-order-btn').length || $(e.target).closest('.rate-review-btn').length) {
+                        return;
+                    }
+
+                    if ($(e.target).closest('.collapse-panel').length) return;
+
+                    const row = $(this);
+                    const bookingId = row.data('booking-id');
+                    const panel = row.find('.collapse-panel');
+
+                    if (currentOpenCard && currentOpenCard[0] !== row[0]) {
+                        currentOpenCard.removeClass('active');
+                        currentOpenCard.find('.collapse-panel').removeClass('active');
+                    }
+
+                    if (panel.hasClass('active')) {
+                        row.removeClass('active');
+                        panel.removeClass('active');
+                        currentOpenCard = null;
+                    } else {
+                        row.addClass('active');
+                        panel.addClass('active');
+
+                        if (!panel.hasClass('loaded')) {
+                            loadProgress(bookingId, panel);
+                            panel.addClass('loaded');
+                        }
+
+                        currentOpenCard = row;
+                    }
+                });
+            }
+
+            function attachCancelButtonEvents() {
+                $(document).on('click', '.cancel-order-btn', function (e) {
+                    e.stopPropagation();
+
+                    const button = $(this);
+                    const bookingId = button.data('booking-id');
+                    const orderId = button.data('order-id');
+                    const orderRow = button.closest('.order-row');
+                    const orderPrice = orderRow.find('.price-display').text();
+
+                    showCancelConfirmation(bookingId, orderId, orderRow, orderPrice);
+                });
+            }
+
+            function attachRateButtonEvents() {
+                $(document).on('click', '.rate-review-btn', function (e) {
+                    e.stopPropagation();
+
+                    const button = $(this);
+
+                    currentRatingOrder = {
+                        orderId: button.data('order-id'),
+                        bookingId: button.data('booking-id'),
+                        restaurantId: button.data('restaurant-id') || 0,
+                        fooditemId: button.data('fooditem-id') || 0
+                    };
+
+                    selectedRating = 0;
+                    $('.star-btn').removeClass('selected');
+                    $('#selectedRatingValue').text('0/5');
+                    $('#reviewText').val('');
+                    $('#charCount').text('0');
+                    $('#submitRating').prop('disabled', true);
+
+                    $('#ratingPopup').css('display', 'flex');
+                });
+            }
+
+            function showCancelConfirmation(bookingId, orderId, orderRow, orderPrice) {
+                Swal.fire({
+                    title: 'Cancel Order?',
+                    html: `<div style="text-align: left;">
+                            <p>Are you sure you want to cancel order <strong>#${orderId}</strong>?</p>
+                            <p style="color: ${orderPrice.includes('₹') ? '#E9622A' : '#EF4444'}; font-weight: 600; margin: 10px 0;">${orderPrice}</p>
+                            <p style="color: #EF4444; font-weight: 600; font-size: 0.9em;">⚠️ This action cannot be undone!</p>
+                        </div>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#EF4444',
+                    cancelButtonColor: '#6B7280',
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'No, keep it',
+                    reverseButtons: true,
+                    backdrop: 'rgba(0, 0, 0, 0.5)',
+                    allowOutsideClick: false,
+                    allowEscapeKey: true,
+                    customClass: {
+                        confirmButton: 'swal2-confirm',
+                        cancelButton: 'swal2-cancel',
+                        popup: 'animated zoomIn'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        cancelOrder(bookingId, orderId, orderRow);
+                    }
+                });
+            }
+
+            function cancelOrder(bookingId, orderId, orderRow) {
+                const cancelButton = orderRow.find('.cancel-order-btn');
+                const originalText = cancelButton.html();
+                cancelButton.html('<span class="k-icon k-i-loading"></span> Cancelling...');
+                cancelButton.prop('disabled', true);
+
+                $.ajax({
+                    url: `http://localhost:5245/api/Order/cancel/${bookingId}`,
+                    type: 'DELETE',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Order Cancelled!',
+                                html: `<div style="text-align: left;">
+                                        <p><strong>${response.message}</strong></p>
+                                        <p style="color: #22B55A; margin-top: 15px; font-size: 0.95em;">
+                                            <strong>Refund Information:</strong><br>
+                                            Your money will be refunded to your original payment method within <strong>5-7 business days</strong>.
+                                        </p>
+                                        <p style="color: #6B7280; font-size: 0.85em; margin-top: 10px;">
+                                            You will receive a confirmation email shortly.
+                                        </p>
+                                    </div>`,
+                                icon: 'success',
+                                confirmButtonColor: '#22B55B',
+                                confirmButtonText: 'Got it!',
+                                backdrop: 'rgba(0, 0, 0, 0.5)',
+                                customClass: {
+                                    popup: 'animated bounceIn'
+                                }
+                            }).then(() => {
+                                orderRow.animate({
+                                    opacity: 0,
+                                    height: 0,
+                                    margin: 0,
+                                    padding: 0
+                                }, 500, function () {
+                                    $(this).remove();
+
+                                    // Update allOrders array and stats
+                                    allOrders = allOrders.filter(order => order.c_bookingid !== bookingId);
+                                    updateOrderStats();
+
+                                    if ($('.order-row').length === 0) {
+                                        $('#ordersContainer').html(`
+                                                <div class="no-orders">
+                                                    <div class="no-orders-icon">
+                                                        <span class="k-icon k-i-cart"></span>
+                                                    </div>
+                                                    <h3>No orders yet</h3>
+                                                    <p>Your order history will appear here once you place your first order</p>
+                                                    <button class="browse-menu-btn">
+                                                        <span class="k-icon k-i-grid"></span>
+                                                        Browse Menu
+                                                    </button>
+                                                </div>
+                                            `);
+                                        $('#footerHint').hide();
+                                        $('#orderStats').hide();
+                                        $('#manualRefreshBtn').hide();
+                                        $('#pollingControls').hide();
+                                    }
+                                });
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Cannot Cancel Order',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonColor: '#EF4444',
+                                confirmButtonText: 'OK',
+                                backdrop: 'rgba(0, 0, 0, 0.5)',
+                                customClass: {
+                                    popup: 'animated shake'
+                                }
+                            }).then(() => {
+                                cancelButton.html(originalText);
+                                cancelButton.prop('disabled', false);
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Failed to cancel order. Please try again.',
+                            icon: 'error',
+                            confirmButtonColor: '#EF4444',
+                            confirmButtonText: 'OK',
+                            backdrop: 'rgba(0, 0, 0, 0.5)',
+                            customClass: {
+                                popup: 'animated wobble'
+                            }
+                        }).then(() => {
+                            cancelButton.html(originalText);
+                            cancelButton.prop('disabled', false);
+                        });
+                    }
+                });
+            }
+
+            function loadProgress(bookingId, panel) {
+                if (progressCache[bookingId]) {
+                    renderProgressBar(progressCache[bookingId], panel);
+                    return;
+                }
+
+                $.ajax({
+                    url: 'http://localhost:5245/api/OrderHistory/progress/' + bookingId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (progress) {
+                        progressCache[bookingId] = progress;
+                        renderProgressBar(progress, panel);
+                    },
+                    error: function () {
+                        panel.html('<div class="error-message"><span class="k-icon k-i-warning"></span>Failed to load progress</div>');
+                    }
+                });
+            }
+
+            function renderProgressBar(progress, panel) {
+                const steps = [
+                    { key: 'processing', label: 'Processing', icon: 'k-i-clock', completed: progress.processing },
+                    { key: 'prepared', label: 'Prepared', icon: 'k-i-check-circle', completed: progress.prepared },
+                    { key: 'outForDelivery', label: 'Out for Delivery', icon: 'k-i-truck', completed: progress.outForDelivery },
+                    { key: 'delivered', label: 'Delivered', icon: 'k-i-package', completed: progress.delivered }
+                ];
+
+                const completedSteps = steps.filter(step => step.completed);
+                const completedCount = completedSteps.length;
+                const progressPercent = completedCount > 0 ? ((completedCount - 1) / (steps.length - 1)) * 100 : 0;
+                const progressWidth = `calc(${progressPercent}% - 40px)`;
+
+                const progressHTML = `
+                        <div class="progress-header">
+                            <div class="progress-header-icon">
+                                <span class="k-icon k-i-track-changes"></span>
+                            </div>
+                            <span class="progress-title">Order Progress</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-line"></div>
+                            <div class="progress-fill" style="--progress-width: ${progressWidth};"></div>
+                            <div class="progress-steps">
+                                ${steps.map((step, index) => {
+                    let stepClass = '';
+                    if (step.completed) {
+                        stepClass = 'completed';
+                    } else if (index === completedCount) {
+                        stepClass = 'active';
+                    }
+                    const iconClass = step.completed ? 'k-i-check' : step.icon;
+
+                    return `
+                                        <div class="step ${stepClass}">
+                                            <div class="step-icon">
+                                                <span class="k-icon ${iconClass}"></span>
+                                            </div>
+                                            <div class="step-label">${step.label}</div>
+                                            ${step.completed ? `
+                                                <div class="step-done-badge">
+                                                    <span class="k-icon k-i-check"></span>
+                                                    Done
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    `;
+                }).join('')}
+                            </div>
+                        </div>
+                    `;
+
+                panel.html(progressHTML);
+            }
+
+            function submitRating() {
+                if (!selectedRating) {
+                    showError('Please select a rating before submitting.');
+                    return;
+                }
+
+                console.log('Submitting rating with data:', currentRatingOrder);
+
+                const today = new Date();
+                const formattedDate = today.toISOString().split('T')[0];
+
+                const ratingData = {
+                    c_userid: customerId,
+                    c_restaurantid: parseInt(currentRatingOrder.restaurantId) || 0,
+                    c_fooditemid: parseInt(currentRatingOrder.fooditemId) || 0,
+                    c_rating: selectedRating,
+                    c_reviewtext: $('#reviewText').val().trim(),
+                    c_date: formattedDate
+                };
+
+                console.log('Rating data being sent:', ratingData);
+
+                if (!ratingData.c_restaurantid || !ratingData.c_fooditemid) {
+                    showError('Missing required data. Cannot submit rating.');
+                    return;
+                }
+
+                $('#submitRating').prop('disabled', true);
+                $('#submitRating').html('<span class="k-icon k-i-loading"></span> Submitting...');
+
+                $.ajax({
+                    url: 'http://localhost:5245/api/Rating',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(ratingData),
+                    dataType: 'json',
+                    success: function (response) {
+                        $('#submitRating').prop('disabled', false);
+                        $('#submitRating').html('<span class="k-icon k-i-check"></span> Submit Rating');
+
+                        console.log('Rating response:', response);
+
+                        // Check if rating was successful (handle both response formats)
+                        let isSuccess = false;
+
+                        if (typeof response === 'object') {
+                            if (response.success !== undefined) {
+                                isSuccess = response.success;
+                            } else if (response.Success !== undefined) {
+                                isSuccess = response.Success;
+                            } else if (Array.isArray(response)) {
+                                // If it's returning all ratings
+                                isSuccess = true;
+                            }
+                        }
+
+                        if (isSuccess) {
+                            // Save to localStorage so button doesn't show again
+                            saveRatedOrder(currentRatingOrder.orderId);
+
+                            Swal.fire({
+                                title: '✅ Thank You!',
+                                html: `<div style="text-align: center;">
+                                        <p><strong>Your rating has been submitted successfully!</strong></p>
+                                        <div style="margin: 20px 0;">
+                                            <span style="font-size: 2rem; color: #FFC107;">
+                                                ${'★'.repeat(selectedRating)}${'☆'.repeat(5 - selectedRating)}
+                                            </span>
+                                        </div>
+                                        <p style="color: #6B7280; font-size: 0.9em;">
+                                            Your feedback helps us serve you better.
+                                        </p>
+                                    </div>`,
+                                icon: 'success',
+                                confirmButtonColor: '#22B55B',
+                                confirmButtonText: 'Continue',
+                                backdrop: 'rgba(0, 0, 0, 0.5)',
+                                customClass: {
+                                    popup: 'animated bounceIn'
+                                }
+                            }).then(() => {
+                                $('#ratingPopup').hide();
+                                // Update the UI to show "Rated" instead of the button
+                                const orderRow = $(`.order-row[data-order-id="${currentRatingOrder.orderId}"]`);
+                                const rateButton = orderRow.find('.rate-review-btn');
+                                if (rateButton.length) {
+                                    rateButton.replaceWith(`
+                                            <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--success); font-weight: 600;">
+                                                <span class="k-icon k-i-check"></span> Rated
+                                            </div>
+                                        `);
+                                }
+                                currentRatingOrder = null;
+                                selectedRating = 0;
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Submission Failed',
+                                text: 'Failed to submit rating. Please try again.',
+                                icon: 'error',
+                                confirmButtonColor: '#EF4444',
+                                confirmButtonText: 'Try Again',
+                                backdrop: 'rgba(0, 0, 0, 0.5)',
+                                customClass: {
+                                    popup: 'animated shake'
+                                }
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log('Rating error:', error, xhr.responseText);
+                        $('#submitRating').prop('disabled', false);
+                        $('#submitRating').html('<span class="k-icon k-i-check"></span> Submit Rating');
+
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Failed to submit rating. Please try again.',
+                            icon: 'error',
+                            confirmButtonColor: '#EF4444',
+                            confirmButtonText: 'OK',
+                            backdrop: 'rgba(0, 0, 0, 0.5)',
+                            customClass: {
+                                popup: 'animated wobble'
+                            }
+                        });
+                    }
+                });
+            }
+
+            function showError(message) {
+                const container = $('#errorContainer');
+                container.html(`
+                        <div class="error-message">
+                            <span class="k-icon k-i-warning"></span>
+                            <span><strong>Error:</strong> ${message}</span>
+                        </div>
+                    `).show();
+            }
+
+            // ===========================================
+            // REAL-TIME POLLING FUNCTIONS
+            // ===========================================
+
+            function startStatusPolling() {
+                // Clear any existing polling
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                }
+
+                // Start polling every 15 seconds
+                pollingInterval = setInterval(checkForStatusUpdates, 15000);
+                console.log('Status polling started (every 15 seconds)');
+
+                // Show real-time indicator
+                $('#realtimeIndicator').show();
+            }
+
+            function checkForStatusUpdates() {
+                if (!isPollingActive) return;
+
+                $.ajax({
+                    url: `http://localhost:5245/api/OrderHistory/updates/${customerId}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    headers: {
+                        'Last-Check': lastCheckTime.toISOString()
+                    },
+                    success: function (updates) {
+                        if (updates && updates.length > 0) {
+                            console.log('Found', updates.length, 'status updates');
+                            updates.forEach(update => {
+                                updateOrderStatusInUI(update);
+                            });
+
+                            // Update the last check time
+                            lastCheckTime = new Date();
+
+                            // Update stats
+                            updateOrderStats();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log('Polling error:', error);
+                    }
+                });
+            }
+
+            function updateOrderStatusInUI(update) {
+                const orderRow = $(`.order-row[data-order-id="${update.orderId}"]`);
+
+                if (orderRow.length) {
+                    const currentStatus = orderRow.find('.status-badge').text().trim();
+
+                    // Only update if status changed
+                    if (currentStatus !== update.newStatus) {
+                        console.log(`Updating order #${update.orderId} from ${currentStatus} to ${update.newStatus}`);
+
+                        // Add update animation
+                        orderRow.addClass('status-updated');
+                        setTimeout(() => {
+                            orderRow.removeClass('status-updated');
+                        }, 1500);
+
+                        // Update status badge
+                        const statusBadge = orderRow.find('.status-badge');
+                        statusBadge.text(update.newStatus);
+
+                        // Remove all status classes and add the new one
+                        const statusClass = getStatusBadgeClass(update.newStatus);
+                        statusBadge.removeClass().addClass(`status-badge ${statusClass}`);
+
+                        // Show notification
+                        showStatusUpdateNotification(update.orderId, update.newStatus);
+
+                        // Update the status in allOrders array
+                        const orderIndex = allOrders.findIndex(order => order.c_orderid === update.orderId);
+                        if (orderIndex !== -1) {
+                            allOrders[orderIndex].c_orderstatus = update.newStatus;
+                        }
+
+                        // Update rate/cancel buttons based on new status
+                        updateOrderButtons(orderRow, update.orderId, update.newStatus);
+
+                        // If progress panel is open, reload it
+                        if (orderRow.hasClass('active')) {
+                            const bookingId = orderRow.data('booking-id');
+                            const panel = orderRow.find('.collapse-panel');
+                            // Clear cache and reload
+                            delete progressCache[bookingId];
+                            panel.removeClass('loaded');
+                            loadProgress(bookingId, panel);
+                        }
+                    }
+                }
+            }
+
+            function updateOrderButtons(orderRow, orderId, newStatus) {
+                const statusSection = orderRow.find('.status-and-chevron');
+                const ratedOrders = getRatedOrders();
+                const isRated = isOrderRated(orderId);
+
+                // Remove existing cancel and rate buttons
+                orderRow.find('.cancel-order-btn').remove();
+                orderRow.find('.rate-review-btn').remove();
+                orderRow.find('div:contains("Rated")').remove();
+
+                // Add appropriate buttons based on new status
+                if (newStatus === 'Processing') {
+                    statusSection.append(`
+                            <button class="cancel-order-btn" data-booking-id="${orderRow.data('booking-id')}" data-order-id="${orderId}">
+                                <span class="k-icon k-i-delete"></span>
+                                Cancel Order
+                            </button>
+                        `);
+                } else if (newStatus === 'Delivered' && !isRated) {
+                    const orderData = allOrders.find(order => order.c_orderid === orderId);
+                    if (orderData) {
+                        statusSection.append(`
+                                <button class="rate-review-btn" data-order-id="${orderId}" 
+                                        data-booking-id="${orderData.c_bookingid}"
+                                        data-restaurant-id="${orderData.c_restaurantid || 0}"
+                                        data-fooditem-id="${orderData.c_fooditemid || 0}">
+                                    <span class="k-icon k-i-star"></span>
+                                    Rate & Review
+                                </button>
+                            `);
+                    }
+                } else if (newStatus === 'Delivered' && isRated) {
+                    statusSection.append(`
+                            <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--success); font-weight: 600;">
+                                <span class="k-icon k-i-check"></span> Rated
+                            </div>
+                        `);
+                }
+
+                // Reattach event listeners for new buttons
+                attachCancelButtonEvents();
+                attachRateButtonEvents();
+            }
+
+            function showStatusUpdateNotification(orderId, newStatus) {
+                // Helper functions for notifications
+                function getStatusColor(status) {
+                    const colors = {
+                        'Processing': '#F59E0B',
+                        'Prepared': '#3B82F6',
+                        'Out for Delivery': '#8B5CF6',
+                        'Out for delivery': '#8B5CF6',
+                        'Delivered': '#22C55E',
+                        'Cancelled': '#EF4444'
+                    };
+                    return colors[status] || '#6B7280';
+                }
+
+                function getStatusBgColor(status) {
+                    const colors = {
+                        'Processing': 'linear-gradient(135deg, #F59E0B, #D97706)',
+                        'Prepared': 'linear-gradient(135deg, #3B82F6, #1D4ED8)',
+                        'Out for Delivery': 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
+                        'Out for delivery': 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
+                        'Delivered': 'linear-gradient(135deg, #22C55E, #16A34A)',
+                        'Cancelled': 'linear-gradient(135deg, #EF4444, #DC2626)'
+                    };
+                    return colors[status] || 'linear-gradient(135deg, #6B7280, #4B5563)';
+                }
+
+                function getStatusIcon(status) {
+                    const icons = {
+                        'Processing': 'k-i-clock',
+                        'Prepared': 'k-i-check-circle',
+                        'Out for Delivery': 'k-i-truck',
+                        'Out for delivery': 'k-i-truck',
+                        'Delivered': 'k-i-package',
+                        'Cancelled': 'k-i-close-circle'
+                    };
+                    return icons[status] || 'k-i-info-circle';
+                }
+
+                // Create toast notification
+                const toast = $(`
+                        <div class="status-toast" style="border-left-color: ${getStatusColor(newStatus)};">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: ${getStatusBgColor(newStatus)}; 
+                                 display: flex; align-items: center; justify-content: center;">
+                                <span class="k-icon ${getStatusIcon(newStatus)}" style="color: white; font-size: 1.2rem;"></span>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 4px;">Order #${orderId}</div>
+                                <div style="font-size: 0.875rem; color: var(--muted-text);">
+                                    Status updated to: <span style="color: ${getStatusColor(newStatus)}; font-weight: 600;">${newStatus}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+
+                $('body').append(toast);
+
+                // Remove toast after 5 seconds
+                setTimeout(() => {
+                    toast.animate({
+                        opacity: 0,
+                        right: '-100%'
+                    }, 300, function () {
+                        $(this).remove();
+                    });
+                }, 5000);
+            }
+
+            // ===========================================
+            // POLLING CONTROLS EVENT HANDLERS
+            // ===========================================
+
+            // Manual refresh button
+            $('#manualRefreshBtn').on('click', function () {
+                const btn = $(this);
+                const originalHtml = btn.html();
+
+                btn.prop('disabled', true);
+                btn.html('<span class="k-icon k-i-loading"></span> Refreshing...');
+
+                // Force check for updates
+                lastCheckTime = new Date(0); // Reset to beginning of time to get all updates
+                checkForStatusUpdates();
+
+                // Re-enable button after 2 seconds
+                setTimeout(() => {
+                    btn.html(originalHtml);
+                    btn.prop('disabled', false);
+                }, 2000);
+            });
+
+            // Enable polling button
+            $('#enablePolling').on('click', function () {
+                isPollingActive = true;
+                startStatusPolling();
+                $(this).css({
+                    'background': 'var(--primary)',
+                    'color': 'white'
+                });
+                $('#disablePolling').css({
+                    'background': 'var(--muted)',
+                    'color': 'var(--muted-text)'
+                });
+                $('#pollingStatus').text('Active').css('background', 'var(--success)');
+                $('#realtimeIndicator').show();
+            });
+
+            // Disable polling button
+            $('#disablePolling').on('click', function () {
+                isPollingActive = false;
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                }
+                $(this).css({
+                    'background': 'var(--danger)',
+                    'color': 'white'
+                });
+                $('#enablePolling').css({
+                    'background': 'var(--muted)',
+                    'color': 'var(--muted-text)'
+                });
+                $('#pollingStatus').text('Paused').css('background', 'var(--danger)');
+                $('#realtimeIndicator').hide();
+            });
+
+            // ===========================================
+            // MOCK UPDATES FOR TESTING (REMOVE WHEN REAL API IS READY)
+            // ===========================================
+            function mockUpdatesForTesting() {
+                // Simulate status changes every 30 seconds
+                setInterval(() => {
+                    if (allOrders.length > 0 && isPollingActive) {
+                        // Pick a random order
+                        const randomIndex = Math.floor(Math.random() * allOrders.length);
+                        const order = allOrders[randomIndex];
+
+                        // Don't update cancelled or delivered orders
+                        if (order.c_orderstatus !== 'Cancelled' && order.c_orderstatus !== 'Delivered') {
+                            const statusFlow = ['Processing', 'Prepared', 'Out for delivery', 'Delivered'];
+                            const currentIndex = statusFlow.indexOf(order.c_orderstatus);
+
+                            if (currentIndex !== -1 && currentIndex < statusFlow.length - 1) {
+                                const newStatus = statusFlow[currentIndex + 1];
+
+                                // Simulate receiving an update
+                                const update = {
+                                    orderId: order.c_orderid,
+                                    newStatus: newStatus,
+                                    updatedAt: new Date().toISOString()
+                                };
+
+                                updateOrderStatusInUI(update);
+
+                                // Update the order in allOrders array
+                                order.c_orderstatus = newStatus;
+                                updateOrderStats();
+                            }
+                        }
+                    }
+                }, 30000); // Every 30 seconds
+            }
+
+            // ===========================================
+            // INITIALIZATION
+            // ===========================================
+
+            // Star rating interaction
+            $('.star-btn').on('click', function () {
+                const value = parseInt($(this).data('value'));
+                selectedRating = value;
+
+                $('.star-btn').removeClass('selected');
+                $('.star-btn').each(function () {
+                    if (parseInt($(this).data('value')) <= value) {
+                        $(this).addClass('selected');
+                    }
+                });
+
+                $('#selectedRatingValue').text(`${value}/5`);
+                $('#submitRating').prop('disabled', false);
+            });
+
+            // Review text character count
+            $('#reviewText').on('input', function () {
+                const length = $(this).val().length;
+                $('#charCount').text(length);
+
+                if (length > 450) {
+                    $('#charCount').css('color', '#EF4444');
+                } else if (length > 400) {
+                    $('#charCount').css('color', '#F59E0B');
+                } else {
+                    $('#charCount').css('color', 'var(--muted-text)');
+                }
+            });
+
+            // Cancel rating button
+            $('#cancelRating').on('click', function () {
+                $('#ratingPopup').hide();
+                currentRatingOrder = null;
+                selectedRating = 0;
+            });
+
+            // Submit rating button
+            $('#submitRating').on('click', submitRating);
+
+            // Close popup when clicking outside
+            $('#ratingPopup').on('click', function (e) {
+                if (e.target === this) {
+                    $('#ratingPopup').hide();
+                    currentRatingOrder = null;
+                    selectedRating = 0;
+                }
+            });
+
+            // Initial load
+            loadOrders();
+
+            // Start polling after 3 seconds (wait for initial load)
+            setTimeout(() => {
+                if (allOrders.length > 0) {
+                    startStatusPolling();
+                    // Uncomment the line below for testing without backend
+                    // mockUpdatesForTesting();
+                }
+            }, 3000);
+
+            // Optimize polling when page is not visible
+            $(window).on('blur', function () {
+                console.log('Page blurred, pausing polling');
+                isPollingActive = false;
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                }
+                $('#pollingStatus').text('Paused').css('background', 'var(--muted-text)');
+                $('#realtimeIndicator').hide();
+            });
+
+            $(window).on('focus', function () {
+                
+                console.log('Page focused, resuming polling');
+                if (allOrders.length > 0) {
+                    isPollingActive = true;
+                    startStatusPolling();
+                    $('#pollingStatus').text('Active').css('background', 'var(--success)');
+                    $('#realtimeIndicator').show();
+                }
+            });
+        });
+    </script>
+}

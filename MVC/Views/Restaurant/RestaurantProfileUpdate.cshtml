@@ -1,0 +1,344 @@
+@{
+    Layout = "_Vendor";
+    ViewData["Title"] = "Restaurant Profile";
+    int customerId = Context.Session.GetInt32("CustomerId") ?? 0;
+
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/RestaurantProfileUpdate.css" asp-append-version="true" />
+}
+
+@if (customerId == 0)
+{
+    <script>
+        window.location.href = "http://localhost:5030/";
+
+    </script>
+}
+
+<!-- Floating Background Elements -->
+<div class="restaurant-background">
+    <div class="restaurant-3d">🍽️</div>
+    <div class="restaurant-3d">🍕</div>
+    <div class="restaurant-3d">🏪</div>
+</div>
+
+<div class="profile-container">
+    <div class="profile-card">
+
+        <!-- Card Header -->
+        <div class="card-header">
+            <div class="header-content">
+                <div class="brand-logo">
+                    <span>🍽️</span>
+                    <h3>Restaurant Profile</h3>
+                </div>
+                <p>Manage your restaurant information and documents</p>
+            </div>
+            <div class="restaurant-badge">Verified Restaurant</div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="profile-content">
+
+            <div id="notification"></div>
+
+            <!-- Documents & Images Section -->
+            <div class="section-card documents-section">
+                <div class="section-header">
+                    <div class="section-icon">📄</div>
+                    <div class="section-title">
+                        <h4>Documents & Images</h4>
+                        <p>Upload your restaurant image and verification documents</p>
+                    </div>
+                </div>
+
+                <div class="image-grid">
+                    <!-- Restaurant Image -->
+                    <div class="image-upload-card">
+                        <div class="image-container">
+                            <img id="previewRestaurant" class="profile-image" src="/Images/no-image.png"
+                                alt="Restaurant" />
+                            <div class="image-overlay">
+                                <label for="imgUpload" class="upload-btn">
+                                    <i class="fa-solid fa-camera"></i>
+                                    Change Photo
+                                </label>
+                            </div>
+                        </div>
+                        <input type="file" id="imgUpload" accept="image/*" />
+                        <div class="image-label">Restaurant Image</div>
+                        <div class="image-hint">Max size: 2MB • JPG, PNG</div>
+                    </div>
+
+                    <!-- Aadhar Image -->
+                    <div class="image-upload-card">
+                        <div class="image-container aadhar">
+                            <img id="previewAadhar" class="profile-image" src="/Images/no-image.png" alt="Aadhar" />
+                            <div class="image-overlay">
+                                <label for="aadUpload" class="upload-btn">
+                                    <i class="fa-solid fa-camera"></i>
+                                    Change Photo
+                                </label>
+                            </div>
+                        </div>
+                        <input type="file" id="aadUpload" accept="image/*" />
+                        <div class="image-label">Food Licence</div>
+                        <div class="image-hint">Max size: 2MB • JPG, PNG</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Restaurant Information Section -->
+            <div class="section-card info-section">
+                <div class="section-header">
+                    <div class="section-icon">ℹ️</div>
+                    <div class="section-title">
+                        <h4>Restaurant Information</h4>
+                        <p>Basic details about your restaurant</p>
+                    </div>
+                </div>
+
+                <form id="restaurantForm"></form>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="button" id="btnUpdate" class="btn-primary k-button">
+                    <i class="fa-solid fa-save"></i>
+                    Update Profile
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const OrangeSwal = Swal.mixin({
+            confirmButtonColor: '#f97316',
+            cancelButtonColor: '#64748b',
+            background: '#fff7ed',
+            color: '#1f2937',
+            iconColor: '#f97316',
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        });
+
+        const customerId = @customerId;
+       
+
+        $(document).ready(function () {
+
+            // ================= Notification =================
+            $("#notification").kendoNotification({
+                position: { top: 20, right: 20 },
+                autoHideAfter: 3000
+            });
+
+            // ================= Load Profile =================
+            $.get("http://localhost:5245/api/restaurant/id/" + customerId, function (res) {
+
+                // ---------- Image Preview ----------
+                $("#previewRestaurant").attr(
+                    "src",
+                    res.c_r_image
+                        ? "/Images/restaurant/restaurantimages/" + res.c_r_image + "?v=" + new Date().getTime()
+                        : "/Images/no-image.png"
+                );
+
+                $("#previewAadhar").attr(
+                    "src",
+                    res.c_r_aadhar
+                        ? "/Images/restaurant/aadhar/" + res.c_r_aadhar + "?v=" + new Date().getTime()
+                        : "/Images/no-image.png"
+                );
+
+
+                // ================= Kendo Form =================
+                $("#restaurantForm").kendoForm({
+                    formData: res,
+                    buttonsTemplate: "",
+                    // 🔥 SAME PATTERN AS REGISTER FORM
+                    validatable: {
+                        validateOnBlur: true,
+                        validationSummary: false,
+                        errorTemplate: "<span class='k-invalid-msg'>#: message #</span>"
+                    },
+
+                    items: [
+                        { field: "c_r_id", editor: "Hidden" },
+
+                        {
+                            field: "c_r_name",
+                            label: "Name",
+                            validation: {
+                                required: { message: "Name is required" }
+                            }
+                        },
+
+                        {
+                            field: "c_r_email",
+                            label: "Email",
+                            validation: {
+                                required: { message: "Email is required" },
+                                email: { message: "Enter valid email" }
+                            }
+                        },
+
+                        {
+                            field: "c_r_address",
+                            label: "Address",
+                            validation: {
+                                required: { message: "Address is required" }
+                            }
+                        },
+
+                        {
+                            field: "c_r_state",
+                            label: "State",
+                            validation: {
+                                required: { message: "State is required" }
+                            }
+                        },
+
+                        {
+                            field: "c_r_city",
+                            label: "City",
+                            validation: {
+                                required: { message: "City is required" }
+                            }
+                        },
+
+                        {
+                            field: "c_r_ifsc",
+                            label: "IFSC",
+                            validation: {
+                                required: { message: "IFSC is required" },
+                                pattern: {
+                                    value: "^[A-Z]{4}0[A-Z0-9]{6}$",
+                                    message: "Invalid IFSC. Example: SBIN0AB1234"
+                                }
+                            }
+                        },
+
+                        {
+                            field: "c_r_gst",
+                            label: "GST Number",
+                            validation: {
+                                required: { message: "GST number is required" },
+                                pattern: {
+                                    value: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$",
+                                    message: "Invalid GST. Example: 27ABCDE1234F1Z5"
+                                }
+                            }
+
+                        },
+                        {
+                            field: "c_r_ac",
+                            label: "Account Number",
+                            editor: "NumericTextBox",
+                            editorOptions: {
+                                format: "n0",
+                                decimals: 0
+                            },
+                            validation: {
+                                required: { message: "Account number is required" },
+                                pattern: {
+                                    value: "^[0-9]{9,18}$",
+                                    message: "Account number must be 9 to 18 digits"
+                                }
+                            }
+
+                        }
+
+                    ]
+                });
+
+                // 🔥 IMPORTANT: hide auto-rendered messages
+                const form = $("#restaurantForm").data("kendoForm");
+                form.validator.hideMessages();
+            });
+
+            // ================= Image Preview =================
+            $("#imgUpload").on("change", function () {
+                if (this.files[0]) {
+                    $("#previewRestaurant")
+                        .attr("src", URL.createObjectURL(this.files[0]));
+                }
+            });
+
+            $("#aadUpload").on("change", function () {
+                if (this.files[0]) {
+                    $("#previewAadhar")
+                        .attr("src", URL.createObjectURL(this.files[0]));
+                }
+            });
+
+            // ================= Update =================
+            $("#btnUpdate").click(function (e) {
+                e.preventDefault();
+                const form = $("#restaurantForm").data("kendoForm");
+                if (!form.validate()) return;
+
+                const fd = new FormData();
+
+                $("#restaurantForm").find(":input[name]").each(function () {
+                    fd.append(this.name, $(this).val());
+                });
+                fd.append("c_r_id", form.options.formData.c_r_id);
+                if ($("#imgUpload")[0].files.length > 0)
+                    fd.append("c_resturantimage", $("#imgUpload")[0].files[0]);
+
+                if ($("#aadUpload")[0].files.length > 0)
+                    fd.append("c_aadharimage", $("#aadUpload")[0].files[0]);
+
+                $.ajax({
+                    url: "http://localhost:5245/api/restaurant/profile/",
+                    type: "PUT",
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+
+                    success: function () {
+
+                        OrangeSwal.fire({
+                            icon: 'success',
+                            title: 'Profile Updated',
+                            text: 'Your restaurant profile has been updated successfully.',
+                            timer: 1800,
+                            showConfirmButton: false
+                        });
+
+                        // 🔁 Refresh images to avoid cache issue
+                        $("#previewRestaurant").attr(
+                            "src",
+                            $("#previewRestaurant").attr("src").split("?")[0] + "?v=" + new Date().getTime()
+                        );
+
+                        $("#previewAadhar").attr(
+                            "src",
+                            $("#previewAadhar").attr("src").split("?")[0] + "?v=" + new Date().getTime()
+                        );
+
+
+                    },
+                    error: function () {
+                        OrangeSwal.fire({
+                            icon: 'error',
+                            title: 'Update Failed',
+                            text: 'Something went wrong. Please try again.'
+                        });
+                    }
+
+                });
+            });
+        });
+    </script>
+}

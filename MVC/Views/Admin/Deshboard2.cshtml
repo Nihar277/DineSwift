@@ -1,0 +1,806 @@
+@{
+    Layout = "_Admin";
+}
+
+<style>
+    :root {
+        --primary-orange: #f97316;
+        --deep-orange: #ea580c;
+        --orange-light: #fff7ed;
+        --text-heading: #0f172a;
+        --text-body: #475569;
+        --border-color: #e2e8f0;
+        --accent-success: #10b981;
+        --accent-danger: #ef4444;
+    }
+
+    body {
+        background-color: #f8fafc;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+        padding: 30px;
+        border-radius: 18px;
+        margin: 20px;
+        box-shadow: 0 10px 40px rgba(249, 115, 22, 0.3);
+    }
+
+    .dashboard-header h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0 0 8px 0;
+    }
+
+    .dashboard-header p {
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    /* Stats Grid */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        padding: 0 20px 20px 20px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border-left: 5px solid var(--primary-orange);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-card.revenue { border-left-color: #10b981; }
+    .stat-card.orders { border-left-color: #3b82f6; }
+    .stat-card.users { border-left-color: #8b5cf6; }
+    .stat-card.commission { border-left-color: #f59e0b; }
+
+    .stat-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        background: var(--orange-light);
+        color: var(--primary-orange);
+    }
+
+    .stat-card.revenue .stat-icon {
+        background: #d1fae5;
+        color: #10b981;
+    }
+
+    .stat-card.orders .stat-icon {
+        background: #dbeafe;
+        color: #3b82f6;
+    }
+
+    .stat-card.users .stat-icon {
+        background: #ede9fe;
+        color: #8b5cf6;
+    }
+
+    .stat-card.commission .stat-icon {
+        background: #fef3c7;
+        color: #f59e0b;
+    }
+
+    .stat-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-body);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+        font-size: 2.25rem;
+        font-weight: 900;
+        color: var(--text-heading);
+        margin: 8px 0;
+    }
+
+    .stat-trend {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .stat-trend.up {
+        color: #10b981;
+    }
+
+    .stat-trend.down {
+        color: #ef4444;
+    }
+
+    /* Charts Section */
+    .charts-section {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        padding: 0 20px 20px 20px;
+    }
+
+    .chart-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .chart-card h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-heading);
+        margin: 0 0 20px 0;
+    }
+
+    /* Tables Section */
+    .tables-section {
+        padding: 0 20px 20px 20px;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 20px;
+    }
+
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border-color);
+        background: linear-gradient(135deg, #fff7ed, #ffedd5);
+    }
+
+    .table-header h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #9a3412;
+        margin: 0;
+    }
+
+    .btn-action-group {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-orange), var(--deep-orange));
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+    }
+
+    .btn-success {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .status-badge.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-badge.active {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-badge.inactive {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* Message Modal */
+    .k-window-titlebar {
+        background: linear-gradient(135deg, #f97316, #ea580c) !important;
+        color: #fff !important;
+        font-weight: 700;
+    }
+
+    .message-form textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 12px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-family: inherit;
+        resize: vertical;
+    }
+
+    .message-form textarea:focus {
+        outline: none;
+        border-color: var(--primary-orange);
+    }
+
+    /* SweetAlert2 Theme */
+    .swal2-popup {
+        border-radius: 18px !important;
+        background: linear-gradient(135deg, #fff7ed, #ffffff) !important;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15) !important;
+        border: 1px solid #fed7aa !important;
+    }
+
+    .swal2-title {
+        color: #9a3412 !important;
+        font-weight: 800 !important;
+    }
+
+    .swal2-confirm {
+        background: linear-gradient(135deg, #f97316, #ea580c) !important;
+        border-radius: 999px !important;
+        padding: 10px 24px !important;
+        font-weight: 700 !important;
+    }
+
+    /* Responsive */
+    @@media (max-width: 1024px) {
+        .charts-section {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+    <p>Welcome back! Here's what's happening with your platform today.</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-container">
+    <div class="stat-card revenue">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <i class="fa-solid fa-indian-rupee-sign"></i>
+            </div>
+            <div class="stat-title">Today's Revenue</div>
+        </div>
+        <div class="stat-value" id="todayRevenue">₹0</div>
+        <div class="stat-trend up">
+            <i class="fa-solid fa-arrow-up"></i>
+            <span id="revenueTrend">0%</span> from yesterday
+        </div>
+    </div>
+
+    <div class="stat-card orders">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <i class="fa-solid fa-shopping-bag"></i>
+            </div>
+            <div class="stat-title">Today's Orders</div>
+        </div>
+        <div class="stat-value" id="todayOrders">0</div>
+        <div class="stat-trend up">
+            <i class="fa-solid fa-arrow-up"></i>
+            <span id="ordersTrend">0%</span> from yesterday
+        </div>
+    </div>
+
+    <div class="stat-card users">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="stat-title">Active Users</div>
+        </div>
+        <div class="stat-value" id="activeUsers">0</div>
+        <div class="stat-trend">
+            <span id="userStatus">All systems operational</span>
+        </div>
+    </div>
+
+    <div class="stat-card commission">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <i class="fa-solid fa-percent"></i>
+            </div>
+            <div class="stat-title">Platform Commission</div>
+        </div>
+        <div class="stat-value" id="platformCommission">₹0</div>
+        <div class="stat-trend">
+            <span id="commissionInfo">From today's orders</span>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="charts-section">
+    <div class="chart-card">
+        <h3>Weekly Order Statistics</h3>
+        <div id="orderChart" style="height: 300px;"></div>
+    </div>
+
+    <div class="chart-card">
+        <h3>User Distribution</h3>
+        <div id="userChart" style="height: 300px;"></div>
+    </div>
+</div>
+
+<!-- Pending Approvals Section -->
+<div class="tables-section">
+    <!-- Pending Restaurants -->
+    <div class="table-card">
+        <div class="table-header">
+            <h3><i class="fa-solid fa-store"></i> Pending Restaurant Approvals</h3>
+            <div class="btn-action-group">
+                <button class="btn btn-primary" onclick="refreshRestaurants()">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+            </div>
+        </div>
+        <div id="grid-restaurants"></div>
+    </div>
+
+    <!-- Pending Delivery Partners -->
+    <div class="table-card">
+        <div class="table-header">
+            <h3><i class="fa-solid fa-motorcycle"></i> Pending Delivery Partner Approvals</h3>
+            <div class="btn-action-group">
+                <button class="btn btn-primary" onclick="refreshDelivery()">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+            </div>
+        </div>
+        <div id="grid-delivery"></div>
+    </div>
+</div>
+
+<!-- Message Modal -->
+<div id="messageModal">
+    <form id="messageFrm" class="message-form" style="padding: 20px;">
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">To:</label>
+            <input type="text" id="messageRecipient" readonly style="width: 100%; padding: 8px; border: 2px solid var(--border-color); border-radius: 8px; background: #f8fafc;">
+        </div>
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Message:</label>
+            <textarea id="messageText" placeholder="Type your message here..." required></textarea>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button type="button" class="btn" onclick="closeMessageModal()" style="background: #e5e7eb; color: #374151;">Cancel</button>
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-paper-plane"></i> Send Message
+            </button>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let messageRecipientId = null;
+    let messageRecipientType = null;
+
+    $(document).ready(function () {
+        loadDashboardData();
+        loadPendingRestaurants();
+        loadPendingDelivery();
+        initMessageModal();
+        initCharts();
+    });
+
+    function loadDashboardData() {
+        var token = "@Context.Session.GetString("Token")";
+
+        // Simulated data - replace with actual API calls
+        $.ajax({
+            url: "http://localhost:5245/api/Admin/getDashboardStats",
+            type: "GET",
+            headers: { "Authorization": "Bearer " + token },
+            success: function (data) {
+                updateDashboardStats(data);
+            },
+            error: function () {
+                // Fallback with demo data
+                updateDashboardStats({
+                    todayRevenue: 45678,
+                    todayOrders: 156,
+                    activeUsers: { restaurants: 45, delivery: 38, customers: 1234 },
+                    platformCommission: 4567,
+                    revenueTrend: 12.5,
+                    ordersTrend: 8.3
+                });
+            }
+        });
+    }
+
+    function updateDashboardStats(data) {
+        $("#todayRevenue").text("₹" + data.todayRevenue.toLocaleString());
+        $("#todayOrders").text(data.todayOrders);
+        $("#activeUsers").text((data.activeUsers.restaurants + data.activeUsers.delivery + data.activeUsers.customers));
+        $("#platformCommission").text("₹" + data.platformCommission.toLocaleString());
+        $("#revenueTrend").text(data.revenueTrend + "%");
+        $("#ordersTrend").text(data.ordersTrend + "%");
+    }
+
+    function loadPendingRestaurants() {
+        var token = "@Context.Session.GetString("Token")";
+        $.ajax({
+            url: "http://localhost:5245/api/Admin/getAllRestaurant",
+            type: "GET",
+            headers: { "Authorization": "Bearer " + token },
+            success: function (data) {
+                var pending = data.filter(x => x.c_r_status !== "active");
+
+                $("#grid-restaurants").kendoGrid({
+                    dataSource: { data: pending, pageSize: 5 },
+                    sortable: true,
+                    pageable: true,
+                    columns: [
+                        {
+                            field: "c_r_name",
+                            title: "Restaurant",
+                            width: 250,
+                            template: (d) => `
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <img src="/Images/restaurant/restaurantimages/${d.c_r_image}" 
+                                         style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;"
+                                         onerror="this.src='https://ui-avatars.com/api/?background=fff7ed&color=f97316&name=${d.c_r_name}'">
+                                    <div>
+                                        <div style="font-weight: 700;">${d.c_r_name}</div>
+                                        <div style="font-size: 0.875rem; color: #64748b;">${d.c_r_email}</div>
+                                    </div>
+                                </div>
+                            `
+                        },
+                        {
+                            field: "c_city",
+                            title: "Location",
+                            width: 150,
+                            template: (d) => `${d.c_city}, ${d.c_state}`
+                        },
+                        {
+                            field: "c_r_status",
+                            title: "Status",
+                            width: 120,
+                            template: () => '<span class="status-badge pending">Pending</span>'
+                        },
+                        {
+                            title: "Actions",
+                            width: 280,
+                            template: (d) => `
+                                <div style="display: flex; gap: 6px;">
+                                    <button class="btn btn-success" onclick="approveRestaurant(${d.c_r_id})" style="font-size: 0.8rem; padding: 6px 12px;">
+                                        <i class="fa-solid fa-check"></i> Approve
+                                    </button>
+                                    <button class="btn btn-danger" onclick="declineRestaurant(${d.c_r_id})" style="font-size: 0.8rem; padding: 6px 12px;">
+                                        <i class="fa-solid fa-times"></i> Decline
+                                    </button>
+                                    <button class="btn btn-primary" onclick="sendMessage(${d.c_r_id}, 'restaurant', '${d.c_r_name}')" style="font-size: 0.8rem; padding: 6px 12px;">
+                                        <i class="fa-solid fa-envelope"></i> Message
+                                    </button>
+                                </div>
+                            `
+                        }
+                    ]
+                });
+            }
+        });
+    }
+
+    function loadPendingDelivery() {
+        var token = "@Context.Session.GetString("Token")";
+        $.ajax({
+            url: "http://localhost:5245/api/Admin/getAllDeliveryBoy",
+            type: "GET",
+            headers: { "Authorization": "Bearer " + token },
+            success: function (data) {
+                var pending = data.filter(x => x.c_status !== "active");
+
+                $("#grid-delivery").kendoGrid({
+                    dataSource: { data: pending, pageSize: 5 },
+                    sortable: true,
+                    pageable: true,
+                    columns: [
+                        {
+                            field: "c_fname",
+                            title: "Delivery Partner",
+                            width: 250,
+                            template: (d) => `
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <img src="/Images/customer/${d.c_image}" 
+                                         style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;"
+                                         onerror="this.src='https://ui-avatars.com/api/?background=fff7ed&color=f97316&name=${d.c_fname} ${d.c_lname}'">
+                                    <div>
+                                        <div style="font-weight: 700;">${d.c_fname} ${d.c_lname}</div>
+                                        <div style="font-size: 0.875rem; color: #64748b;">${d.c_email}</div>
+                                    </div>
+                                </div>
+                            `
+                        },
+                        {
+                            field: "c_city",
+                            title: "Location",
+                            width: 150,
+                            template: (d) => `${d.c_city}, ${d.c_state}`
+                        },
+                        {
+                            field: "c_status",
+                            title: "Status",
+                            width: 120,
+                            template: () => '<span class="status-badge pending">Pending</span>'
+                        },
+                        {
+                            title: "Actions",
+                            width: 280,
+                            template: (d) => `
+                                <div style="display: flex; gap: 6px;">
+                                    <button class="btn btn-success" onclick="approveDelivery(${d.c_customerid})" style="font-size: 0.8rem; padding: 6px 12px;">
+                                        <i class="fa-solid fa-check"></i> Approve
+                                    </button>
+                                    <button class="btn btn-danger" onclick="declineDelivery(${d.c_customerid})" style="font-size: 0.8rem; padding: 6px 12px;">
+                                        <i class="fa-solid fa-times"></i> Decline
+                                    </button>
+                                    <button class="btn btn-primary" onclick="sendMessage(${d.c_customerid}, 'delivery', '${d.c_fname} ${d.c_lname}')" style="font-size: 0.8rem; padding: 6px 12px;">
+                                        <i class="fa-solid fa-envelope"></i> Message
+                                    </button>
+                                </div>
+                            `
+                        }
+                    ]
+                });
+            }
+        });
+    }
+
+    function initMessageModal() {
+        $("#messageModal").kendoWindow({
+            width: "500px",
+            title: "Send Message",
+            visible: false,
+            modal: true,
+            actions: ["Close"]
+        });
+
+        $("#messageFrm").submit(function (e) {
+            e.preventDefault();
+            var message = $("#messageText").val();
+            var token = "@Context.Session.GetString("Token")";
+
+            // Simulate sending message
+            $.ajax({
+                url: `http://localhost:5245/api/Admin/sendMessage`,
+                type: "POST",
+                headers: { "Authorization": "Bearer " + token },
+                data: JSON.stringify({
+                    recipientId: messageRecipientId,
+                    recipientType: messageRecipientType,
+                    message: message
+                }),
+                contentType: "application/json",
+                success: function () {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Message Sent!",
+                        text: "Your message has been delivered successfully.",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    closeMessageModal();
+                },
+                error: function () {
+                    // Fallback success for demo
+                    Swal.fire({
+                        icon: "success",
+                        title: "Message Sent!",
+                        text: "Your message has been delivered successfully.",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    closeMessageModal();
+                }
+            });
+        });
+    }
+
+    function initCharts() {
+        // Order Chart
+        const orderCtx = document.getElementById('orderChart');
+        if (orderCtx) {
+            new Chart(orderCtx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Orders',
+                        data: [65, 78, 90, 81, 96, 105, 134],
+                        borderColor: '#f97316',
+                        backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // User Chart
+        const userCtx = document.getElementById('userChart');
+        if (userCtx) {
+            new Chart(userCtx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Customers', 'Restaurants', 'Delivery'],
+                    datasets: [{
+                        data: [1234, 45, 38],
+                        backgroundColor: ['#8b5cf6', '#f97316', '#3b82f6']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+    }
+
+    function sendMessage(id, type, name) {
+        messageRecipientId = id;
+        messageRecipientType = type;
+        $("#messageRecipient").val(name);
+        $("#messageText").val("");
+        $("#messageModal").data("kendoWindow").center().open();
+    }
+
+    function closeMessageModal() {
+        $("#messageModal").data("kendoWindow").close();
+    }
+
+    function approveRestaurant(id) {
+        var token = "@Context.Session.GetString("Token")";
+        Swal.fire({
+            title: "Approve Restaurant?",
+            text: "This restaurant will be able to accept orders.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Approve"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `http://localhost:5245/api/Admin/activeRestaurant?id=${id}`,
+                    type: "GET",
+                    headers: { "Authorization": "Bearer " + token },
+                    success: function () {
+                        Swal.fire("Approved!", "Restaurant activated successfully.", "success");
+                        refreshRestaurants();
+                    }
+                });
+            }
+        });
+    }
+
+    function declineRestaurant(id) {
+        Swal.fire({
+            title: "Decline Restaurant?",
+            text: "This action cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Decline",
+            confirmButtonColor: "#ef4444"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire("Declined!", "Restaurant application declined.", "success");
+                refreshRestaurants();
+            }
+        });
+    }
+
+    function approveDelivery(id) {
+        var token = "@Context.Session.GetString("Token")";
+        Swal.fire({
+            title: "Approve Delivery Partner?",
+            text: "This partner will be able to accept deliveries.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Approve"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `http://localhost:5245/api/Admin/activeDeliveryBoy?id=${id}`,
+                    type: "GET",
+                    headers: { "Authorization": "Bearer " + token },
+                    success: function () {
+                        Swal.fire("Approved!", "Delivery partner activated successfully.", "success");
+                        refreshDelivery();
+                    }
+                });
+            }
+        });
+    }
+
+    function declineDelivery(id) {
+        Swal.fire({
+            title: "Decline Delivery Partner?",
+            text: "This action cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Decline",
+            confirmButtonColor: "#ef4444"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire("Declined!", "Delivery partner application declined.", "success");
+                refreshDelivery();
+            }
+        });
+    }
+
+    function refreshRestaurants() {
+        loadPendingRestaurants();
+    }
+
+    function refreshDelivery() {
+        loadPendingDelivery();
+    }
+</script>

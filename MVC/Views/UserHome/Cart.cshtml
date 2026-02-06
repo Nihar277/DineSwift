@@ -1,0 +1,639 @@
+@{
+    ViewData["Title"] = "My Cart";
+    Layout = "_userdashboardLayout";
+}
+@* 
+<link href="https://kendo.cdn.telerik.com/2024.1.319/styles/kendo.default-v2.min.css" rel="stylesheet" />
+<script src="https://kendo.cdn.telerik.com/2024.1.319/js/jquery.min.js"></script>
+<script src="https://kendo.cdn.telerik.com/2024.1.319/js/kendo.all.min.js"></script> *@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+    body {
+        background: #fffaf5;
+        font-family: 'Segoe UI', sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .cart-container {
+        max-width: 1250px;
+        margin: 40px auto;
+        display: grid;
+        grid-template-columns: 2.3fr 1fr;
+        gap: 28px;
+        padding: 0 15px;
+    }
+
+    .cart-item {
+        position: relative;
+        background: #fff;
+        border-radius: 18px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 18px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+        flex-wrap: wrap;
+        margin-top: 35px
+    }
+
+    .cart-item img {
+        width: 95px;
+        height: 95px;
+        border-radius: 14px;
+        object-fit: cover;
+    }
+
+    .item-details {
+        flex: 1;
+        padding-left: 18px;
+        min-width: 150px;
+    }
+
+    .item-name {
+        font-size: 17px;
+        font-weight: 600;
+    }
+
+    .item-rest {
+        font-size: 13px;
+        color: #777;
+    }
+
+    .item-price {
+        font-size: 15px;
+        font-weight: 700;
+        color: #f37021;
+        margin-top: 6px;
+    }
+
+    .qty-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin-left: 15px;
+    }
+
+    .remove-btn {
+        position: absolute;
+        /* move button to top-right */
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 18px;
+        color: #131111;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    .remove-btn:hover {
+        color: #ff4d4f;
+    }
+
+
+    .qty-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #fff3ea;
+        padding: 6px 10px;
+        border-radius: 20px;
+    }
+
+    .qty-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        background: #fff;
+        color: #f37021;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .qty {
+        min-width: 20px;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .summary {
+        background: #fff;
+        border-radius: 20px;
+        padding: 22px;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.07);
+        position: sticky;
+        top: 70px;
+        margin-top: 65px;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+
+    .summary-row.total {
+        font-size: 18px;
+        font-weight: 700;
+        color: #f37021;
+    }
+
+    .checkout-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #f37021, #ff8c42);
+        border: none;
+        padding: 15px;
+        color: #fff;
+        border-radius: 30px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    /* ===== PROMO CODE ===== */
+    .promo-code-container {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .promo-input {
+        flex: 1;
+        padding: 10px 15px;
+        border-radius: 25px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+
+    .promo-btn {
+        padding: 10px 20px;
+        border-radius: 25px;
+        background: #f37021;
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .promo-btn:hover {
+        background: #ff8c42;
+    }
+
+    /* ===== DELIVERY ADDRESS LABEL STYLING ===== */
+    .address-label {
+        margin-bottom: 10px;
+    }
+
+    .address-label .label-title {
+        font-size: 12px;
+        color: #777;
+    }
+
+    .address-label h6 {
+        margin: 2px 0 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+    }
+
+
+    @@media (max-width: 768px) {
+        .cart-container {
+            grid-template-columns: 1fr;
+        }
+
+        .cart-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .qty-wrapper {
+            margin-left: 0;
+            margin-top: 10px;
+        }
+
+        .promo-code-container {
+            flex-direction: column;
+        }
+
+        .promo-btn {
+            width: 100%;
+        }
+
+        /* ===== DELIVERY ADDRESS STYLING (ADDED) ===== */
+        .address-box {
+            margin-bottom: 15px;
+        }
+
+        .address-box input {
+            width: 100%;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 13px;
+        }
+
+
+    }
+</style>
+
+<div class="cart-container">
+
+    <!-- CART -->
+    <div>
+        <h3>Your Cart</h3>
+        <div id="cart-items"></div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary">
+        <h4>Order Summary</h4>
+        <div class="address-box">
+            <h6 style="margin-bottom:10px;">Delivery Address</h6>
+
+            <!-- House Number -->
+            <div style="display:flex; align-items:center; margin-bottom:8px;">
+                <label style="width:110px; font-size:13px; color:#555;">House No :</label>
+                <input type="text" id="c_housenumber"
+                    style="flex:1; padding:8px 12px; border-radius:10px; border:1px solid #ccc;"
+                    placeholder="Enter house number">
+            </div>
+
+            <!-- Society Name -->
+            <div style="display:flex; align-items:center; margin-bottom:8px;">
+                <label style="width:110px; font-size:13px; color:#555;">Society :</label>
+                <input type="text" id="c_societyname"
+                    style="flex:1; padding:8px 12px; border-radius:10px; border:1px solid #ccc;"
+                    placeholder="Enter society name">
+            </div>
+
+            <!-- Landmark -->
+            <div style="display:flex; align-items:center; margin-bottom:8px;">
+                <label style="width:110px; font-size:13px; color:#555;">Landmark :</label>
+                <input type="text" id="c_landmark"
+                    style="flex:1; padding:8px 12px; border-radius:10px; border:1px solid #ccc;"
+                    placeholder="Enter landmark">
+            </div>
+
+            <!-- City (LABEL ONLY) -->
+            <div style="display:flex; align-items:center; margin-bottom:6px;">
+                <label style="width:110px; font-size:13px; color:#555;">City :</label>
+                <h6 id="c_city" style="margin:0; font-size:14px; font-weight:600;"></h6>
+            </div>
+
+            <!-- State (LABEL ONLY) -->
+            <div style="display:flex; align-items:center;">
+                <label style="width:110px; font-size:13px; color:#555;">State :</label>
+                <h6 id="c_state" style="margin:0; font-size:14px; font-weight:600;"></h6>
+            </div>
+        </div>
+
+
+        <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="subtotal">₹0</span>
+        </div>
+
+        <div class="summary-row">
+            <span>Delivery Fee</span>
+            <span id="deliveryFee" style="color:red">₹0</span>
+
+        </div>
+
+
+        <!-- PROMO CODE -->
+        <div class="promo-code-container">
+            <input type="text" class="promo-input" id="promoCode" placeholder="Enter Promo Code">
+            <button class="promo-btn" id="applyPromoBtn">Apply</button>
+        </div>
+
+        <hr />
+
+        <div class="summary-row total">
+            <span>Total</span>
+            <span id="total">₹0</span>
+        </div>
+
+        <button class="checkout-btn" id="checkoutBtn">
+            Proceed to Checkout →
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    
+
+        $(document).ready(function () {
+            loadCartCount();
+            loadCart();
+            loadCartAddress(); // ADDED
+        });
+
+        let promoApplied = false; // track promo
+        let deliveryFee = 0;
+
+        function loadCart() {
+            $.get(`http://localhost:5245/api/userHome/GetCartItems?userid=${USER_ID}`, function (res) {
+                let items = res.data ?? res;
+                $("#cart-items").empty();
+
+                if (!items || items.length === 0) {
+                    $("#cart-items").html("<p>Your cart is empty 😔</p>");
+                    updateCartTotals(); // subtotal = 0
+                    return;
+                }
+
+                items.forEach(item => {
+                    $("#cart-items").append(`
+                                            <div class="cart-item" data-price="${item.c_price}" data-cartid="${item.c_cartId}">
+                                               <img src="/Images/restaurant/dishes/${item.c_restaurantId}/${item.c_image}"
+     onerror="this.src='/Images/no-image.png'">
+                                                <button class="remove-btn" data-cartid="${item.c_cartId}">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                <div class="item-details">
+                                                    <div class="item-name">${item.c_itemname}</div>
+                                                    <div class="item-rest">Restaurant ID: ${item.c_restaurantId}</div>
+                                                    <div class="item-price">₹${item.c_price}</div>
+                                                </div>
+                                                <div class="qty-wrapper">
+                                                    <div class="qty-box">
+                                                        <button class="qty-btn minus">-</button>
+                                                        <span class="qty">${item.c_quantity}</span>
+                                                        <button class="qty-btn plus">+</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `);
+                });
+
+
+                // AFTER items are added, update totals including delivery fee
+                updateCartTotals();
+            });
+        }
+        // ===== LOAD DELIVERY ADDRESS (ADDED) =====
+        function loadCartAddress() {
+            $.get(`http://localhost:5245/api/userHome/GetAddress/${USER_ID}`, function (res) {
+                if (!res) return;
+
+                $("#c_housenumber").val(res.c_housenumber);
+                $("#c_societyname").val(res.c_societyname);
+                $("#c_landmark").val(res.c_landmark);
+                $("#c_city").text(res.c_city);
+                $("#c_state").text(res.c_state);
+
+            });
+        }
+
+
+        function updateTotal(total) {
+            $("#subtotal").text(`₹${total}`);
+            $("#total").text(`₹${total}`);
+        }
+
+        function recalc() {
+            let total = 0;
+            $(".cart-item").each(function () {
+                let price = $(this).data("price");
+                let qty = parseInt($(this).find(".qty").text());
+                total += price * qty;
+            });
+            updateTotal(total);
+        }
+
+        function updateQuantity(cartId, quantity) {
+            $.ajax({
+                url: "http://localhost:5245/api/userHome/UpdateCartQuantity",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ CartId: cartId, Quantity: quantity }),
+                success: function (res) {
+                    console.log("Quantity updated");
+                    updateCartTotals(); // recalc totals including delivery
+                },
+                error: function (err) {
+                    Swal.fire("Error", "Failed to update quantity", "error");
+                    console.log(err);
+                }
+            });
+        }
+
+        // PLUS button
+        $(document).on("click", ".plus", function () {
+            let qtyEl = $(this).siblings(".qty");
+            let newQty = +qtyEl.text() + 1;
+            qtyEl.text(newQty);
+
+            let cartId = $(this).closest(".cart-item").data("cartid");
+            updateQuantity(cartId, newQty);
+        });
+
+        // MINUS button
+        $(document).on("click", ".minus", function () {
+            let qtyEl = $(this).siblings(".qty");
+            if (+qtyEl.text() <= 1) return;
+
+            let newQty = +qtyEl.text() - 1;
+            qtyEl.text(newQty);
+
+            let cartId = $(this).closest(".cart-item").data("cartid");
+            updateQuantity(cartId, newQty);
+        });
+
+
+        $(document).on("click", ".remove-btn", function () {
+            let cartId = $(this).data("cartid");
+            let cartItem = $(this).closest(".cart-item");
+
+            Swal.fire({
+                title: 'Remove item?',
+                text: "Do you want to remove this item from your cart?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f37021',
+                cancelButtonColor: '#aaa',
+                confirmButtonText: 'Yes, remove it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `http://localhost:5245/api/userHome/DeleteCartItem?cartId=${cartId}`,
+                        type: "DELETE",
+                        success: function () {
+                            cartItem.slideUp(200, function () {
+                                $(this).remove();
+                                recalc();
+                            });
+                        },
+                        error: function () {
+                            alert("Failed to delete item");
+                        }
+                    });
+                }
+            });
+        });
+
+
+
+        function updateCartTotals() {
+            let subtotal = 0;
+
+            $(".cart-item").each(function () {
+                let price = $(this).data("price");
+                let qty = parseInt($(this).find(".qty").text());
+                subtotal += price * qty;
+            });
+
+            $("#subtotal").text(`₹${subtotal.toFixed(2)}`);
+
+            // Default delivery fee = 10% of subtotal
+            deliveryFee = Math.round(subtotal * 0.10);
+
+            if (promoApplied) {
+                $("#deliveryFee").text("FREE").css("color", "green");
+                deliveryFee = 0;
+            } else {
+                $("#deliveryFee").text(`₹${deliveryFee}`).css("color", "red");
+            }
+
+            $("#total").text(`₹${(subtotal + deliveryFee).toFixed(2)}`);
+        }
+
+
+
+        // APPLY PROMO
+        $("#applyPromoBtn").click(function () {
+            let code = $("#promoCode").val().trim();
+            if (!code) {
+                Swal.fire("Error", "Please enter a promo code", "error");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("c_promocode", code);
+            formData.append("c_email", "dhruvlakhani0210@gmail.com");
+
+            $.ajax({
+                url: "http://localhost:5245/api/Promodcode/send",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    if (res.success) {
+                        promoApplied = true; // promo applied
+                        Swal.fire("Success", res.message || "Promo applied!", "success");
+                    } else {
+                        promoApplied = false; // promo failed
+                        Swal.fire("Failed", res.message || "Promo not applied", "error");
+                    }
+                    updateCartTotals(); // recalc totals after promo
+                },
+
+                error: function (xhr) {
+                    promoApplied = false;
+                    let errMsg = xhr.responseJSON?.message || "Error applying promo";
+                    Swal.fire("Failed", errMsg, "error");
+                    updateCartTotals();
+                }
+            });
+        });
+
+        // Recalculate totals on quantity change or item removal
+        $(document).on("click", ".plus, .minus, .remove-btn", function () {
+            updateCartTotals();
+        });
+
+        // Initial calculation
+        updateCartTotals();
+
+        $("#checkoutBtn").click(function () {
+            Swal.fire({
+                title: 'Place Order?',
+                text: "Do you want to confirm your order?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#f37021',
+                cancelButtonColor: '#aaa',
+                confirmButtonText: 'Yes, Place Order'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+
+                    // ✅ ADDRESS VALIDATION
+                    if (!$("#c_housenumber").val() || !$("#c_societyname").val()) {
+                        Swal.fire("Error", "Please enter delivery address", "error");
+                        return;
+                    }
+
+                    await pay();
+                }
+            });
+        });
+
+
+        async function pay() {
+
+            // 1️⃣ Read total (₹ → paise)
+            let amtText = $("#total").text();          // "₹1234.56"
+            let rupees = parseFloat(amtText.replace('₹', ''));
+            let paise = Math.round(rupees * 100);      // Stripe expects paise
+
+            // 2️⃣ Get first cart item (assuming single restaurant / dish)
+            let firstItem = $(".cart-item").first();
+
+            let payload = {
+                amount: paise,
+                currency: "inr",
+
+                c_customerid: USER_ID,
+                c_restaurantid: firstItem.find(".item-rest").text().replace("Restaurant ID:", "").trim(),
+
+                c_housenumber: $("#c_housenumber").val(),
+                c_societyname: $("#c_societyname").val(),
+                c_landmark: $("#c_landmark").val(),
+                c_city: $("#c_city").text(),
+                c_state: $("#c_state").text(),
+
+                c_quantity: parseInt(firstItem.find(".qty").text()),
+                c_dishname: firstItem.find(".item-name").text(),
+                c_foodimage: firstItem.find("img").attr("src")
+            };
+
+            // 3️⃣ Call Stripe API
+            const res = await fetch(
+                "http://localhost:5245/api/StripePayment/create-checkout-session",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            const data = await res.json();
+
+            if (data.success) {
+                window.location.href = data.checkoutUrl;
+            } else {
+                Swal.fire("Payment Error", data.message, "error");
+            }
+        }
+
+
+
+
+
+
+
+    </script>
+}

@@ -1,0 +1,1198 @@
+<!-- Kendo UI CSS -->
+<link rel="stylesheet" href="https://kendo.cdn.telerik.com/2025.3.1015/styles/kendo.default-v2.min.css" />
+
+<!-- jQuery -->
+<script src="https://kendo.cdn.telerik.com/2025.3.1015/js/jquery.min.js"></script>
+
+<!-- Kendo UI JS -->
+<script src="https://kendo.cdn.telerik.com/2025.3.1015/js/kendo.all.min.js"></script>
+
+
+
+<style>
+
+        /* ================= ROOT & BODY ================= */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            background: #fef0e6;
+        }
+
+        /* ================= MAIN WRAPPER ================= */
+        .vendor-wrapper {
+            width: min(95%, 1300px);
+            min-height: 85vh;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            border-radius: 24px;
+        }
+
+        /* ================= LEFT PANEL ================= */
+        .vendor-left {
+            flex: 1 1 45%;
+            min-width: 320px;
+            position: relative;
+            overflow: hidden;
+            color: #fff;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #dc2626 100%);
+            border-radius: 24px 0 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-box {
+            width: 80%;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+             margin-bottom: 20px;
+        }
+        
+
+        /* ================= LOGO ================= */
+        .brand-logo {
+            width: clamp(180px, 25vw, 300px);
+            height: auto;
+            display: block;
+            margin: clamp(-60px, -8vh, -80px) auto 20px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35));
+          
+           
+
+        }
+
+        /* ================= IMAGE CARD ================= */
+        .image-card {
+            width: clamp(220px, 28vw, 280px);
+            height: clamp(280px, 40vw, 360px);
+            margin: 20px auto;
+            background: rgba(255,255,255,0.15);
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.35);
+            margin-top: -70px;
+            
+        }
+
+        .image-card img {
+            width: 90%;
+            animation: floatImage 5s ease-in-out infinite;
+        }
+
+        /* ================= BADGES ================= */
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        /* ================= STATS ================= */
+        .stats-box {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .stat {
+            background: rgba(255,255,255,0.18);
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat h4 {
+            margin: 0;
+            font-size: clamp(16px, 2vw, 20px);
+        }
+
+        .stat span {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* ================= FLOATING ICONS ================= */
+        .float-icon {
+            position: absolute;
+            font-size: 22px;
+            opacity: 0.6;
+            animation: floatIcons 8s infinite ease-in-out;
+        }
+
+        .icon-1 { top: 20%; left: 10%; }
+        .icon-2 { top: 40%; right: 15%; }
+        .icon-3 { bottom: 30%; left: 15%; }
+        .icon-4 { bottom: 20%; right: 10%; }
+
+        /* ================= RIGHT PANEL ================= */
+        .vendor-right {
+            flex: 1 1 55%;
+            min-width: 320px;
+            background: #fff;
+            border-radius: 0 24px 24px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .form-card {
+            width: 85%;
+        }
+
+        .title {
+            text-align: center;
+            font-size: clamp(18px, 2vw, 26px);
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        /* ================= BACK BUTTON ================= */
+        .back-inside-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            color: #c6894d;
+            background: #fff3e6;
+            border: 1px solid #ffd2a8;
+            transition: all 0.25s ease;
+        }
+
+        .back-inside-btn:hover {
+            background: #ff7a00;
+            color: #fff;
+            transform: translateX(-4px);
+        }
+
+        /* ================= KENDO FIXES ================= */
+        .k-wizard {
+            border: none !important;
+            background: transparent !important;
+        }
+
+        .k-stepper {
+            justify-content: center;
+        }
+
+        .k-step-current .k-step-indicator {
+            background: #ff7a00 !important;
+            color: #fff !important;
+        }
+
+        /* ================= ANIMATIONS ================= */
+        @@keyframes floatImage {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0); }
+        }
+
+        @@keyframes floatIcons {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-25px); }
+            100% { transform: translateY(0); }
+        }
+
+        /* ================= RESPONSIVE - TABLET ================= */
+        @@media (max-width: 1024px) {
+            .vendor-wrapper {
+                flex-direction: column;
+                min-height: auto;
+                width: 95%;
+            }
+
+            .vendor-left,
+            .vendor-right {
+                width: 100%;
+                min-width: unset;
+                border-radius: 0;
+            }
+
+            .vendor-left {
+                border-radius: 24px 24px 0 0;
+                padding: 30px 20px;
+            }
+
+            .vendor-right {
+                border-radius: 0 0 24px 24px;
+                padding: 40px 20px;
+            }
+
+            .brand-box {
+                width: 90%;
+            }
+
+            .image-card {
+                width: 200px;
+                height: 260px;
+            }
+        }
+
+        /* ================= RESPONSIVE - MOBILE ================= */
+        @@media (max-width: 480px) {
+            body {
+                align-items: flex-start;
+                padding: 10px;
+            }
+
+            .vendor-wrapper {
+                width: 100%;
+                margin-top: 10px;
+                border-radius: 16px;
+            }
+
+            .vendor-left {
+                border-radius: 16px 16px 0 0;
+                padding: 20px 15px;
+            }
+
+            .vendor-right {
+                border-radius: 0 0 16px 16px;
+                padding: 30px 15px;
+            }
+
+            .brand-logo {
+                width: 150px;
+                margin: -30px auto 15px;
+            }
+
+            .image-card {
+                width: 160px;
+                height: 200px;
+                margin: 15px auto;
+            }
+
+            .badges {
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-bottom: 20px;
+            }
+
+            .badge {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+
+            .stats-box {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .stat {
+                padding: 10px 8px;
+            }
+
+            .stat h4 {
+                font-size: 14px;
+            }
+
+            .stat span {
+                font-size: 10px;
+            }
+
+            .form-card {
+                width: 95%;
+            }
+
+            .title {
+                font-size: 18px;
+                margin-bottom: 20px;
+            }
+
+            .back-inside-btn {
+                top: 12px;
+                left: 12px;
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .float-icon {
+                font-size: 16px;
+            }
+
+            .k-stepper .k-step-label {
+                font-size: 11px;
+            }
+        }
+
+        .loader-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loader-box {
+    background: #fff;
+    padding: 24px 32px;
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+.loader-box .k-icon {
+    font-size: 42px;
+    color: #ff7a00;
+    animation: spin 1s linear infinite;
+}
+
+.loader-box p {
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+@@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+
+
+/* Main orange background */
+/* 🔥 Hide Kendo field-name validation tooltips */
+.k-tooltip,
+.k-tooltip-validation {
+    display: none !important;
+}
+
+/* 🛑 Prevent browser autofill icons overlay */
+input::-webkit-credentials-auto-fill-button {
+    display: none !important;
+}
+
+/* 👇 Extra safety: remove auto labels from dropdown inputs */
+.k-dropdown .k-input,
+.k-dropdown input {
+    title: "" !important;
+    aria-label: "" !important;
+}
+
+
+</style>
+
+<body>
+     <div class="vendor-wrapper">
+        <!-- ================= LEFT PANEL ================= -->
+        <div class="vendor-left">
+            <!-- Floating Food Icons -->
+            <span class="float-icon icon-1">🍔</span>
+            <span class="float-icon icon-2">🍕</span>
+            <span class="float-icon icon-3">🥗</span>
+            <span class="float-icon icon-4">🍟</span>
+
+            <div class="brand-box">
+                <!-- Logo -->
+                <img src="~/Images/dineLogo1.png" alt="DineSwift Logo" class="brand-logo" onerror="this.style.display='none'">
+
+                <!-- 3D Image Card -->
+                <div class="image-card">
+                    <img src="~/Images/cheif.jpeg" alt="Food Delivery" onerror="this.innerHTML='🍽️'; this.style.fontSize='80px';">
+                </div>
+
+                <!-- Feature Badges -->
+                <div class="badges">
+                    <span class="badge">⚡ Fast</span>
+                    <span class="badge">🥬 Fresh</span>
+                    <span class="badge">😋 Tasty</span>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-box">
+                    <div class="stat">
+                        <h4>5K+</h4>
+                        <span>Restaurants</span>
+                    </div>
+                    <div class="stat">
+                        <h4>5K+</h4>
+                        <span>Orders/Day</span>
+                    </div>
+                    <div class="stat">
+                        <h4>50+</h4>
+                        <span>Cities</span>
+                    </div>
+                    <div class="stat">
+                        <h4>24/7</h4>
+                        <span>Support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= RIGHT PANEL ================= -->
+        <div class="vendor-right">
+            <!-- Back Button -->
+            <a href="/" class="back-inside-btn">←</a>
+
+            <div class="form-card">
+                <!-- Title -->
+                <h2 class="title">Restaurant Vendor Registration</h2>
+
+                <!-- Kendo Wizard Container -->
+                <div id="wizard"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="globalLoader" class="loader-overlay">
+    <div class="loader-box">
+        <span class="k-icon k-i-loading"></span>
+        <p id="loaderText">Processing...</p>
+    </div>
+</div>
+
+</body>
+
+
+
+
+
+
+
+
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+             (function () {
+
+        // Function to remove field-name overlays (like "c_email")
+        function cleanKendoFields(container) {
+            $(container)
+                .find("input, textarea, select")
+                .each(function () {
+                    $(this)
+                        .removeAttr("title")
+                        .removeAttr("aria-label")
+                        .attr("autocomplete", "off");
+                });
+        }
+
+        // Run on initial page load
+        $(document).ready(function () {
+            cleanKendoFields(document);
+        });
+
+        // Run when focusing any input (fixes stepper dynamic rendering)
+        $(document).on("focusin", ".k-form input, .k-form textarea, .k-form select", function () {
+            $(this).removeAttr("title").removeAttr("aria-label");
+        });
+
+        // Stepper support: when step changes, re-clean fields
+        $(document).on("kendoStepperActivate", function (e) {
+            try { cleanKendoFields(e.sender.element); } catch (err) { }
+        });
+
+    })();
+
+            function showLoader(text) {
+    $("#loaderText").text(text);
+    $("#globalLoader").fadeIn(200);
+}
+
+function hideLoader() {
+    $("#globalLoader").fadeOut(200);
+}
+
+
+            let otpSent = false;
+            let otpVerified = false;
+
+            /* ================= CUSTOM VALIDATIONS ================= */
+
+            kendo.ui.validator.rules.strongPassword = function (input) {
+                if (input.is("[name='c_password']")) {
+                    var value = input.val();
+                    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@@$!%*?&]).{8,}$/.test(value);
+                }
+                return true;
+            };
+            kendo.ui.validator.messages.strongPassword = "Password must contain uppercase, lowercase, number & special character";
+
+            kendo.ui.validator.rules.passwordMatch = function (input) {
+                if (input.is("[name='c_confirmpassword']")) {
+                    var password = $("[name='c_password']").val();
+                    var confirm = input.val();
+                    return password === confirm;
+                }
+                return true;
+            };
+            kendo.ui.validator.messages.passwordMatch = "Password and Confirm Password do not match";
+
+            kendo.ui.validator.rules.ifscValidation = function (input) {
+                if (input.is("[name='c_r_ifsc']")) {
+                    return /^[A-Z]{4}0[A-Z0-9]{6}$/.test(input.val());
+                }
+                return true;
+            };
+            kendo.ui.validator.messages.ifscValidation = "Invalid IFSC Code";
+
+            kendo.ui.validator.rules.phoneValidation = function (input) {
+                if (input.is("[name='c_phonenumber']")) {
+                    return /^[6-9]\d{9}$/.test(input.val());
+                }
+                return true;
+            };
+            kendo.ui.validator.messages.phoneValidation = "Enter a valid 10-digit mobile number";
+
+            kendo.ui.validator.rules.pincodeValidation = function (input) {
+                if (input.is("[name='c_pincode']")) {
+                    return /^[1-9][0-9]{5}$/.test(input.val());
+                }
+                return true;
+            };
+            kendo.ui.validator.messages.pincodeValidation = "Enter a valid 6-digit pincode";
+
+            kendo.ui.validator.rules.accountNoValidation = function (input) {
+                if (input.is("[name='c_r_ac']")) {
+                    return /^\d{12}$/.test(input.val());
+                }
+                return true;
+            };
+            kendo.ui.validator.messages.accountNoValidation = "Account number must be exactly 12 digits";
+
+            kendo.ui.validator.rules.fileRequired = function (input) {
+                if (input.is("[name='c_image']") || input.is("[name='c_r_image']") || input.is("[name='c_r_aadhar']")) {
+                    var upload = input.getKendoUpload();
+                    if (!upload) return false;
+                    return upload.getFiles().length > 0;
+                }
+                return true;
+            };
+            kendo.ui.validator.messages.fileRequired = "Please select a file";
+
+            kendo.ui.validator.rules.gstValidation = function (input) {
+                if (input.is("[name='c_r_gst']")) {
+                    var gst = input.val().toUpperCase();
+                    // Indian GST format
+                    return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gst);
+                }
+                return true;
+            };
+
+            kendo.ui.validator.messages.gstValidation = "Enter a valid GST Number (Example: 27AAPFU0939F1ZV)";
+
+            kendo.ui.validator.rules.emailExists = function (input) {
+
+                if (input.is("[name='c_email']")) {
+
+                    var email = input.val();
+                    if (!email) return true;
+
+                    $.ajax({
+                        url: "http://localhost:5245/api/Customer/checkEmailExists?email=" + email,
+                        type: "GET",               // or POST (as per your API)
+                        async: false,              // 🔴 REQUIRED
+                        success: function () {
+                            emailExists = false;   // email NOT exists
+                        },
+                        error: function () {
+                            emailExists = true;    // email exists (400)
+                        }
+                    });
+
+                    return emailExists === false;
+                }
+
+                return true;
+            };
+
+            kendo.ui.validator.messages.emailExists = "Email already exists";
+
+
+            /* ================= WIZARD ================= */
+
+            $("#wizard").kendoWizard({
+                pager: true,
+                validateStep: function (e) {
+                    if (e.step.options.form) {
+                        return e.step.options.form.validate();
+                    }
+                    return true;
+                },
+                steps: [
+                    /* ================= STEP 1 : CUSTOMER ================= */
+                    {
+                        title: "Customer",
+                        icon: "user",
+                        buttons: ["next"],
+                        form: {
+                            validateOnBlur: false,
+                            layout: "grid",
+                            grid: { cols: 2, gutter: 20 },
+                            items: [
+                                { field: "c_fname", label: "First Name", validation: { required: { message: "First Name is Required" } } },
+                                { field: "c_lname", label: "Last Name", validation: { required: { message: "Last Name is Required" } } },
+                                { field: "c_email", label: "Email", validation: { required: { message: "Email is Required" }, email: { message: "Email is not valid" }, emailExists: true } },
+                                { field: "c_phonenumber", label: "Phone Number", validation: { required: { message: "Phone Number is Required" }, phone: true } },
+                                {
+                                    field: "c_password",
+                                    label: "Password",
+                                    editor: function (container, options) {
+                                        $(`<input type="password" id="${options.field}" name="${options.field}" data-strongPassword-match="true" class="form-control" data-required-msg="${options.label} is required" required/>`)
+                                            .appendTo(container).kendoTextBox();
+                                    },
+                                },
+                                {
+                                    field: "c_confirmpassword",
+                                    label: "Confirm Password",
+                                    editor: (container, options) => {
+                                        $('<input name="' + options.field + '" type="password" required data-required-msg="Confirm Password Is Required"/>')
+                                            .appendTo(container).kendoTextBox();
+                                    },
+                                    validation: { required: true, passwordMatch: true }
+                                },
+                                {
+                                    field: "c_gender",
+                                    label: "Gender",
+                                    editor: function (container, options) {
+
+                                        const wrapper = $('<div class="gender-wrapper"></div>').appendTo(container);
+
+                                        ["Male", "Female", "Other"].forEach(g => {
+                                            wrapper.append(`
+                        <label class="me-3">
+                            <input type="radio"
+                                   name="gender_radio"
+                                   value="${g}">
+                            ${g}
+                        </label>
+                    `);
+                                        });
+
+                                        // 🔥 Hidden input for Kendo validation
+                                        $('<input type="hidden" name="' + options.field + '" required data-required-msg="Gender is Required" />')
+                                            .appendTo(container);
+
+                                        // 🔥 Validation message placed AFTER radios
+                                        $('<span class="k-invalid-msg" data-for="' + options.field + '"></span>')
+                                            .appendTo(container);
+
+                                        // Sync radio value to hidden input
+                                        wrapper.on("change", "input[type=radio]", function () {
+                                            $('[name="' + options.field + '"]').val(this.value).trigger("change");
+                                        });
+                                    },
+                                    validation: { required: true }
+                                }
+
+                            ]
+                        }
+                    },
+                    /* ================= STEP 2 : ADDRESS ================= */
+                    {
+                        title: "Address",
+                        icon: "home",
+                        buttons: ["previous", "next"],
+                        form: {
+                            validateOnBlur: false,
+                            layout: "grid",
+                            grid: { cols: 2, gutter: 20 },
+                            items: [
+                                { field: "c_pincode", label: "Pincode", editor: (c, o) => { $('<input name="' + o.field + '" required data-required-msg="Pincode is required"/>').appendTo(c).kendoTextBox(); }, validation: { required: true } },
+                                {
+                                    field: "c_state",
+                                    label: "State",
+                                    editor: function (container, options) {
+                                        $('<input name="' + options.field + '" required data-required-msg="State is required" required />')
+                                            .appendTo(container)
+                                            .kendoDropDownList({
+                                                optionLabel: "Select State",
+                                                dataTextField: "c_sname",
+                                                dataValueField: "id",
+                                                dataSource: {
+                                                    transport: {
+                                                        read: {
+                                                            url: "http://localhost:5245/api/Customer/states",
+                                                            dataType: "json"
+                                                        }
+                                                    }
+                                                },
+                                                change: function () {
+                                                    const cityDropDown = $("[name='c_city']").data("kendoDropDownList");
+                                                    cityDropDown.value("");
+                                                    cityDropDown.dataSource.read();
+                                                    cityDropDown.enable(true);
+                                                }
+                                            });
+                                    },
+                                    validation: { required: { message: "State is required" } }
+                                },
+                                {
+                                    field: "c_city",
+                                    label: "City",
+                                    editor: function (container, options) {
+                                        $('<input name="' + options.field + '" required  data-required-msg="City is required"/>')
+                                            .appendTo(container)
+                                            .kendoDropDownList({
+                                                optionLabel: "Select City",
+                                                dataTextField: "cityName",
+                                                dataValueField: "cityId",
+                                                enable: false,
+                                                dataSource: {
+                                                    transport: {
+                                                        read: {
+                                                            url: function () {
+                                                                const stateId = $("[name='c_state']").val();
+                                                                return "http://localhost:5245/api/Customer/cities/" + stateId;
+                                                            },
+                                                            dataType: "json"
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                    },
+                                    validation: { required: { message: "City is required" } }
+                                },
+                                { field: "c_address", label: "Address", editor: (c, o) => { $('<textarea name="' + o.field + '" required data-required-msg="Address is required"></textarea>').appendTo(c).kendoTextArea({ rows: 2 }); }, validation: { required: true } },
+                                {
+                                    field: "c_image",
+                                    label: "Profile Image",
+                                    editor: function (container, options) {
+                                        $(`<input type="file"
+                name="${options.field}"
+                accept=".jpg,.jpeg,.png" />`)
+                                            .appendTo(container)
+                                            .kendoUpload({
+                                                multiple: false,
+                                                localization: {
+                                                    select: "📷 Choose Profile Image"
+                                                },
+                                                validation: {
+                                                    allowedExtensions: [".jpg", ".jpeg", ".png"]
+                                                },
+                                                select: function (e) {
+                                                    const ext = e.files[0].extension.toLowerCase();
+
+                                                    if (![".jpg", ".jpeg", ".png"].includes(ext)) {
+                                                        e.preventDefault();
+                                                        kendo.alert("❌ Only JPG, JPEG, and PNG images are allowed.");
+                                                    }
+                                                }
+                                            });
+                                    },
+                                    validation: { fileRequired: true }
+                                }
+
+                            ]
+                        }
+                    },
+                    /* ================= STEP 3 : RESTAURANT ================= */
+                    {
+                         title: "Restaurant",
+                        icon: "cart",
+                        buttons: ["previous", "done"],
+                        form: {
+                            validateOnBlur: false,
+                            layout: "grid",
+                            grid: { cols: 2, gutter: 20 },
+                            items: [
+                                { field: "c_r_name", label: "Restaurant Name", validation: { required: { message: "Restaurant Name is required" } } },
+                                { field: "c_r_email", label: "Restaurant Email", validation: { required: { message: "Restaurant Email is required" }, email: { message: "Enter a valid email" } } },
+                                {
+                                    field: "c_r_state",
+                                    label: "State",
+                                    editor: function (container, options) {
+                                        $('<input name="' + options.field + '" required />')
+                                            .appendTo(container)
+                                            .kendoDropDownList({
+                                                optionLabel: "Select State",
+                                                dataTextField: "c_sname",
+                                                dataValueField: "id",
+                                                dataSource: {
+                                                    transport: {
+                                                        read: {
+                                                            url: "http://localhost:5245/api/Customer/states",
+                                                            dataType: "json"
+                                                        }
+                                                    }
+                                                },
+                                                change: function () {
+                                                    const cityDropDown = $("[name='c_r_city']").data("kendoDropDownList");
+                                                    cityDropDown.value("");
+                                                    cityDropDown.dataSource.read();
+                                                    cityDropDown.enable(true);
+                                                }
+                                            });
+                                    },
+                                    validation: { required: { message: "State is required" } }
+                                },
+                                {
+                                    field: "c_r_city",
+                                    label: "City",
+                                    editor: function (container, options) {
+                                        $('<input name="' + options.field + '" required />')
+                                            .appendTo(container)
+                                            .kendoDropDownList({
+                                                optionLabel: "Select City",
+                                                dataTextField: "cityName",
+                                                dataValueField: "cityId",
+                                                enable: false,
+                                                dataSource: {
+                                                    transport: {
+                                                        read: {
+                                                            url: function () {
+                                                                const stateId = $("[name='c_r_state']").val();
+                                                                return "http://localhost:5245/api/Customer/cities/" + stateId;
+                                                            },
+                                                            dataType: "json"
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                    },
+                                    validation: { required: { message: "City is required" } }
+                                },
+                                { field: "c_r_address", label: "Restaurant Address", editor: (c, o) => { $('<textarea name="' + o.field + '" required data-required-msg="Address is required"></textarea>').appendTo(c).kendoTextArea({ rows: 2 }); }, validation: { required: true } },
+                                { field: "c_r_ac", label: "Account Number", validation: { required: { message: "Account Number is required" }, accountNoValidation: true } },
+                                { field: "c_r_ifsc", label: "IFSC Code", validation: { required: { message: "IFSC Code is required" }, ifscValidation: true } },
+                                {
+                                    field: "c_r_gst",
+                                    label: "GST Number",
+                                    validation: {
+                                        required: { message: "GST Number is required" },
+                                        gstValidation: true
+                                    }
+                                },
+
+                                {
+                                    field: "c_r_image",
+                                    label: "Restaurant Logo",
+                                    editor: function (container, options) {
+                                        $(`<input type="file" 
+                    name="${options.field}" 
+                    accept=".jpg,.jpeg,.png" />`)
+                                            .appendTo(container)
+                                            .kendoUpload({
+                                                multiple: false,
+                                                localization: {
+                                                    select: "📷 Choose Logo"
+                                                },
+                                                validation: {
+                                                    allowedExtensions: [".jpg", ".jpeg", ".png"]
+                                                },
+                                                select: function (e) {
+                                                    const ext = e.files[0].extension.toLowerCase();
+                                                    if (![".jpg", ".jpeg", ".png"].includes(ext)) {
+                                                        e.preventDefault();
+                                                        kendo.alert("❌ Only JPG, JPEG, and PNG images are allowed.");
+                                                    }
+                                                }
+                                            });
+                                    },
+                                    validation: { fileRequired: true }
+                                },
+                                {
+                                    field: "c_r_aadhar",
+                                    label: "Food Licence",
+                                    editor: function (container, options) {
+                                        $(`<input type="file" 
+                    name="${options.field}" 
+                    accept=".jpg,.jpeg,.png" />`)
+                                            .appendTo(container)
+                                            .kendoUpload({
+                                                multiple: false,
+                                                localization: {
+                                                    select: "🪪 Upload Aadhar"
+                                                },
+                                                validation: {
+                                                    allowedExtensions: [".jpg", ".jpeg", ".png"]
+                                                },
+                                                select: function (e) {
+                                                    const ext = e.files[0].extension.toLowerCase();
+                                                    if (![".jpg", ".jpeg", ".png"].includes(ext)) {
+                                                        e.preventDefault();
+                                                        kendo.alert("❌ Only JPG, JPEG, and PNG images are allowed.");
+                                                    }
+                                                }
+                                            });
+                                    },
+                                    validation: { fileRequired: true }
+                                }
+
+                            ]
+                        }
+                    }
+                ],
+
+                /* ================= SUBMIT ================= */
+                done: function (e) {
+
+                    if (!e.forms[2].validate()) return;
+
+                    let email = $("[name='c_email']").val();
+                    showLoader("Sending OTP...");
+
+
+                    // SEND OTP if not sent
+                    if (!otpSent) {
+                        var formData = new FormData();
+                        formData.append("Email", email);
+
+                        $.ajax({
+                            url: "http://localhost:5245/api/otp/send",
+                            type: "POST",
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            success: function (res) {
+                                 hideLoader();
+                                if (res.success) {
+                                    otpSent = true;
+                                    openOtpDialog(e);
+                                } else {
+                                    kendo.alert(res.Message || "OTP not sent");
+                                }
+                            },
+                            error: function () {
+                                 hideLoader();
+                                kendo.alert("OTP service failed");
+                            }
+                        });
+                        return;
+                    }
+
+                    // If OTP already sent
+                    openOtpDialog(e);
+                }
+
+            });
+
+           function openOtpDialog(e) {
+
+    // destroy previous dialog
+    if ($("#otpDialog").data("kendoDialog")) {
+        $("#otpDialog").data("kendoDialog").destroy();
+        $("#otpDialog").remove();
+    }
+
+    $("<div id='otpDialog' />").kendoDialog({
+        title: "Verify OTP",
+        width: "420px",
+        modal: true,
+        content: `
+        <style>
+            .k-dialog { animation: otpZoomIn 0.35s ease-out; }
+            @@keyframes otpZoomIn {
+                from { transform: scale(0.85); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+            .otp-container { text-align:center; padding:10px 0; }
+            .otp-title { font-size:18px; font-weight:600; margin-bottom:6px; }
+            .otp-subtitle { font-size:13px; color:#6b7280; margin-bottom:16px; }
+            .otp-inputs { display:flex; justify-content:center; gap:8px; }
+            .otp-box {
+                width:42px; height:46px; text-align:center;
+                font-size:20px; border-radius:8px;
+                border:1px solid #d1d5db;
+            }
+            .otp-box:focus {
+                border-color:#4f46e5;
+                box-shadow:0 0 0 2px rgba(79,70,229,0.25);
+            }
+            .k-dialog .k-primary {
+                background:linear-gradient(135deg,#4f46e5,#6366f1);
+                border:none;
+            }
+        </style>
+
+        <div class="otp-container">
+            <div class="otp-title">OTP Verification</div>
+            <div class="otp-subtitle">Enter the 6-digit code sent to your email</div>
+
+            <div class="otp-inputs">
+                <input class="otp-box" maxlength="1" />
+                <input class="otp-box" maxlength="1" />
+                <input class="otp-box" maxlength="1" />
+                <input class="otp-box" maxlength="1" />
+                <input class="otp-box" maxlength="1" />
+                <input class="otp-box" maxlength="1" />
+            </div>
+
+            <input type="hidden" id="otpInput" />
+        </div>
+        `,
+        open: function () {
+
+            const boxes = $("#otpDialog .otp-box");
+            boxes.first().focus();
+
+            boxes.on("input", function () {
+                const i = boxes.index(this);
+                if (this.value && boxes[i + 1]) boxes[i + 1].focus();
+                $("#otpInput").val(boxes.map(function () {
+                    return this.value;
+                }).get().join(""));
+            });
+
+            boxes.on("keydown", function (e) {
+                const i = boxes.index(this);
+                if (e.key === "Backspace" && !this.value && boxes[i - 1]) {
+                    boxes[i - 1].focus();
+                }
+            });
+        },
+        actions: [
+            {
+                text: "Verify",
+                primary: true,
+                action: function () {
+
+                    const otp = $("#otpInput").val();
+                    const email = $("[name='c_email']").val();
+
+                    if (!otp) {
+                        kendo.alert("Enter OTP");
+                        return false;
+                    }
+
+                    var otpData = new FormData();
+                    otpData.append("Email", email);
+                    otpData.append("OTP", otp);
+
+                    showLoader("Verifying OTP...");
+
+
+                    // VERIFY OTP
+                    $.ajax({
+                        url: "http://localhost:5245/api/otp/verify",
+                        type: "POST",
+                        data: otpData,
+                        contentType: false,
+                        processData: false,
+                        success: function (res) {
+                            hideLoader();
+                            if (!res.success) {
+                                kendo.alert(res.Message || "Invalid OTP");
+                                return;
+                            }
+
+                            // ✅ CLOSE OTP DIALOG
+                             hideLoader();
+                            $("#otpDialog").data("kendoDialog").close();
+
+                            // FINAL SUBMIT
+                            let data = {
+                                ...e.forms[0]._model,
+                                ...e.forms[1]._model,
+                                ...e.forms[2]._model
+                            };
+
+                            let fd = new FormData();
+                            Object.entries(data).forEach(([key, value]) => {
+                                if (
+                                    value !== null &&
+                                    value !== "" &&
+                                    !["c_state", "c_city", "c_r_state", "c_r_city"].includes(key)
+                                ) {
+                                    fd.append(key, value);
+                                }
+                            });
+
+                            if ($("[name='c_image']")[0].files.length)
+                                fd.append("c_image", $("[name='c_image']")[0].files[0]);
+                            if ($("[name='c_r_image']")[0].files.length)
+                                fd.append("c_r_image", $("[name='c_r_image']")[0].files[0]);
+                            if ($("[name='c_r_aadhar']")[0].files.length)
+                                fd.append("c_r_aadhar", $("[name='c_r_aadhar']")[0].files[0]);
+
+                            fd.append("c_state", $("[name='c_state']").data("kendoDropDownList").text());
+                            fd.append("c_city", $("[name='c_city']").data("kendoDropDownList").text());
+                            fd.append("c_r_state", $("[name='c_r_state']").data("kendoDropDownList").text());
+                            fd.append("c_r_city", $("[name='c_r_city']").data("kendoDropDownList").text());
+                            showLoader("Registering vendor...");
+
+                            $.ajax({
+                                url: "http://localhost:5245/api/restaurant/vendor/register",
+                                type: "POST",
+                                data: fd,
+                                processData: false,
+                                contentType: false,
+                                success: function (res) {
+                                     hideLoader();
+                                    if (res.success) {
+
+                                        // ✅ SUCCESS DIALOG
+                                        $("<div />").kendoDialog({
+                                            title: "Registration Successful",
+                                            content: `
+                                                <div style="text-align:center;padding:10px">
+                                                    <h3>🎉 Vendor Registered!</h3>
+                                                    <p>Your account has been created successfully.</p>
+                                                </div>
+                                            `,
+                                            width: "400px",
+                                            modal: true,
+                                            actions: [{
+                                                text: "OK",
+                                                primary: true,
+                                                action: function () {
+                                                    window.location.href = "/auth/login";
+                                                }
+                                            }]
+                                        }).data("kendoDialog").open();
+                                    }
+                                },
+                                error: function (err) {
+                                     hideLoader();
+                                    if (err.responseJSON?.Message) {
+                                        kendo.alert(err.responseJSON.Message);
+                                    } else if (err.responseJSON?.errors) {
+                                        kendo.alert(Object.values(err.responseJSON.errors).join("\n"));
+                                    } else {
+                                        kendo.alert("Registration failed.");
+                                    }
+                                }
+                            });
+                        },
+                        error: function () {
+                             hideLoader();
+                            kendo.alert("OTP verification failed.");
+                        }
+                    });
+
+                    return false;
+                }
+            },
+            { text: "Cancel" }
+        ]
+    }).data("kendoDialog").open();
+}
+
+
+
+
+
+        });
+    </script>
+}

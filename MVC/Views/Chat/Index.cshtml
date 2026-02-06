@@ -1,0 +1,989 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodBot Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            width: 100%;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFE5D4 25%, #FFD4A3 50%, #FFB88C 75%, #FF8C42 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            perspective: 1000px;
+        }
+
+        @@keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 3D Floating Food Background */
+        .background-3d {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 15;
+            overflow: visible;
+        }
+
+        .floating-food {
+            position: absolute;
+            font-size: 4.5rem;
+            opacity: 0.3;
+            filter: blur(0.5px);
+            transform-style: preserve-3d;
+            color: rgba(255, 107, 53, 0.6);
+            text-shadow: 0 4px 12px rgba(255, 140, 66, 0.4);
+            will-change: transform, x, y;
+            z-index: 16;
+            cursor: default;
+            transition: all 0.3s ease;
+            transform-origin: center center;
+        }
+
+        .floating-food:hover {
+            opacity: 0.5;
+            transform: scale(1.2);
+            filter: blur(0px);
+        }
+
+        .food-1 { top: 8%; left: 8%; }
+        .food-2 { top: 12%; right: 10%; }
+        .food-3 { top: 25%; left: 5%; }
+        .food-4 { top: 35%; right: 8%; }
+        .food-5 { top: 50%; left: 12%; }
+        .food-6 { top: 60%; right: 15%; }
+        .food-7 { top: 75%; left: 8%; }
+        .food-8 { top: 80%; right: 10%; }
+        .food-9 { top: 45%; left: 50%; transform: translateX(-50%); }
+        .food-10 { top: 20%; left: 50%; transform: translateX(-50%); }
+
+        /* Main Chat Container - 3D Card Effect */
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            max-height: 800px;
+            background: #ffffff;
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            box-shadow: 
+                0 20px 60px rgba(255, 140, 66, 0.25),
+                0 0 0 1px rgba(255, 184, 140, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 184, 140, 0.2);
+        }
+
+        .chat-container:hover {
+            transform: translateY(-5px) rotateX(2deg);
+            box-shadow: 
+                0 25px 70px rgba(255, 140, 66, 0.35),
+                0 0 0 1px rgba(255, 184, 140, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        /* Header */
+        .chat-header {
+            background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%);
+            padding: 25px 30px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @@keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bot-avatar {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            animation: avatarPulse 2s ease-in-out infinite;
+        }
+
+        @@keyframes avatarPulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .header-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .status {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status::before {
+            content: '●';
+            color: #4ade80;
+            animation: pulse 2s ease infinite;
+        }
+
+        @@keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Messages Container */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #ffffff;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 140, 66, 0.5) transparent;
+        }
+
+        .messages-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 140, 66, 0.5);
+            border-radius: 10px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 140, 66, 0.7);
+        }
+
+        /* Message Wrapper */
+        .message-wrapper {
+            display: flex;
+            width: 100%;
+            transform-style: preserve-3d;
+            animation: messageSlideIn 0.4s ease-out;
+        }
+
+        @@keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) rotateX(-15deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
+        }
+
+        .message-wrapper.user {
+            justify-content: flex-end;
+        }
+
+        .message-wrapper.bot {
+            justify-content: flex-start;
+        }
+
+        /* Message Bubbles */
+        .message {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            position: relative;
+            word-wrap: break-word;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .message:hover {
+            transform: scale(1.02) rotateY(2deg);
+        }
+
+        .message.user {
+            background: rgba(255, 255, 255, 0.9);
+            color: #000000;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 184, 140, 0.3);
+        }
+
+        .message.bot {
+            background: rgba(255, 255, 255, 0.9);
+            color: #000000;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 184, 140, 0.3);
+        }
+
+        .message.loading {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border: 1px solid rgba(255, 184, 140, 0.3);
+        }
+
+        .message-emoji {
+            font-size: 1.5rem;
+            margin-right: 10px;
+            display: inline-block;
+            animation: emojiRotate 2s ease-in-out infinite;
+        }
+
+        @@keyframes emojiRotate {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            75% { transform: rotate(-10deg); }
+        }
+
+        .message-text {
+            display: inline-block;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        /* Formatted Message Points */
+        .formatted-message {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .message-point {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            line-height: 1.6;
+            animation: fadeInPoint 0.3s ease-out;
+        }
+
+        @@keyframes fadeInPoint {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .point-bullet {
+            font-size: 1.2rem;
+            color: #000000;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .point-text {
+            flex: 1;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            word-wrap: break-word;
+            color: #000000;
+        }
+
+        .message-time {
+            display: block;
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 12px;
+            text-align: right;
+        }
+
+        .message.bot .message-time {
+            text-align: left;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #000000;
+            animation: typing 1.4s ease-in-out infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @@keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.7;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        /* Input Container */
+        .input-container {
+            padding: 25px;
+            background: #ffffff;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 184, 140, 0.3);
+            box-shadow: 0 -4px 15px rgba(255, 140, 66, 0.1);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid rgba(255, 184, 140, 0.4);
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 0 2px 10px rgba(255, 140, 66, 0.1);
+        }
+
+        .chat-input:focus {
+            border-color: #FF8C42;
+            box-shadow: 0 4px 20px rgba(255, 140, 66, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .chat-input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .chat-input::placeholder {
+            color: #666666;
+            opacity: 0.7;
+        }
+
+        .send-button {
+            width: 55px;
+            height: 55px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%);
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.4);
+        }
+
+        .send-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+            box-shadow: 0 6px 25px rgba(255, 140, 66, 0.6);
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .send-button:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .app-container {
+                padding: 10px;
+            }
+
+            .chat-container {
+                height: 95vh;
+                max-height: none;
+                border-radius: 20px;
+            }
+
+            .chat-header {
+                padding: 20px;
+            }
+
+            .header-text h1 {
+                font-size: 1.4rem;
+            }
+
+            .bot-avatar {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+
+            .messages-container {
+                padding: 15px;
+            }
+
+            .message {
+                max-width: 85%;
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+
+            .formatted-message {
+                gap: 10px;
+            }
+
+            .message-point {
+                padding: 6px 0;
+                gap: 8px;
+            }
+
+            .point-bullet {
+                font-size: 1.1rem;
+            }
+
+            .point-text {
+                font-size: 0.9rem;
+                line-height: 1.6;
+            }
+
+            .input-container {
+                padding: 15px;
+            }
+
+            .chat-input {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+
+            .send-button {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+
+            .floating-food {
+                font-size: 3rem;
+                opacity: 0.25;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .chat-container {
+                border-radius: 15px;
+            }
+
+            .header-text h1 {
+                font-size: 1.2rem;
+            }
+
+            .status {
+                font-size: 0.8rem;
+            }
+
+            .message {
+                max-width: 90%;
+                padding: 10px 14px;
+                font-size: 0.85rem;
+            }
+
+            .message-emoji {
+                font-size: 1.2rem;
+            }
+
+            .formatted-message {
+                gap: 8px;
+            }
+
+            .message-point {
+                padding: 5px 0;
+                gap: 6px;
+            }
+
+            .point-bullet {
+                font-size: 1rem;
+            }
+
+            .point-text {
+                font-size: 0.85rem;
+                line-height: 1.5;
+            }
+
+            .floating-food {
+                font-size: 2.5rem;
+                opacity: 0.2;
+            }
+
+            .food-7, .food-8, .food-9, .food-10 {
+                display: none;
+            }
+        }
+
+        .back-button {
+        position: absolute;
+        left: 20px;
+        top: 20px;
+        width: 45px;
+        height: 45px;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: 50%;
+        background: rgba(247, 245, 244, 0.2);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(252, 128, 25, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+        color: var(--swiggy-orange-dark);
+        font-size: 20px;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(251, 250, 249, 0.3),
+                    inset 0 1px 3px rgba(255, 255, 255, 0.2);
+        /* Touch-friendly */
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        touch-action: manipulation;
+    }
+
+    .back-button:hover {
+        background: rgba(252, 128, 25, 0.3);
+        border-color: rgba(246, 244, 243, 0.6);
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(252, 128, 25, 0.4),
+                    inset 0 1px 3px rgba(255, 255, 255, 0.3);
+        color: var(--swiggy-orange-dark);
+    }
+
+    .back-button:active {
+        transform: scale(0.95);
+    }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+         <a href="javascript:history.back()" class="back-button" title="Go Back">
+                ←
+            </a>
+        <!-- 3D Animated Background -->
+        <div class="background-3d">
+            <div class="floating-food food-1">🍕</div>
+            <div class="floating-food food-2">🍔</div>
+            <div class="floating-food food-3">🍰</div>
+            <div class="floating-food food-4">🌮</div>
+            <div class="floating-food food-5">🍜</div>
+            <div class="floating-food food-6">🍱</div>
+            <div class="floating-food food-7">🍣</div>
+            <div class="floating-food food-8">🍩</div>
+            <div class="floating-food food-9">🍪</div>
+            <div class="floating-food food-10">🥗</div>
+        </div>
+
+        <!-- Main Chat Container -->
+        <div class="chat-container">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="header-content">
+                    <div class="bot-avatar">🤖</div>
+                    <div class="header-text">
+                        <h1>FoodBot Assistant</h1>
+                        <p class="status">Online • Ready to help</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="messages-container" id="messagesContainer">
+                <div class="message-wrapper bot">
+                    <div class="message bot">
+                        <span class="message-emoji">🍕</span>
+                        <span class="message-text">Welcome to FoodBot! I'm here to help you with your food cravings. What would you like to order today?</span>
+                        <span class="message-time" id="welcomeTime"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-container">
+                <form id="chatForm" class="input-wrapper">
+                    <input
+                        type="text"
+                        id="chatInput"
+                        class="chat-input"
+                        placeholder="Ask about food, recipes, or place an order... 🍽️"
+                        autocomplete="off"
+                    />
+                    <button type="submit" class="send-button" id="sendButton">
+                        <span id="sendIcon">🚀</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize
+        const messagesContainer = document.getElementById('messagesContainer');
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
+        const sendIcon = document.getElementById('sendIcon');
+        let isLoading = false;
+
+        // Set welcome message time
+        document.getElementById('welcomeTime').textContent = new Date().toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        // Food emojis array
+        const foodEmojis = ["🍕", "🍔", "🍟", "🌮", "🍜", "🍱", "🍣", "🍰", "🍩", "🍪"];
+
+        // Get random food emoji
+        function getFoodEmoji() {
+            return foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
+        }
+
+        // Clean markdown from text
+        function cleanMarkdown(text) {
+            if (!text) return text;
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '$1')
+                .replace(/\*(.*?)\*/g, '$1')
+                .replace(/__(.*?)__/g, '$1')
+                .replace(/_(.*?)_/g, '$1')
+                .replace(/~~(.*?)~~/g, '$1')
+                .replace(/`(.*?)`/g, '$1')
+                .replace(/```[\s\S]*?```/g, '')
+                .replace(/#{1,6}\s+/g, '')
+                .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+                .replace(/^\s*[-*+]\s+/gm, '')
+                .replace(/^\s*\d+\.\s+/gm, '')
+                .trim();
+        }
+
+        // Format message into points
+        function formatMessage(text) {
+            if (!text) return text;
+            text = cleanMarkdown(text);
+            let lines = text.split('\n').filter(line => line.trim());
+            
+            if (lines.length === 1 && text.length > 150) {
+                const numberedSplit = text.match(/\d+[\.\)]\s+[^0-9]+/g);
+                if (numberedSplit && numberedSplit.length > 1) {
+                    lines = numberedSplit;
+                } else {
+                    const semicolonSplit = text.split(/[;]\s+/).filter(s => s.trim().length > 10);
+                    if (semicolonSplit.length > 1) {
+                        lines = semicolonSplit;
+                    }
+                }
+            }
+            
+            const hasNumberedList = lines.some(line => /^\d+[\.\)]\s/.test(line.trim()));
+            const hasBulletPoints = lines.some(line => /^[-*•]\s/.test(line.trim()));
+            const hasMultipleLines = lines.length > 1;
+
+            if (lines.length === 1 && !hasNumberedList && !hasBulletPoints && text.length < 200) {
+                return text;
+            }
+
+            if (hasMultipleLines || hasNumberedList || hasBulletPoints) {
+                const formatted = lines.map((line) => {
+                    const trimmed = line.trim();
+                    let cleaned = trimmed
+                        .replace(/^\d+[\.\)]\s*/, '')
+                        .replace(/^[-*•]\s*/, '')
+                        .replace(/^[a-zA-Z]\)\s*/, '')
+                        .trim();
+                    cleaned = cleanMarkdown(cleaned);
+                    if (!cleaned || cleaned.length < 3) return null;
+                    return cleaned;
+                }).filter(item => item !== null);
+
+                if (formatted.length >= 2) {
+                    return formatted;
+                }
+            }
+
+            return text;
+        }
+
+        // Render message
+        function renderMessage(text, sender) {
+            const cleanedText = cleanMarkdown(text);
+            const formatted = formatMessage(cleanedText);
+            
+            if (typeof formatted === 'string') {
+                return `<span class="message-text">${cleanedText}</span>`;
+            }
+
+            if (Array.isArray(formatted) && formatted.length > 0) {
+                let pointsHtml = '<div class="formatted-message">';
+                formatted.forEach((item, idx) => {
+                    pointsHtml += `
+                        <div class="message-point" style="animation-delay: ${idx * 0.1}s">
+                            <span class="point-bullet">•</span>
+                            <span class="point-text">${item}</span>
+                        </div>
+                    `;
+                });
+                pointsHtml += '</div>';
+                return pointsHtml;
+            }
+
+            return `<span class="message-text">${cleanedText}</span>`;
+        }
+
+        // Add message to chat
+        function addMessage(text, sender) {
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = `message-wrapper ${sender}`;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            let emojiHtml = '';
+            if (sender === 'bot') {
+                emojiHtml = `<span class="message-emoji">${getFoodEmoji()}</span>`;
+            }
+            
+            const messageContent = renderMessage(text, sender);
+            const time = new Date().toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            messageDiv.innerHTML = `
+                ${emojiHtml}
+                ${messageContent}
+                <span class="message-time">${time}</span>
+            `;
+            
+            messageWrapper.appendChild(messageDiv);
+            messagesContainer.appendChild(messageWrapper);
+            scrollToBottom();
+        }
+
+        // Show loading indicator
+        function showLoading() {
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = 'message-wrapper bot';
+            messageWrapper.id = 'loadingMessage';
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot loading';
+            messageDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            
+            messageWrapper.appendChild(messageDiv);
+            messagesContainer.appendChild(messageWrapper);
+            scrollToBottom();
+        }
+
+        // Remove loading indicator
+        function removeLoading() {
+            const loadingMessage = document.getElementById('loadingMessage');
+            if (loadingMessage) {
+                loadingMessage.remove();
+            }
+        }
+
+        // Scroll to bottom
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Handle form submission
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const prompt = chatInput.value.trim();
+            
+            if (!prompt || isLoading) return;
+
+            // Add user message
+            addMessage(prompt, 'user');
+            chatInput.value = '';
+            
+            // Show loading
+            isLoading = true;
+            sendButton.disabled = true;
+            sendIcon.textContent = '⏳';
+            showLoading();
+
+            try {
+                const response = await fetch('http://localhost:5245/api/chat/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || 'Network response was not ok');
+                }
+
+                const data = await response.text();
+                removeLoading();
+                addMessage(data, 'bot');
+            } catch (error) {
+                console.error('Error:', error);
+                removeLoading();
+                addMessage("Sorry, I'm having trouble connecting. Please try again! 🍔", 'bot');
+            } finally {
+                isLoading = false;
+                sendButton.disabled = false;
+                sendIcon.textContent = '🚀';
+            }
+        });
+
+        // Floating food animations using CSS animations
+        const floatingFoods = document.querySelectorAll('.floating-food');
+        floatingFoods.forEach((food, index) => {
+            const durations = [12, 14, 11, 13, 12.5, 14.5, 11.5, 15, 12.2, 13.2];
+            const delays = [0, 1, 2, 0.5, 1.5, 2.5, 3, 3.5, 1.8, 2.2];
+            const yMovements = [
+                [0, -50, 40, -35, 30, -20, 0],
+                [0, 45, -40, 35, -30, 25, 0],
+                [0, -40, 35, -45, 30, -25, 0],
+                [0, 50, -35, 40, -45, 30, 0],
+                [0, -45, 40, -35, 45, -30, 0],
+                [0, 40, -50, 35, -40, 30, 0],
+                [0, -35, 45, -40, 35, -30, 0],
+                [0, 50, -35, 45, -40, 35, 0],
+                [0, -40, 35, -50, 40, -35, 0],
+                [0, 45, -40, 50, -35, 40, 0]
+            ];
+            const xMovements = [
+                [0, 30, -25, 35, -30, 20, 0],
+                [0, -35, 30, -25, 35, -20, 0],
+                [0, 25, -30, 20, -35, 25, 0],
+                [0, -40, 35, -30, 40, -25, 0],
+                [0, 35, -40, 30, -35, 25, 0],
+                [0, -30, 40, -35, 30, -25, 0],
+                [0, 40, -35, 40, -30, 35, 0],
+                [0, -35, 40, -30, 35, -40, 0],
+                [0, 30, -40, 25, -35, 30, 0],
+                [0, -40, 35, -45, 30, -35, 0]
+            ];
+
+            // Create keyframes dynamically
+            const style = document.createElement('style');
+            const keyframeName = `float-${index}`;
+            let keyframes = `@@keyframes ${keyframeName} {`;
+            const steps = 6;
+            for (let i = 0; i <= steps; i++) {
+                const percent = (i / steps) * 100;
+                const y = yMovements[index][i];
+                const x = xMovements[index][i];
+                keyframes += `${percent}% { transform: translate(${x}px, ${y}px) rotate(${i * 60}deg) scale(${1 + (i % 2) * 0.1}); }`;
+            }
+            keyframes += '}';
+            style.textContent = keyframes;
+            document.head.appendChild(style);
+
+            food.style.animation = `${keyframeName} ${durations[index]}s ease-in-out infinite`;
+            food.style.animationDelay = `${delays[index]}s`;
+        });
+    </script>
+</body>
+</html>
+

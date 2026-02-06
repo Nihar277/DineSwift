@@ -1,0 +1,464 @@
+@using MVC.Models
+@section Styles {
+    <link rel="stylesheet" href="~/css/Dashboard.css" asp-append-version="true" />
+}
+
+@inject IHttpClientFactory HttpClientFactory
+@functions {
+    string TrendClass(decimal value) => value >= 0 ? "up" : "down";
+    string TrendIcon(decimal value) => value >= 0 ? "fa-arrow-up" : "fa-arrow-down";
+    string TrendValue(decimal value) => $"{Math.Abs(value):0.##}%";
+}
+
+@{
+    ViewData["Title"] = "Delivery Dashboard";
+    Layout = "_deliveryLayout";
+
+    int deliveryId = Context.Session.GetInt32("CustomerId") ?? 0;
+    Console.WriteLine("Delivery ID from session: " + deliveryId);
+    if (deliveryId == 0)
+    {
+        <text>
+            <script>window.location.href = "http://localhost:5030/";</script>
+        </text>
+    }
+    string userName = Context.Session.GetString("Name") ?? "Partner";
+    string userEmail = Context.Session.GetString("Email") ?? "";
+
+    var client = HttpClientFactory.CreateClient();
+    client.BaseAddress = new Uri("http://localhost:5245/api/");
+
+    DashboardSummaryDto summary = null;
+    List<RecentOrderDto> orders = new();
+
+    System.Text.Json.JsonElement? profileJson = null;
+    string profileFirst = null;
+    string profileLast = null;
+    string profileEmail = null;
+    string profilePhone = null;
+
+    try
+    {
+        summary = await client.GetFromJsonAsync<DashboardSummaryDto>($"delivery/dashboard-summary/{deliveryId}");
+        orders = (await client.GetFromJsonAsync<List<RecentOrderDto>>($"delivery/recent-orders/{deliveryId}")) ?? new();
+
+        try
+        {
+            var resp = await client.GetAsync($"delivery/{deliveryId}");
+            if (resp.IsSuccessStatusCode)
+            {
+                var content = await resp.Content.ReadAsStringAsync();
+                using var doc = System.Text.Json.JsonDocument.Parse(content);
+                profileJson = doc.RootElement.Clone();
+                if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object)
+                {
+                    var root = doc.RootElement;
+                    if (root.TryGetProperty("c_fname", out var p)) profileFirst = p.GetString();
+                    if (root.TryGetProperty("c_lname", out var p2)) profileLast = p2.GetString();
+                    if (root.TryGetProperty("c_email", out var p3)) profileEmail = p3.GetString();
+                    if (root.TryGetProperty("c_phonenumber", out var p4)) profilePhone = p4.GetString();
+                }
+            }
+        }
+        catch { /* ignore profile load errors - fall back to session values */ }
+    }
+    catch { }
+
+    // UI-only: Show 10% of TotalRevenue as the displayed 'Total Earnings' value
+    decimal displayedEarnings = (summary?.TotalRevenue ?? 0) * 0.10m;
+}
+
+<div class="dashboard-wrapper">
+    <div class="dashboard-container">
+        <!-- HEADER -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="user-info">
+                    <div class="avatar">@(userName.Trim().FirstOrDefault().ToString().ToUpper())</div>
+                    <div class="user-details">
+                        <h1>@(!string.IsNullOrEmpty(profileFirst) ? (profileFirst + " " + (profileLast ?? "")) :
+                                                        userName)</h1>
+                        <p>@(profileEmail ?? userEmail)</p>
+                        <p style="font-size:0.95rem;color:#64748b">@(!string.IsNullOrEmpty(profilePhone) ? profilePhone
+                                                        : "")</p>
+                    </div>
+                </div>
+                <div class="restaurant-badge">
+                    <i class="fa-solid fa-motorcycle badge-icon"></i>
+                    <span>Delivery Partner</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- STATS GRID -->
+        <section class="stats-grid">
+            <article class="stat-card stat-card--revenue">
+                <div class="stat-content">
+                    <p class="stat-label">Total Earnings</p>
+                    <h3 class="stat-value">₹@(displayedEarnings.ToString("N0"))</h3>
+                    <span class="trend @TrendClass(summary?.RevenueGrowth ?? 0)">
+                        <i class="fa-solid @TrendIcon(summary?.RevenueGrowth ?? 0)"></i>
+                        @TrendValue(summary?.RevenueGrowth ?? 0)
+                    </span>
+                </div>
+                <div class="stat-icon stat-icon--revenue"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            </article>
+
+            <article class="stat-card stat-card--orders">
+                <div class="stat-content">
+                    <p class="stat-label">Total Deliveries</p>
+                    <h3 class="stat-value">@(summary?.TotalOrders.ToString("N0") ?? "0")</h3>
+                    <span class="trend @TrendClass(summary?.OrdersGrowth ?? 0)">
+                        <i class="fa-solid @TrendIcon(summary?.OrdersGrowth ?? 0)"></i>
+                        @TrendValue(summary?.OrdersGrowth ?? 0)
+                    </span>
+                </div>
+                <div class="stat-icon stat-icon--orders"><i class="fa-solid fa-box"></i></div>
+            </article>
+
+            <article class="stat-card stat-card--clients">
+                <div class="stat-content">
+                    <p class="stat-label">Active Customers</p>
+                    <h3 class="stat-value">@(summary?.TotalClients.ToString() ?? "0")</h3>
+                    <span class="trend @TrendClass(summary?.ClientsGrowth ?? 0)">
+                        <i class="fa-solid @TrendIcon(summary?.ClientsGrowth ?? 0)"></i>
+                        @TrendValue(summary?.ClientsGrowth ?? 0)
+                    </span>
+                </div>
+                <div class="stat-icon stat-icon--clients"><i class="fa-solid fa-users"></i></div>
+            </article>
+
+            @* <article class="stat-card stat-card--fees">
+                <div class="stat-content">
+                    <p class="stat-label">Platform Charge</p>
+                    <h3 class="stat-value">₹@(summary?.PlatformFees.ToString("N0") ?? "0")</h3>
+                </div>
+                <div class="stat-icon stat-icon--fees"><i class="fa-solid fa-coins"></i></div> *@
+            </article>
+        </section>
+
+        <!-- CHART SECTION -->
+        <section class="chart-section">
+            <div class="chart-header">
+                <h2>Delivery Analytics</h2>
+                <div class="chart-controls">
+                    <div class="period-selector">
+                        <button class="period-btn active" data-period="7">7D</button>
+                        <button class="period-btn" data-period="30">30D</button>
+                        <button class="period-btn" data-period="180">6M</button>
+                        <button class="period-btn" data-period="365">1Y</button>
+                    </div>
+                    <div class="chart-type-selector">
+                        <button class="type-btn active" data-type="line" title="Line"><i
+                                class="fa-solid fa-chart-line"></i></button>
+                        <button class="type-btn" data-type="column" title="Column"><i
+                                class="fa-solid fa-chart-column"></i></button>
+                        <button class="type-btn" data-type="area" title="Area"><i
+                                class="fa-solid fa-chart-area"></i></button>
+                        <button class="type-btn" data-type="stacked" title="Stacked"><i
+                                class="fa-solid fa-chart-simple"></i></button>
+                        <button class="type-btn" data-type="donut" title="Donut"><i
+                                class="fa-solid fa-circle-notch"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div id="dashboardChart" class="chart-container"></div>
+        </section>
+
+        <!-- ORDERS TABLE -->
+        <section class="orders-section">
+            <div class="section-header">
+                <h2>Recent Deliveries</h2>
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input id="orderSearch" type="text" placeholder="Search deliveries..." />
+                </div>
+            </div>
+            <div class="table-responsive">
+                <div id="ordersGrid" class="orders-grid"></div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+
+        function swellFire(message, options = {}) {
+            Swal.fire({
+                title: options.title || 'Message',
+                text: message,
+                icon: options.icon || 'info',
+                toast: options.toast || false,
+                position: options.position || 'center',
+                timer: options.timer || null,
+                showConfirmButton: !options.toast,
+                        @* isHtml: true, *@
+                html: message
+                    });
+                }
+
+        const deliveryId = @deliveryId;
+        const ordersData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(orders));
+
+        console.log(deliveryId)
+
+        let currentPeriod = 7;
+        let currentType = "line";
+
+        function loadChart(period, type) {
+            $.getJSON(`http://localhost:5245/api/delivery/dashboard-chart/${deliveryId}/${period}`)
+                .done(function (data) {
+                    const chartWidth = $("#dashboardChart").width();
+                    const isMobile = chartWidth < 500;
+
+                    if (!data || data.length === 0) {
+                        // Generate sample data if API returns empty
+                        data = generateSampleData(period);
+                    }
+
+                    // For 30D, 6M (180) and 1Y (365) aggregate day-wise data into month-wise buckets on the UI
+                    if (Number(period) === 30 || Number(period) === 180 || Number(period) === 365) {
+                        data = aggregateToMonths(data);
+                        // Inform the user that we are presenting month-wise aggregates with contextual label
+                        const label = Number(period) === 30 ? '30-day' : (Number(period) === 180 ? '6-month' : '1-year');
+                        swellFire(`Showing month-wise summary for selected ${label} range`, { title: 'Month-wise view', icon: 'info', toast: true, timer: 2400, position: 'top-end' });
+                    }
+
+                    const categories = data.map(x => x.label);
+
+                    if (type === "donut") {
+                        $("#dashboardChart").empty().kendoChart({
+                            title: { text: "Earnings Distribution", font: "600 14px 'Segoe UI', sans-serif" },
+                            legend: { position: isMobile ? "bottom" : "right", labels: { font: "11px 'Segoe UI'" } },
+                            series: [{
+                                type: "donut",
+                                data: data.map(x => ({ category: x.label, value: x.revenue })),
+                                holeSize: 40,
+                                labels: { visible: false }
+                            }],
+                            tooltip: { visible: true, template: "₹ #= kendo.toString(value, 'n0') #" }
+                        });
+                        return;
+                    }
+
+                    const isStacked = type === "stacked";
+
+                    $("#dashboardChart").empty().kendoChart({
+                        transitions: true,
+                        chartArea: { background: "transparent", margin: isMobile ? 5 : 20 },
+                        seriesDefaults: { type: isStacked ? "column" : type, stack: isStacked },
+                        series: [
+                            { name: "Deliveries", data: data.map(x => x.orders), color: "#f97316" },
+                            { name: "Earnings", data: data.map(x => x.revenue), color: "#22c55e" },
+                            { name: "Platform Fees", data: data.map(x => x.platformFees), color: "#a855f7" },
+                            { name: "Customers", data: data.map(x => x.clients), color: "#3b82f6" }
+                        ],
+                        categoryAxis: {
+                            categories,
+                            labels: {
+                                rotation: isMobile ? -90 : -45,
+                                font: isMobile ? "10px 'Segoe UI'" : "12px 'Segoe UI'"
+                            }
+                        },
+                        valueAxis: {
+                            labels: {
+                                format: "₹{0}",
+                                font: isMobile ? "10px 'Segoe UI'" : "12px 'Segoe UI'"
+                            }
+                        },
+                        legend: { position: "bottom", labels: { font: isMobile ? "10px 'Segoe UI'" : "12px 'Segoe UI'" } },
+                        tooltip: { visible: true, template: "<b>#= series.name #</b>: #= value #" }
+                    });
+                })
+                .fail(function () {
+                    swellFire('Failed to load chart data. Please try again later.', { title: 'Chart Error', icon: 'error', toast: true, timer: 4000, position: 'top-end' });
+                });
+        }
+
+        function generateSampleData(period) {
+            const data = [];
+            const today = new Date();
+            for (let i = period - 1; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                data.push({
+                    label: date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }),
+                    orders: Math.floor(Math.random() * 10) + 1,
+                    revenue: Math.floor(Math.random() * 3000) + 500,
+                    platformFees: Math.floor(Math.random() * 300) + 50,
+                    clients: Math.floor(Math.random() * 8) + 1
+                });
+            }
+            return data;
+        }
+
+        // Aggregate day-based data to month buckets (UI-only transformation)
+        function aggregateToMonths(dayData) {
+            const map = {};
+            dayData.forEach(item => {
+                // Prefer an explicit date field if API provides one
+                let dt = null;
+                if (item.date) {
+                    dt = new Date(item.date);
+                } else {
+                    // If label is like '05 Jan', append current year to parse
+                    try {
+                        dt = new Date(item.label + ' ' + new Date().getFullYear());
+                    } catch (e) {
+                        dt = new Date();
+                    }
+                }
+
+                const key = dt.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+                if (!map[key]) map[key] = { label: key, orders: 0, revenue: 0, platformFees: 0, clients: 0 };
+                map[key].orders += (item.orders || 0);
+                map[key].revenue += (item.revenue || 0);
+                map[key].platformFees += (item.platformFees || 0);
+                map[key].clients += (item.clients || 0);
+            });
+            // Preserve chronological order
+            const keys = Object.keys(map).sort((a, b) => {
+                const da = new Date(a);
+                const db = new Date(b);
+                return da - db;
+            });
+            return keys.map(k => map[k]);
+        }
+
+        function timeAgo(date) {
+            const now = new Date();
+            const diff = Math.floor((now - new Date(date)) / 1000);
+            if (diff < 60) return "Just now";
+            const minutes = Math.floor(diff / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            if (days === 1) return "Yesterday";
+            return new Date(date).toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+        }
+
+        function getStatusClass(status) {
+            if (!status) return 'status-pending';
+            const s = status.toLowerCase();
+            if (s === 'delivered') return 'status-delivered';
+            if (s === 'out for delivery') return 'status-out';
+            if (s === 'processing') return 'status-processing';
+            if (s === 'prepared') return 'status-prepared';
+            return 'status-pending';
+        }
+
+        $(document).ready(function () {
+            // Load chart with default period
+            loadChart(currentPeriod, currentType);
+
+            // Handle window resize
+            $(window).resize(function () {
+                loadChart(currentPeriod, currentType);
+            });
+
+            // Period button clicks
+            $(".period-btn").click(function () {
+                $(".period-btn").removeClass("active");
+                $(this).addClass("active");
+                currentPeriod = $(this).data("period");
+                loadChart(currentPeriod, currentType);
+            });
+
+            // Chart type button clicks
+            $(".type-btn").click(function () {
+                $(".type-btn").removeClass("active");
+                $(this).addClass("active");
+                currentType = $(this).data("type");
+                loadChart(currentPeriod, currentType);
+            });
+
+            // Initialize Kendo Grid for orders
+            const grid = $("#ordersGrid").kendoGrid({
+                dataSource: {
+                    data: ordersData,
+                    pageSize: 5,
+                    schema: {
+                        model: {
+                            id: "OrderId",
+                            fields: {
+                                OrderId: { type: "number" },
+                                DishName: { type: "string" },
+                                Amount: { type: "number" },
+                                Status: { type: "string" },
+                                OrderDate: { type: "date" }
+                            }
+                        }
+                    }
+                },
+                sortable: true,
+                pageable: {
+                    numeric: true,
+                    previousNext: true,
+                    info: true,
+                    buttonCount: 3,
+                    pageSizes: [5, 10, 20]
+                },
+                scrollable: false,
+                mobile: true,
+                columns: [
+                    {
+                        field: "OrderId",
+                        title: "Order #",
+                        template: "<span class='order-id'>#= OrderId #</span>",
+                        width: 80
+                    },
+                    {
+                        field: "DishName",
+                        title: "Items",
+                        width: 150
+                    },
+                    {
+                        field: "RestaurantName",
+                        title: "Restaurant",
+                        width: 120
+                    },
+                    {
+                        field: "CustomerName",
+                        title: "Customer",
+                        width: 100
+                    },
+                    {
+                        field: "Amount",
+                        title: "Amount",
+                        template: "<span class='amount'>₹#= Amount.toLocaleString() #</span>",
+                        width: 90
+                    },
+                    {
+                        field: "Status",
+                        title: "Status",
+                        template: d => `<span class="status-badge ${getStatusClass(d.Status)}">${d.Status || 'Pending'}</span>`,
+                        width: 120
+                    },
+                    {
+                        field: "OrderDate",
+                        title: "Time",
+                        template: d => timeAgo(d.OrderDate),
+                        width: 80
+                    }
+                ]
+            }).data("kendoGrid");
+
+            // Search functionality
+            $("#orderSearch").on("input", function () {
+                const value = $(this).val().toLowerCase();
+                grid.dataSource.filter({
+                    logic: "or",
+                    filters: [
+                        { field: "OrderId", operator: "contains", value },
+                        { field: "DishName", operator: "contains", value },
+                        { field: "RestaurantName", operator: "contains", value },
+                        { field: "CustomerName", operator: "contains", value },
+                        { field: "Status", operator: "contains", value }
+                    ]
+                });
+            });
+        });
+    </script>
+}

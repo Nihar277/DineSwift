@@ -1,0 +1,178 @@
+/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+ /* Back Button */
+    .back-button {
+        position: absolute;
+        left: 20px;
+        top: 20px;
+        z-index: 100;
+        width: 45px;
+        height: 45px;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: 50%;
+        background: rgba(252, 128, 25, 0.2);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(252, 128, 25, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+        color: var(--swiggy-orange-dark);
+        font-size: 20px;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(252, 128, 25, 0.3),
+                    inset 0 1px 3px rgba(255, 255, 255, 0.2);
+        /* Touch-friendly */
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        touch-action: manipulation;
+    }
+
+    .back-button:hover {
+        background: rgba(252, 128, 25, 0.3);
+        border-color: rgba(252, 128, 25, 0.6);
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(252, 128, 25, 0.4),
+                    inset 0 1px 3px rgba(255, 255, 255, 0.3);
+        color: var(--swiggy-orange-dark);
+    }
+
+    .back-button:active {
+        transform: scale(0.95);
+    }
+    
+/* Navbar always on top */
+.custom-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+}
+
+/* Hero spacing fix */
+.hero {
+  padding-top: 100px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Remove double spacing */
+.main-wrapper {
+  margin-top: 0;
+  
+}
+
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+a {
+  color: #0077cc;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.border-top {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px;
+}
+
+/* ================= NAVBAR ================= */
+
+.custom-navbar {
+  background: transparent;
+  padding: 12px 0;
+  transition: all 0.3s ease;
+  z-index: 1050;
+}
+
+/* Navbar on scroll */
+.custom-navbar.scrolled {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* Logo */
+.navbar-logo {
+      width: 19rem;
+    height: auto;
+    position: fixed;
+    top: -15%;
+    left: 5%;
+}
+
+/* Icons */
+.nav-icon {
+  font-size: 22px;
+  color: #222 !important;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-icon:hover {
+  color: #fa7414 !important;
+  transform: translateY(-2px);
+}
+
+/* Remove default toggler border */
+.navbar-toggler {
+  border: none;
+}
+
+/* Make toggler visible on transparent background */
+.navbar-toggler-icon {
+  filter: invert(1);
+}
+
+
+
+/* Mobile dropdown */
+@media (max-width: 991px) {
+  .navbar-collapse {
+      background: white;
+      margin-top: 12px;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+  }
+}
+
+
+

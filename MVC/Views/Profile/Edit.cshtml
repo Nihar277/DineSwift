@@ -1,0 +1,1280 @@
+@{
+    ViewData["Title"] = "Edit Profile";
+    Layout = "~/Views/Shared/_userdashboardLayout.cshtml";
+    @* Layout="_userdashboardLayout"; *@
+}
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- Kendo UI CSS CDN -->
+<!-- <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2023.3.1114/styles/kendo.default-v2.min.css"> -->
+    <link rel="stylesheet" href="~/lib/kendo/kendo.default-v2.min.css">
+
+<!-- jQuery CDN (must load first before Kendo UI) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<!-- Kendo UI JS CDN (requires jQuery) -->
+<!-- <script src="https://kendo.cdn.telerik.com/2023.3.1114/js/kendo.all.min.js"></script> -->
+ <script src="~/lib/kendo/kendo.all.min.js"></script>
+
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Bootstrap JS -->
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+   background-color: #fef0e6;
+    padding: 20px;
+
+    /* CENTERING */
+
+    justify-content: center;   /* horizontal center */
+    align-items: center;       /* vertical center */
+    min-height: 100vh;
+
+}
+
+
+    .profile-container {
+        max-width: 1200px;
+        @* margin: 0 auto; *@
+        margin: 100px;
+        display: flex;
+        gap: 30px;
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        margin-left: 350px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: relative; /* allow glow pseudo-element */
+        overflow: visible; /* ensure glow extends outside container */
+    }
+
+    /* Subtle animated light-orange glow outside the profile container */
+    .profile-container::before {
+        content: "";
+        position: absolute;
+        top: -18px;
+        left: -18px;
+        right: -18px;
+        bottom: -18px;
+        border-radius: 20px;
+        @* background: radial-gradient(circle at 20% 20%, rgba(255,140,0,0.12), rgba(255,196,77,0.04) 40%, rgba(255,140,0,0.02) 70%, transparent 85%); *@
+        filter: blur(18px);
+        z-index: -1;
+        pointer-events: none;
+        animation: pulseGlow 6s ease-in-out infinite;
+        opacity: 0.95;
+        transition: opacity 0.4s ease;
+    }
+
+    .sidebar {
+        width: 250px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Profile image: outer spacing, color accent and gentle animation */
+    .profile-image-wrapper {
+        position: relative;
+        margin-bottom: 20px;
+        padding: 6px; /* reduces the hard white space and creates a colored ring */
+        border-radius: 50%;
+        display: inline-block;
+        background: radial-gradient(circle at 30% 30%, rgba(255,140,0,0.12), transparent 40%);
+        transition: transform 0.35s ease;
+    }
+
+    .profile-image-wrapper::before {
+        content: "";
+        position: absolute;
+        inset: -6px; /* extends slightly outside wrapper to form a soft ring */
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, rgba(255,140,0,0.12), rgba(255,196,77,0.08));
+        filter: blur(6px);
+        z-index: -1;
+        animation: rotateRing 8s linear infinite;
+        opacity: 0.95;
+    }
+
+    @@keyframes rotateRing {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* Subtle pulsing animation for the outer glow */
+    @@keyframes pulseGlow {
+        0% { transform: scale(0.99); opacity: 0.88; }
+        50% { transform: scale(1.02); opacity: 1; }
+        100% { transform: scale(0.99); opacity: 0.88; }
+    }
+
+    .profile-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255,255,255,0.92); /* keep a soft inner border */
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        display: block;
+    }
+
+    .profile-image-wrapper:hover .profile-image {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+    }
+
+    .edit-image-btn {
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        background: linear-gradient(135deg, #ff8c00, #ffb86b);
+        border: 3px solid white;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: white;
+        font-size: 16px;
+        box-shadow: 0 6px 18px rgba(255,140,0,0.18);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .edit-image-btn:hover {
+        transform: scale(1.08);
+        box-shadow: 0 10px 26px rgba(255,140,0,0.22);
+    }
+
+    .profile-name {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .profile-role {
+        font-size: 14px;
+        color: #888;
+        margin-bottom: 30px;
+    }
+
+    .menu-item {
+        width: 100%;
+        padding: 12px 20px;
+        margin-bottom: 10px;
+        border: none;
+        background: transparent;
+        text-align: left;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 15px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s;
+    }
+
+    .menu-item:hover {
+        background: #fff5eb;
+        color: #ff8c00;
+    }
+
+    .menu-item.active {
+        background: #fff5eb;
+        color: #ff8c00;
+        font-weight: 500;
+    }
+
+    .menu-item svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .main-content {
+        flex: 1;
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    .gender-selection {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 25px;
+    }
+
+    .gender-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+    .gender-option input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        accent-color: #ff8c00;
+    }
+
+    .gender-option label {
+        font-size: 15px;
+        color: #666;
+        cursor: pointer;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .k-textbox, .k-input {
+        padding: 12px 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 15px;
+        background: #f9f9f9;
+        width: 100%;
+    }
+
+    .k-textbox:focus, .k-input:focus {
+        border-color: #ff8c00;
+        background: white;
+    }
+
+    .k-input-inner {
+        padding: 12px 15px;
+    }
+
+    .verified-badge {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: #00c853;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 20px;
+        margin-top: 40px;
+    }
+
+    .k-button {
+        flex: 1;
+        padding: 14px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-discard {
+        background: white;
+
+        color: #ff8c00;
+        border: 2px solid #ff8c00 !important;
+    }
+
+    .btn-discard:hover {
+        background: #fff5eb;
+    }
+
+    .btn-save {
+        @* background: #ff8c00 !important; *@
+       background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        
+        color: white !important;
+        border: none !important;
+    }
+   
+    .k-progress {
+        position: fixed !important;
+        z-index: 10000;
+    }
+
+    .k-notification {
+        z-index: 10001;
+    }
+
+    .btn-save:hover {
+        background: #e67e00 !important;
+        linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    }
+
+    .btn-danger {
+        background: #dc3545 !important;
+        color: white !important;
+        border: none !important;
+    }
+
+    .btn-danger:hover {
+        background: #c82333 !important;
+    }
+
+    .btn-secondary {
+       background: white;
+
+        color: #ff8c00;
+        border: 2px solid #ff8c00 !important;
+    }   
+
+    .btn-secondary:hover {
+        background: #5a6268 !important;
+    }
+
+    #imageInput {
+        display: none;
+    }
+
+    /* Kendo Window Styles */
+    .k-window {
+        border-radius: 12px !important;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3) !important;
+    }
+
+    .k-window-titlebar {
+        background: white !important;
+        border-bottom: 1px solid #e0e0e0 !important;
+        padding: 15px 20px !important;
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+    .password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #888;
+    font-size: 16px;
+}
+
+.password-toggle:hover {
+    color: #ff8c00;
+}
+
+    /* Spinner inside buttons */
+    .btn-spinner {
+        display: inline-block;
+        margin-left: 8px;
+    }
+
+
+    .k-window-title {
+        font-size: 20px !important;
+        font-weight: 600 !important;
+        color: #333 !important;
+    }
+
+    .k-window-content {
+        padding: 25px !important;
+    }
+
+    .k-overlay {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+
+    /* Window Content Styles */
+    .window-form-group {
+        margin-bottom: 20px;
+    }
+
+    .window-form-group label {
+        display: block;
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .window-form-group input {
+        width: 100%;
+    }
+
+    .window-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 25px;
+    }
+
+    .window-buttons .k-button {
+        padding: 10px 25px;
+        flex: 0 1 auto;
+    }
+
+    .window-message {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    @@media (max-width: 768px) {
+        .profile-container {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ================= PAGE LOAD ANIMATIONS ================= */
+
+/* Whole profile card animation */
+.profile-container {
+    animation: containerFadeUp 0.9s ease-out forwards;
+}
+
+/* Sidebar slides from left */
+.sidebar {
+    animation: slideFromLeft 0.8s ease-out forwards;
+}
+
+/* Main content slides from right */
+.main-content {
+    animation: slideFromRight 0.8s ease-out forwards;
+}
+
+/* Keyframes */
+@@keyframes containerFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@@keyframes slideFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@@keyframes slideFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Stagger animation */
+.form-group,
+.gender-option,
+.action-buttons {
+    opacity: 0;
+    animation: staggerFade 0.6s ease forwards;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.2s; }
+.form-group:nth-child(2) { animation-delay: 0.3s; }
+.form-group:nth-child(3) { animation-delay: 0.4s; }
+.form-group:nth-child(4) { animation-delay: 0.5s; }
+
+@@keyframes staggerFade {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.menu-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-item::before {
+    content: "";
+    position: absolute;
+    left: -100%;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,140,0,0.15),
+        transparent
+    );
+    transition: left 0.4s ease;
+}
+
+.menu-item:hover::before {
+    left: 100%;
+}
+
+    /* SweetAlert2 button styling: cancel = white/orange outline, confirm = orange gradient */
+    .swal2-popup .swal2-cancel {
+        background: white !important;
+        color: #ff8c00 !important;
+        border: 2px solid #ff8c00 !important;
+        box-shadow: none !important;
+    }
+
+    .swal2-popup .swal2-confirm {
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+        color: white !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+
+
+</style>
+
+<div class="profile-container">
+    <div class="sidebar">
+        <div class="profile-image-wrapper">
+            <img id="profileImage" alt="Profile" class="profile-image">
+            <label for="imageInput" class="edit-image-btn">✏️</label>
+            <input type="file" id="imageInput" accept="image/*">
+        </div>
+        <div class="profile-name" id="displayName">Loading...</div>
+        <br/>
+
+        <button class="menu-item active">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+            </svg>
+            Personal Information
+        </button>
+        <button class="menu-item" onclick="openChangePasswordWindow()">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 015.905-.75 1 1 0 001.937-.5A5.002 5.002 0 0010 2z"/>
+            </svg>
+            Change Password
+        </button>
+        <button class="menu-item" onclick="logout()">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+                <path d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"/>
+            </svg>
+            Log Out
+        </button>
+        <button class="menu-item" onclick="openDeleteAccountWindow()">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"/>
+            </svg>
+            Delete Account
+        </button>
+    </div>
+
+    <div class="main-content">
+        <h2 class="section-title">Personal Information</h2>
+
+        <form id="profileForm">
+            <input type="hidden" id="customerId" name="c_customerid">
+
+            <div class="gender-selection">
+                <div class="gender-option">
+                    <input type="radio" id="male" name="c_gender" value="Male">
+                    <label for="male">Male</label>
+                </div>
+                <div class="gender-option">
+                    <input type="radio" id="female" name="c_gender" value="Female">
+                    <label for="female">Female</label>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">First Name</label>
+                    <input id="firstName" name="c_fname" class="k-textbox" required data-required-msg="First Name is required" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Last Name</label>
+                    <input id="lastName" name="c_lname" class="k-textbox" required data-required-msg="Last Name is required" />
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label class="form-label">Email</label>
+                <input id="email" name="c_email" class="k-textbox" disabled data-required-msg="Email is required" />
+                <span class="verified-badge">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                    </svg>
+                    Verified
+                </span>
+            </div>
+
+            <div class="form-group full-width">
+                <label class="form-label">Address</label>
+                <input id="address" name="c_address" class="k-textbox" required data-required-msg="Address is required" />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input id="phoneNumber" name="c_phonenumber" class="k-textbox" required data-required-msg="Phone Number is required" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Postal Code</label>
+                    <input id="pincode" name="c_pincode" class="k-textbox" required data-required-msg="Postal Code is required" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">City</label>
+                    <input id="city" name="c_city" class="k-textbox" required data-required-msg="City is required" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">State</label>
+                    <input id="state" name="c_state" class="k-textbox" required data-required-msg="State is required" />
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button type="button" class="k-button btn-discard" onclick="discardChanges()"><a href="/UserHome/Index" style="text-decoration:none; color: #ff8c00 ;">Discard Changes</a></button>
+                <button type="submit" class="k-button btn-save">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ================= CHANGE PASSWORD KENDO WINDOW ================= -->
+<div id="changePasswordWindow" style="display:none;">
+    <form id="changePasswordForm">
+        <div class="window-form-group">
+            <label>Old Password</label>
+           <div style="position:relative;">
+    <input id="oldPassword" name="oldPassword" type="password" class="k-textbox" required data-required-msg="Old Password is required" />
+    <span class="password-toggle" data-target="oldPassword">
+        <i class="fa-solid fa-eye-slash"></i>
+    </span>
+</div>
+
+            <span class="k-invalid-msg" data-for="oldPassword"></span>
+        </div>
+
+        <div class="window-form-group">
+            <label>New Password</label>
+           <div style="position:relative;">
+    <input id="newPassword" name="newPassword" type="password" class="k-textbox" required data-required-msg="New Password is required" />
+    <span class="password-toggle" data-target="newPassword">
+        <i class="fa-solid fa-eye-slash"></i>
+    </span>
+</div>
+
+            <span class="k-invalid-msg" data-for="newPassword"></span>
+        </div>
+
+        <div class="window-form-group">
+            <label>Confirm Password</label>
+           <div style="position:relative;">
+    <input id="confirmPassword" name="confirmPassword" type="password" class="k-textbox" required data-required-msg="Confirm Password is required" />
+    <span class="password-toggle" data-target="confirmPassword">
+        <i class="fa-solid fa-eye-slash"></i>
+    </span>
+</div>
+
+            <span class="k-invalid-msg" data-for="confirmPassword"></span>
+        </div>
+
+        <div class="window-buttons">
+            <button type="button" class="k-button btn-secondary" onclick="closeChangePassword()">Cancel</button>
+            <button type="button" class="k-button btn-save" id="btnChangePassword">
+                <span class="btn-text">Update Password</span>
+                <span class="btn-spinner" style="display:none;"><i class="fa-solid fa-spinner fa-spin"></i></span>
+            </button>
+
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+<script>
+    // Ensure jQuery is loaded
+    if (typeof jQuery === 'undefined') {
+        console.error('jQuery is not loaded!');
+    }
+    
+    @* const USER_ID = "@Context.Session.GetInt32("CustomerId")"; *@
+    let originalData = {};
+    const apiBase = "http://localhost:5245";
+    const imageBase = "/Images/customer/"; // Make sure this matches your MVC static files path
+    
+    $(document).ready(function() {
+        loadCartCount();
+        $("#btnChangePassword").on("click", function () {
+            $("#changePasswordForm").trigger("submit");
+        });
+    });
+
+    function loadCartCount() {
+    $.get(`/api/userHome/GetCartCount?userid=${USER_ID}`, function (count) {
+        $("#cartCount").text(count);
+    });
+}
+
+
+
+    let changePasswordWindow;
+
+    /* ================= NOTIFICATION SYSTEM ================= */
+    function showNotification(message, type) {
+        // Create notification container if it doesn't exist
+        if (!$("#notificationContainer").length) {
+            $('body').append('<div id="notificationContainer"></div>');
+        }
+        
+        const container = $("#notificationContainer");
+        
+        // Create Kendo Notification widget
+        container.kendoNotification({
+            position: {
+                pinned: true,
+                top: 50,
+                right: 50
+            },
+            stacking: "down",
+            hideOnClick: true,
+            autoHideAfter: 4000,
+            templates: [{
+                type: "success",
+                template: '<div class="k-notification-success">#= message #</div>'
+            }, {
+                type: "error",
+                template: '<div class="k-notification-error">#= message #</div>'
+            }, {
+                type: "info",
+                template: '<div class="k-notification-info">#= message #</div>'
+            }]
+        }).data("kendoNotification");
+        
+        // Show notification
+        const notification = container.data("kendoNotification");
+        notification.show({
+            message: message
+        }, type || "info");
+    }
+
+    // Add CSS for notification styles
+    $('head').append(`
+    <style>
+        .k-notification-success {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .k-notification-error {
+            background: #F44336;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+        }
+        
+        .k-notification-info {
+            background: #2196F3;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+    </style>
+    `);
+
+    $(document).ready(function () {
+        // 🔹 Change Password
+        initChangePasswordWindow();
+        initChangePasswordValidator();
+
+        // 🔹 Profile Form Validator
+       $("#profileForm").kendoValidator({
+    validateOnBlur: true,
+    rules: {
+
+        // Gender required
+        genderRequired: function (input) {
+            if (input.is("[name='c_gender']")) {
+                return $("input[name='c_gender']:checked").length > 0;
+            }
+            return true;
+        },
+
+        // Phone number → exactly 10 digits
+        phoneLength: function (input) {
+            if (input.is("#phoneNumber")) {
+                return /^\d{10}$/.test(input.val());
+            }
+            return true;
+        },
+
+        // Postal code → exactly 6 digits
+        pincodeLength: function (input) {
+            if (input.is("#pincode")) {
+                return /^\d{6}$/.test(input.val());
+            }
+            return true;
+        }
+    },
+
+    messages: {
+        required: "This field is required",
+        genderRequired: "Please select gender",
+        phoneLength: "Phone number must be exactly 10 digits",
+        pincodeLength: "Postal code must be exactly 6 digits"
+    }
+});
+
+
+        // 🔹 Load profile data
+        loadProfile();
+    });
+
+    /* ================= KENDO WINDOW ================= */
+    function initChangePasswordWindow() {
+        changePasswordWindow = $("#changePasswordWindow").kendoWindow({
+            title: "Change Password",
+            modal: true,
+            visible: false,
+            width: "420px",
+            resizable: false
+        }).data("kendoWindow");
+    }
+
+    function openChangePasswordWindow() {
+        $("#changePasswordForm")[0].reset();
+        $(".k-invalid-msg").hide();
+        changePasswordWindow.center().open();
+    }
+
+    function closeChangePassword() {
+        changePasswordWindow.close();
+    }
+
+    /* ================= VALIDATION ================= */
+    function initChangePasswordValidator() {
+        $("#changePasswordForm").kendoValidator({
+            validateOnBlur: true,
+            rules: {
+                passwordLength: function (input) {
+                    if (input.is("#newPassword")) {
+                        return input.val().length >= 8;
+                    }
+                    return true;
+                },
+                passwordMatch: function (input) {
+                    if (input.is("#confirmPassword")) {
+                        return input.val() === $("#newPassword").val();
+                    }
+                    return true;
+                }
+            },
+            messages: {
+                required: "This field is required",
+                passwordLength: "Password must be at least 8 characters",
+                passwordMatch: "Passwords do not match"
+            }
+        });
+    }
+
+    /* ================= CHANGE PASSWORD SUBMIT ================= */
+$("#changePasswordForm").on("submit", function (e) {
+    e.preventDefault();
+
+    const validator = $(this).data("kendoValidator");
+    if (!validator.validate()) return;
+
+    // Show Kendo window progress and button spinner
+    kendo.ui.progress($("#changePasswordWindow .k-window-content"), true);
+    const $btn = $("#btnChangePassword");
+    $btn.prop('disabled', true);
+    $btn.find('.btn-text').hide();
+    $btn.find('.btn-spinner').show();
+
+    function restoreChangePasswordBtn() {
+        $btn.prop('disabled', false);
+        $btn.find('.btn-spinner').hide();
+        $btn.find('.btn-text').show();
+    }
+
+    $.ajax({
+        url: apiBase + "/api/Password/change/" + USER_ID,
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+            currentPassword: $("#oldPassword").val(),
+            newPassword: $("#newPassword").val(),
+            confirmPassword: $("#confirmPassword").val()
+        }),
+        success: function (response) {
+            console.log(response);
+            if (response.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: response.message,
+                    confirmButtonText: "OK"
+                });
+                closeChangePassword();
+                return;
+            } else {
+                showNotification(response.message || "Password update failed", "error");
+            }
+        },
+        error: function (xhr) {
+            console.log(xhr);
+            showNotification(xhr.responseText || "Failed to update password", "error");
+        },
+        complete: function () {
+            // Ensure spinner and kendo progress are hidden regardless of outcome
+            restoreChangePasswordBtn();
+            kendo.ui.progress($("#changePasswordWindow .k-window-content"), false);
+        }
+    });
+});
+
+    /* ================= LOAD PROFILE ================= */
+ function loadProfile() {
+
+    // Instant placeholders
+    $('#displayName').text("Loading...");
+    $('#profileImage').attr("src", imageBase + "default.jpg");
+
+    // Load cached data first
+    const cached = sessionStorage.getItem("profileCache");
+    if (cached) {
+        populateForm(JSON.parse(cached));
+    }
+
+    // Show loader only on image
+    kendo.ui.progress($(".profile-image-wrapper"), true);
+
+    $.get(apiBase + "/api/ProfileApi?id=" + USER_ID)
+        .done(function (data) {
+            originalData = { ...data };
+            populateForm(data);
+            sessionStorage.setItem("profileCache", JSON.stringify(data));
+        })
+        .fail(function () {
+            showNotification("Failed to load profile", "error");
+        })
+        .always(function () {
+            kendo.ui.progress($(".profile-image-wrapper"), false);
+        });
+}
+
+
+    function logout() {
+        Swal.fire({
+            title: "Logout?",
+            text: "Are you sure you want to logout?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Logout",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/Profile/Logout";
+            }
+        });
+    }
+
+    function openDeleteAccountWindow() {
+        const customerId = parseInt($("#customerId").val());
+
+        if (!customerId) {
+            showNotification("Invalid session", "error");
+            return;
+        }
+
+        Swal.fire({
+            title: "Delete Account?",
+            text: "This action will deactivate your account permanently!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Yes, Delete",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                kendo.ui.progress($(".profile-container"), true);
+                var formData = new FormData();
+                formData.append('customerId', customerId);
+
+                $.ajax({
+                    url: apiBase + "/api/ProfileApi/delete-account",
+                    type: "POST",
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (response) {
+                        kendo.ui.progress($(".profile-container"), false);
+                        Swal.fire("Deleted!", response.message, "success")
+                            .then(() => {
+                                window.location.href = "/Profile/Logout";
+                            });
+                    },
+                    error: function (xhr) {
+                        kendo.ui.progress($(".profile-container"), false);
+                        showNotification(
+                            xhr.responseJSON?.message || "Delete failed",
+                            "error"
+                        );
+                    }
+                });
+            }
+        });
+    }
+
+    /* ================= POPULATE FORM ================= */
+    /* ================= POPULATE FORM ================= */
+function populateForm(data) {
+    console.log("Populating form with data:", data); // Debug log
+    
+    $('#customerId').val(data.c_customerid || '');
+    $('#firstName').val(data.c_fname || '');
+    $('#lastName').val(data.c_lname || '');
+    $('#email').val(data.c_email || '');
+    $('#address').val(data.c_address || '');
+    $('#phoneNumber').val(data.c_phonenumber || '');
+    $('#city').val(data.c_city || '');
+    $('#pincode').val(data.c_pincode || '');
+    $('#state').val(data.c_state || '');
+
+    $('input[name="c_gender"]').prop('checked', false);
+    if (data.c_gender) {
+        $('input[name="c_gender"][value="' + data.c_gender + '"]').prop('checked', true);
+    }
+
+    $('#displayName').text((data.c_fname || '') + " " + (data.c_lname || ''));
+
+    // Handle image loading
+    const imageName = data.c_image && data.c_image.trim() !== ""
+        ? data.c_image
+        : "default.jpg";
+    
+    // Add timestamp to prevent caching
+    const timestamp = new Date().getTime();
+    const imageUrl = imageBase + imageName + "?v=" + timestamp;
+    
+    console.log("Setting image src to:", imageUrl); // Debug log
+    $('#profileImage').attr("src", imageUrl);
+}
+
+    /* ================= IMAGE PREVIEW ================= */
+    $('#imageInput').on('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            showNotification("Only image files are allowed", "error");
+            this.value = "";
+            return;
+        }
+
+        // Check file size (limit to 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            showNotification("Image size should be less than 5MB", "error");
+            this.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = e => {
+            $('#profileImage').attr('src', e.target.result);
+            // Store the file for upload
+            $(this).data('selectedFile', file);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    /* ================= PROFILE FORM SUBMIT ================= */
+/* ================= PROFILE FORM SUBMIT ================= */
+$('#profileForm').submit(function (e) {
+    e.preventDefault();
+
+    const validator = $("#profileForm").data("kendoValidator");
+    if (!validator || !validator.validate()) {
+        return;
+    }
+
+    const formData = new FormData();
+    const imageFile = $('#imageInput')[0].files[0];
+
+    // Add all form data
+    formData.append('c_customerid', $('#customerId').val());
+    formData.append('c_fname', $('#firstName').val());
+    formData.append('c_lname', $('#lastName').val());
+    formData.append('c_email', $('#email').val());
+    formData.append('c_address', $('#address').val());
+    formData.append('c_phonenumber', $('#phoneNumber').val());
+    formData.append('c_city', $('#city').val());
+    formData.append('c_pincode', $('#pincode').val());
+    formData.append('c_state', $('#state').val());
+    formData.append('c_gender', $('input[name="c_gender"]:checked').val());
+
+    // Append image if exists
+    if (imageFile) {
+        formData.append('c_imagefile', imageFile);
+    }
+
+    // Show loading indicator
+    kendo.ui.progress($(".profile-container"), true);
+
+    $.ajax({
+        url: apiBase + "/api/ProfileApi",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            kendo.ui.progress($(".profile-container"), false);
+            
+            // Check if response is valid
+            if (response && typeof response === 'object') {
+                if (response.success === true) {
+                   Swal.fire({
+    icon: "success",
+    title: "Success",
+    text: response.message || "Profile updated successfully",
+    confirmButtonText: "OK"
+});
+
+                    
+                    // Update originalData
+                    originalData = {
+                        c_customerid: $('#customerId').val(),
+                        c_fname: $('#firstName').val(),
+                        c_lname: $('#lastName').val(),
+                        c_email: $('#email').val(),
+                        c_address: $('#address').val(),
+                        c_phonenumber: $('#phoneNumber').val(),
+                        c_city: $('#city').val(),
+                        c_pincode: $('#pincode').val(),
+                        c_state: $('#state').val(),
+                        c_gender: $('input[name="c_gender"]:checked').val(),
+                        c_image: response.c_image || originalData.c_image
+                    };
+                    
+                    // Refresh profile image with timestamp to prevent caching
+                    if (response.c_image) {
+                        const timestamp = new Date().getTime();
+                        $('#profileImage').attr('src', imageBase + response.c_image + '?t=' + timestamp);
+                    } else if (originalData.c_image) {
+                        // If no new image but we have existing image
+                        const timestamp = new Date().getTime();
+                        $('#profileImage').attr('src', imageBase + originalData.c_image + '?t=' + timestamp);
+                    }
+                    
+                    // Update display name
+                    $('#displayName').text($('#firstName').val() + " " + $('#lastName').val());
+                    
+                    // Clear file input
+                    $('#imageInput').val('');
+                } else {
+                    showNotification(response.message || "Update failed", "error");
+                }
+            } else {
+                showNotification("Invalid response from server", "error");
+            }
+        },
+        error: function (xhr, status, error) {
+            kendo.ui.progress($(".profile-container"), false);
+            let errorMessage = "Update Failed: ";
+            
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMessage += xhr.responseJSON.message;
+            } else if (xhr.responseText) {
+                errorMessage += xhr.responseText;
+            } else {
+                errorMessage += error;
+            }
+            
+            showNotification(errorMessage, "error");
+        }
+    });
+});
+    /* ================= DISCARD CHANGES ================= */
+    function discardChanges() {
+        populateForm(originalData);
+        $('#imageInput').val('');
+    }
+
+    $(document).on("click", ".password-toggle", function () {
+    const targetId = $(this).data("target");
+    const input = $("#" + targetId);
+    const icon = $(this).find("i");
+
+    if (input.attr("type") === "password") {
+        input.attr("type", "text");
+        icon.removeClass("fa-eye-slash").addClass("fa-eye");
+    } else {
+        input.attr("type", "password");
+        icon.removeClass("fa-eye").addClass("fa-eye-slash");
+    }
+});
+
+</script>
+
+
+}

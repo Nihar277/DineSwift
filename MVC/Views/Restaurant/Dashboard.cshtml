@@ -1,0 +1,341 @@
+@using MVC.Models
+@section Styles {
+    <link rel="stylesheet" href="~/css/Dashboard.css" asp-append-version="true" />
+
+}
+
+@inject IHttpClientFactory HttpClientFactory
+@functions {
+    string TrendClass(decimal value) => value >= 0 ? "up" : "down";
+    string TrendIcon(decimal value) => value >= 0 ? "fa-arrow-up" : "fa-arrow-down";
+    string TrendValue(decimal value) => $"{Math.Abs(value):0.##}%";
+}
+
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_Vendor";
+
+    int customerId = Context.Session.GetInt32("CustomerId") ?? 0;
+
+    string userName = Context.Session.GetString("Name") ?? "User";
+    string userEmail = Context.Session.GetString("Email") ?? "";
+
+    var client = HttpClientFactory.CreateClient();
+    client.BaseAddress = new Uri("http://localhost:5245/api/");
+
+    DashboardSummaryDto summary = null;
+    List<RecentOrderDto> orders = new();
+    RestaurantProfileDto restaurantProfile = null;
+    bool isRestaurantAvailable = false;
+
+    try
+    {
+        summary = await client.GetFromJsonAsync<DashboardSummaryDto>($"restaurant/summary/by-customer/{customerId}");
+        orders = await client.GetFromJsonAsync<List<RecentOrderDto>>($"restaurant/recent-orders/by-customer/{customerId}");
+        restaurantProfile = await client.GetFromJsonAsync<RestaurantProfileDto>($"restaurant/id/{customerId}");
+        if (restaurantProfile != null)
+        {
+            isRestaurantAvailable = restaurantProfile.c_r_isavailable?.ToLower() == "yes";
+        }
+    }
+    catch { }
+}
+
+<div class="dashboard-wrapper">
+    <div class="dashboard-container">
+        <!-- HEADER -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="user-info">
+                    <div class="avatar">@(userName.Trim().FirstOrDefault().ToString().ToUpper())</div>
+                    <div class="user-details">
+                        <h1>@userName</h1>
+                        <p>@userEmail</p>
+                    </div>
+                </div>
+
+                <div class="restaurant-badge">
+                    <i class="fa-solid fa-utensils badge-icon"></i>
+                    <span>Premium Restaurant</span>
+                </div>
+
+                <!-- Restaurant On/Off Toggle -->
+                <div class="restaurant-toggle-container">
+                    <label class="toggle-label">
+                        <span class="toggle-text">@(isRestaurantAvailable ? "Open" : "Closed")</span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="restaurantToggle" @(isRestaurantAvailable ? "checked" : "") />
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </header>
+
+        <!-- STATS GRID -->
+        <section class="stats-grid">
+            <article class="stat-card stat-card--revenue">
+                <div class="stat-content">
+                    <p class="stat-label">Total Revenue</p>
+                    <h3 class="stat-value">₹@(summary?.TotalRevenue.ToString("N0") ?? "0")</h3>
+                    <span class="trend @TrendClass(summary?.RevenueGrowth ?? 0)">
+                        <i class="fa-solid @TrendIcon(summary?.RevenueGrowth ?? 0)"></i>
+                        @TrendValue(summary?.RevenueGrowth ?? 0)
+                    </span>
+                </div>
+                <div class="stat-icon stat-icon--revenue"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            </article>
+
+            <article class="stat-card stat-card--orders">
+                <div class="stat-content">
+                    <p class="stat-label">Total Orders</p>
+                    <h3 class="stat-value">@(summary?.TotalOrders.ToString("N0") ?? "0")</h3>
+                    <span class="trend @TrendClass(summary?.OrdersGrowth ?? 0)">
+                        <i class="fa-solid @TrendIcon(summary?.OrdersGrowth ?? 0)"></i>
+                        @TrendValue(summary?.OrdersGrowth ?? 0)
+                    </span>
+                </div>
+                <div class="stat-icon stat-icon--orders"><i class="fa-solid fa-shopping-bag"></i></div>
+            </article>
+
+            <article class="stat-card stat-card--clients">
+                <div class="stat-content">
+                    <p class="stat-label">Total Clients</p>
+                    <h3 class="stat-value">@(summary?.TotalClients.ToString() ?? "0")</h3>
+                    <span class="trend @TrendClass(summary?.ClientsGrowth ?? 0)">
+                        <i class="fa-solid @TrendIcon(summary?.ClientsGrowth ?? 0)"></i>
+                        @TrendValue(summary?.ClientsGrowth ?? 0)
+                    </span>
+                </div>
+                <div class="stat-icon stat-icon--clients"><i class="fa-solid fa-users"></i></div>
+            </article>
+
+            <article class="stat-card stat-card--fees">
+                <div class="stat-content">
+                    <p class="stat-label">Platform Charge</p>
+                    <h3 class="stat-value">₹@(summary?.PlatformFees.ToString("N0") ?? "0")</h3>
+                </div>
+                <div class="stat-icon stat-icon--fees"><i class="fa-solid fa-coins"></i></div>
+            </article>
+        </section>
+
+        <!-- CHART SECTION -->
+        <section class="chart-section">
+            <div class="chart-header">
+                <h2>Business Analytics</h2>
+                <div class="chart-controls">
+                    <div class="period-selector">
+                        <button class="period-btn active" data-period="7">7D</button>
+                        <button class="period-btn" data-period="30">30D</button>
+                        <button class="period-btn" data-period="180">6M</button>
+                        <button class="period-btn" data-period="365">1Y</button>
+                    </div>
+                    <div class="chart-type-selector">
+                        <button class="type-btn active" data-type="line" title="Line"><i
+                                class="fa-solid fa-chart-line"></i></button>
+                        <button class="type-btn" data-type="column" title="Column"><i
+                                class="fa-solid fa-chart-column"></i></button>
+                        <button class="type-btn" data-type="area" title="Area"><i
+                                class="fa-solid fa-chart-area"></i></button>
+                        <button class="type-btn" data-type="stacked" title="Stacked"><i
+                                class="fa-solid fa-chart-simple"></i></button>
+                        <button class="type-btn" data-type="donut" title="Donut"><i
+                                class="fa-solid fa-circle-notch"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div id="dashboardChart" class="chart-container"></div>
+        </section>
+
+        <!-- ORDERS TABLE -->
+        <section class="orders-section">
+            <div class="section-header">
+                <h2>Recent Orders</h2>
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input id="orderSearch" type="text" placeholder="Search orders..." />
+                </div>
+            </div>
+            <div class="table-responsive">
+                <div id="ordersGrid" class="orders-grid"></div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const customerId = @customerId;
+        const ordersData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(orders));
+
+        let currentPeriod = 7;
+        let currentType = "line";
+
+        function loadChart(period, type) {
+            $.getJSON(`http://localhost:5245/api/restaurant/dashboard-chart/${customerId}/${period}`, function (data) {
+                const categories = data.map(x => x.label);
+                const chartWidth = $("#dashboardChart").width();
+                const isMobile = chartWidth < 500;
+
+                if (type === "donut") {
+                    $("#dashboardChart").empty().kendoChart({
+                        title: { text: "Revenue Distribution", font: "600 14px 'Segoe UI', sans-serif" },
+                        legend: { position: isMobile ? "bottom" : "right", labels: { font: "11px 'Segoe UI'" } },
+                        series: [{ type: "donut", data: data.map(x => ({ category: x.label, value: x.revenue })), holeSize: 40 }],
+                        tooltip: { visible: true, template: "₹ #= kendo.toString(value, 'n0') #" }
+                    });
+                    return;
+                }
+
+                const isStacked = type === "stacked";
+
+                $("#dashboardChart").empty().kendoChart({
+                    transitions: true,
+                    chartArea: { background: "transparent", margin: isMobile ? 5 : 20 },
+                    seriesDefaults: { type: isStacked ? "column" : type, stack: isStacked },
+                    series: [
+                        { name: "Orders", data: data.map(x => x.orders), color: "#f97316" },
+                        { name: "Revenue", data: data.map(x => x.revenue), color: "#22c55e" },
+                        { name: "Platform Fees", data: data.map(x => x.platformFees), color: "#a855f7" },
+                        { name: "Clients", data: data.map(x => x.clients), color: "#3b82f6" }
+                    ],
+                    categoryAxis: { categories, labels: { rotation: isMobile ? -90 : -45, font: isMobile ? "10px 'Segoe UI'" : "12px 'Segoe UI'" } },
+                    valueAxis: { labels: { font: isMobile ? "10px 'Segoe UI'" : "12px 'Segoe UI'" } },
+                    legend: { position: "bottom", labels: { font: isMobile ? "10px 'Segoe UI'" : "12px 'Segoe UI'" } },
+                    tooltip: { visible: true, template: "<b>#= series.name #</b>: #= value #" }
+                });
+            });
+        }
+
+        function timeAgo(date) {
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+            if (diff < 60) return "Just now";
+            const minutes = Math.floor(diff / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            if (days === 1) return "Yesterday";
+            return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+        }
+
+        $(document).ready(function () {
+
+
+            loadChart(currentPeriod, currentType);
+
+            $(window).resize(function () { loadChart(currentPeriod, currentType); });
+
+            $(".period-btn").click(function () {
+                $(".period-btn").removeClass("active");
+                $(this).addClass("active");
+                currentPeriod = $(this).data("period");
+                loadChart(currentPeriod, currentType);
+            });
+
+            $(".type-btn").click(function () {
+                $(".type-btn").removeClass("active");
+                $(this).addClass("active");
+                currentType = $(this).data("type");
+                loadChart(currentPeriod, currentType);
+            });
+
+            // Restaurant toggle change handler
+            $("#restaurantToggle").change(function () {
+                const isChecked = $(this).is(":checked");
+                const newStatus = isChecked ? "yes" : "no";
+                toggleRestaurantStatus(newStatus, isChecked);
+            });
+
+            // Function to toggle restaurant status
+            function toggleRestaurantStatus(newStatus, isChecked) {
+                // Disable toggle during API call
+                $("#restaurantToggle").prop("disabled", true);
+                const toggleText = $(".toggle-text");
+
+                $.ajax({
+                    url: `http://localhost:5245/api/restaurant/toggle-availability/${customerId}`,
+                    type: "PUT",
+                    contentType: "application/json",
+                    data: JSON.stringify({ availability: newStatus }),
+                    success: function (response) {
+                        if (response.success) {
+                            toggleText.text(response.isAvailable ? "Open" : "Closed");
+                            showNotification(response.isAvailable ? "Restaurant is now Open" : "Restaurant is now Closed", "success");
+                        } else {
+                            // Revert toggle on failure
+                            $("#restaurantToggle").prop("checked", !isChecked);
+                            showNotification("Failed to update restaurant status", "error");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Revert toggle on error
+                        $("#restaurantToggle").prop("checked", !isChecked);
+                        showNotification("Error updating restaurant status. Please try again.", "error");
+                        console.error("Toggle error:", error);
+                    },
+                    complete: function () {
+                        // Re-enable toggle after API call
+                        $("#restaurantToggle").prop("disabled", false);
+                    }
+                });
+            }
+
+            // Simple notification function
+            function showNotification(message, type) {
+                const notification = $(`
+                                            <div class="notification notification-${type}" style="
+                                                position: fixed;
+                                                top: 20px;
+                                                right: 20px;
+                                                padding: 12px 20px;
+                                                background: ${type === 'success' ? '#22c55e' : '#ef4444'};
+                                                color: white;
+                                                border-radius: 8px;
+                                                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                                                z-index: 10000;
+                                                font-size: 14px;
+                                                animation: slideIn 0.3s ease;
+                                            ">
+                                                ${message}
+                                            </div>
+                                        `);
+                $("body").append(notification);
+                setTimeout(() => {
+                    notification.fadeOut(300, function () { $(this).remove(); });
+                }, 3000);
+            }
+
+            const grid = $("#ordersGrid").kendoGrid({
+                dataSource: { data: ordersData, pageSize: 5 },
+                sortable: true,
+                pageable: { numeric: true, previousNext: true, info: true, buttonCount: 3 },
+                scrollable: true,
+                mobile: true,
+                columns: [
+                    { field: "OrderId", title: "Order #", template: "<span class='order-id'>#= OrderId #</span>", width: 100 },
+                    { field: "DishName", title: "Items", width: 180 },
+                    { field: "Amount", title: "Amount", template: "<span class='amount'>₹#= Amount.toLocaleString() #</span>", width: 100 },
+                    { field: "Status", title: "Status", template: d => `<span class="status-badge status-badge--${d.Status.toLowerCase().replace(/\s+/g, '-')}">${d.Status}</span>`, width: 120 },
+                    { field: "OrderDate", title: "Time", template: d => timeAgo(new Date(d.OrderDate)), width: 100 }
+                ]
+            }).data("kendoGrid");
+
+            $("#orderSearch").on("input", function () {
+                const value = $(this).val();
+                grid.dataSource.filter({
+                    logic: "or",
+                    filters: [
+                        { field: "OrderId", operator: "contains", value },
+                        { field: "DishName", operator: "contains", value },
+                        { field: "Status", operator: "contains", value },
+                        { field: "Amount", operator: "contains", value }
+                    ]
+                });
+            });
+        });
+
+
+    </script>
+}

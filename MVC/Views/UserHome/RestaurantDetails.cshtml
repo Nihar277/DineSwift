@@ -1,0 +1,600 @@
+@{
+    Layout = "~/Views/Shared/_userdashboardLayout.cshtml";
+}
+
+
+<style>
+    .restaurant-header {
+        background: linear-gradient(135deg, #fa7414, #ff8c42);
+        color: white;
+        padding: 40px 20px;
+        margin-bottom: 30px;
+    }
+
+    .restaurant-header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+
+    .restaurant-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 15px;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .restaurant-info h1 {
+        margin: 0 0 10px 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .restaurant-info p {
+        margin: 5px 0;
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .restaurant-address {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .dishes-section {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    .section-title span {
+        color: #fa7414;
+    }
+
+    .dishes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    .dish-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .dish-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 40px rgba(250, 116, 20, 0.15);
+    }
+
+    .dish-card-image {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        background: #f5f5f5;
+    }
+
+    .dish-card-body {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dish-card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 8px 0;
+        line-height: 1.3;
+    }
+
+    .dish-card-subtitle {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin: 0 0 12px 0;
+        font-weight: 500;
+    }
+
+    .dish-card-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin: 0 0 16px 0;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex-grow: 1;
+    }
+
+    .dish-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+        padding-top: 16px;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .dish-card-category {
+        background: #fa7414;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+
+    .dish-card-price {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #fa7414;
+    }
+
+    .dish-card-type {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .dish-card-actions {
+        padding: 0 20px 20px 20px;
+        display: flex;
+        gap: 12px;
+    }
+
+    .dish-card-btn {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .dish-card-btn-primary {
+        background: #fa7414;
+        color: white;
+    }
+
+    .dish-card-btn-primary:hover {
+        background: #e35f00;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(250, 116, 20, 0.3);
+    }
+
+    .dish-card-btn-secondary {
+        background: white;
+        color: #fa7414;
+        border: 2px solid #fa7414;
+    }
+
+    .dish-card-btn-secondary:hover {
+        background: #fa7414;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6b7280;
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    .empty-state-text {
+        font-size: 1.125rem;
+        font-weight: 500;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: white;
+        color: #fa7414;
+        border: 2px solid #fa7414;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+        background: #fa7414;
+        color: white;
+    }
+
+    /* MODAL FIX */
+.item-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999; /* higher than header */
+    align-items: center;
+    justify-content: center;
+}
+
+/* Modal Box */
+.item-modal > div {
+    background: #fff;
+    border-radius: 20px;
+    max-width: 520px;
+    width: 92%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: modalFade 0.3s ease;
+}
+
+@@keyframes modalFade {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+
+</style>
+
+<!-- Restaurant Header -->
+<div class="restaurant-header">
+    <div class="restaurant-header-content">
+        <img id="restaurant-image" class="restaurant-image" src="" alt="Restaurant"/>
+        <div class="restaurant-info">
+            <h1 id="restaurant-name">Loading...</h1>
+            <p id="restaurant-city"></p>
+            <div class="restaurant-address">
+                <i class="fas fa-map-marker-alt"></i>
+                <p id="restaurant-address"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dishes Section -->
+<div class="dishes-section">
+    <a href="/UserHome/Index" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        Back to Home
+    </a>
+    
+    <h2 class="section-title">
+        Our <span>Menu</span>
+    </h2>
+
+    <div id="dishes-list" class="dishes-grid">
+        <div class="empty-state" style="display: none; grid-column: 1 / -1;">
+            <div class="empty-state-icon">🍽️</div>
+            <div class="empty-state-text">No dishes available at this restaurant</div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Item Details -->
+<div id="item-details-modal" class="item-modal">
+
+    <div style="background: white; border-radius: 20px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; margin: auto; margin-top: 5vh;">
+        <button onclick="closeItemModal()" style="position: absolute; top: 15px; right: 15px; background: #f3f4f6; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-size: 1.2rem; color: #6b7280;">&times;</button>
+        <div id="item-details-content"></div>
+    </div>
+</div>
+
+@section scripts {
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+    <script>
+        const RESTAURANT_ID = @ViewBag.RestaurantId;
+        @* const USER_ID = "@Context.Session.GetInt32("CustomerId")"; *@
+ // Default customer ID
+        let restaurantName = '';
+
+        function loadDishes() {
+            $.ajax({
+                url: `http://localhost:5245/api/FoodItem/${RESTAURANT_ID}`,
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+
+                    let dishes = response.data || response;
+                    
+                    // Filter to ensure only dishes from this restaurant are shown
+                    dishes = Array.isArray(dishes) ? dishes.filter(function(dish) {
+                        return dish.c_restaurantid === RESTAURANT_ID && dish.c_isavailable !== false;
+                    }) : [];
+
+                    const dishesContainer = $("#dishes-list");
+                    dishesContainer.find('.empty-state').hide();
+                    
+                    if (!dishes || dishes.length === 0) {
+                        dishesContainer.find('.empty-state').show();
+                        return;
+                    }
+
+                    // Clear existing content
+                    dishesContainer.find('.dish-card').remove();
+
+                    // Render each dish card
+                    dishes.forEach(function(dish) {
+                        const imageUrl = dish.c_imageurl ? `/Images/restaurant/dishes/${dish.c_restaurantid}/${dish.c_imageurl.split('\\').pop().split('/').pop()}` : '/Images/no-image.png';
+                        
+                        const cardHtml = `
+                            <div class="dish-card" data-item-id="${dish.c_itemid}">
+                                <img class="dish-card-image" src="${imageUrl}" alt="${dish.c_name || 'Dish'}" />
+                                <div class="dish-card-body">
+                                    <h4 class="dish-card-title">${dish.c_name || 'Untitled Dish'}</h4>
+                                    <h5 class="dish-card-subtitle">${restaurantName || 'DineSwift Partner'}</h5>
+                                    ${dish.c_description ? `<p class="dish-card-description">${dish.c_description}</p>` : ''}
+                                    ${dish.c_type ? `<div class="dish-card-type"><i class="fas fa-tag"></i> ${dish.c_type}</div>` : ''}
+                                    <div class="dish-card-footer">
+                                        ${dish.c_category ? `<span class="dish-card-category">${dish.c_category}</span>` : '<span></span>'}
+                                        <span class="dish-card-price">₹${dish.c_price || 0}</span>
+                                    </div>
+                                </div>
+                                <div class="dish-card-actions">
+                                    <button class="dish-card-btn dish-card-btn-primary" onclick="addToCart(${dish.c_itemid})">
+                                        Add to Cart
+                                    </button>
+                                    <button class="dish-card-btn dish-card-btn-secondary" onclick="showItemInfo(${dish.c_itemid})">
+                                        View Details
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        dishesContainer.append(cardHtml);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading dishes:", error);
+                    $("#dishes-list").html('<div class="empty-state" style="grid-column: 1 / -1;"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Failed to load dishes. Please try again.</div></div>');
+                }
+            });
+        }
+
+      function closeItemModal() {
+    $("#item-details-modal").hide();
+    $("body").removeClass("modal-open");
+}
+
+
+        $(document).ready(function () {
+             
+            // Load restaurant details first, then load dishes
+            loadRestaurantDetails().then(function() {
+                loadDishes();
+            });
+
+            // Close modal when clicking outside
+            $(document).on('click', '#item-details-modal', function(e) {
+                if (e.target.id === 'item-details-modal') {
+                    closeItemModal();
+                }
+            });
+        });
+
+        function loadRestaurantDetails() {
+            return $.ajax({
+                url: `http://localhost:5245/api/userHome/GetRestaurantById/${RESTAURANT_ID}`,
+                type: "GET",
+                dataType: "json",
+                success: function (restaurant) {
+                    if (restaurant) {
+                        restaurantName = restaurant.c_r_name || "DineSwift Partner";
+                        $("#restaurant-name").text(restaurant.c_r_name || "Restaurant");
+                        $("#restaurant-city").text(restaurant.c_r_city || "");
+                        $("#restaurant-address").text(restaurant.c_r_address || "");
+                        $("#restaurant-image").attr("src", `/Images/restaurant/restaurantimages/${restaurant.c_r_image || 'no-image.png'}`);
+                    }
+                },
+                error: function () {
+                    restaurantName = "DineSwift Partner";
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: "Failed to load restaurant details.",
+                        showConfirmButton: true
+                    });
+                }
+            });
+        }
+
+        function showItemInfo(itemId) {
+            $.ajax({
+                url: `http://localhost:5245/api/userHome/${itemId}`,
+                type: "GET",
+                dataType: "json",
+                success: function (item) {
+                    if (!item) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: "Item not found.",
+                            showConfirmButton: true
+                        });
+                        return;
+                    }
+
+                    const imageUrl = item.c_imageurl ? `/Images/restaurant/dishes/${item.c_restaurantid}/${item.c_imageurl.split('\\').pop().split('/').pop()}` : '/Images/no-image.png';
+                    
+                    let modalContent = `
+                        <div style="padding: 30px;">
+                            <div style="text-align: center; margin-bottom: 25px;">
+                                <img src="${imageUrl}" 
+                                     style="width: 250px; height: 250px; object-fit: cover; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);"
+                                     />
+                            </div>
+                            <h3 style="color: #fa7414; margin-bottom: 20px; font-size: 1.75rem; font-weight: 700; text-align: center;">${item.c_name || 'N/A'}</h3>
+                            <div style="background: #f9fafb; padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                                <p style="margin: 10px 0;"><strong style="color: #374151; font-size: 0.95rem;">Restaurant:</strong> <span style="color: #6b7280; margin-left: 8px;">${item.c_r_name || restaurantName || 'N/A'}</span></p>
+                                <p style="margin: 10px 0;"><strong style="color: #374151; font-size: 0.95rem;">Category:</strong> <span style="color: #6b7280; margin-left: 8px;">${item.c_category || 'N/A'}</span></p>
+                                <p style="margin: 10px 0;"><strong style="color: #374151; font-size: 0.95rem;">Price:</strong> <span style="color: #fa7414; font-weight: 700; font-size: 1.3rem; margin-left: 8px;">₹${item.c_price || '0'}</span></p>
+                                ${item.c_type ? `<p style="margin: 10px 0;"><strong style="color: #374151; font-size: 0.95rem;">Type:</strong> <span style="color: #6b7280; margin-left: 8px;">${item.c_type}</span></p>` : ''}
+                            </div>
+                            ${item.c_description ? `<div style="margin-bottom: 20px;"><strong style="color: #374151; display: block; margin-bottom: 8px; font-size: 0.95rem;">Description:</strong><p style="color: #6b7280; line-height: 1.7; font-size: 0.9rem;">${item.c_description}</p></div>` : ''}
+                            ${item.c_ingredients ? `<div style="margin-bottom: 20px;"><strong style="color: #374151; display: block; margin-bottom: 8px; font-size: 0.95rem;">Ingredients:</strong><p style="color: #6b7280; line-height: 1.7; font-size: 0.9rem;">${item.c_ingredients}</p></div>` : ''}
+                            <div style="text-align: center; margin-top: 25px;">
+                                <button onclick="addToCart(${item.c_itemid}); closeItemModal();" style="background: #fa7414; color: white; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease;">
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    $("#item-details-content").html(modalContent);
+                    $("#item-details-modal").css("display", "flex");
+$("body").addClass("modal-open");
+
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: "Error fetching item details. Please try again.",
+                        showConfirmButton: true
+                    });
+                }
+            });
+        }
+
+        function addToCart(itemId) {
+            // Find the dish card and get data from it
+            const dishCard = $(`.dish-card[data-item-id="${itemId}"]`);
+            if (!dishCard.length) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: "Item not found.",
+                    showConfirmButton: true
+                });
+                return;
+            }
+
+            // Get dish data from the card or fetch it
+            $.ajax({
+                url: `http://localhost:5245/api/userHome/${itemId}`,
+                type: "GET",
+                dataType: "json",
+                success: function(item) {
+                    if (!item) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: "Item not found.",
+                            showConfirmButton: true
+                        });
+                        return;
+                    }
+
+                    // Create FormData with all cart data
+                    let data = new FormData();
+                    data.append("c_customerId", USER_ID);
+                    data.append("c_itemId", item.c_itemid);
+                    data.append("c_restaurantId", item.c_restaurantid);
+                    data.append("c_itemname", item.c_name);
+                    data.append("c_price", item.c_price);
+                    data.append("c_quantity", 1);
+                    data.append("c_image", item.c_imageurl);
+
+                    if (item.c_imageurlPicture) {
+                        data.append("c_imageurlPicture", item.c_imageurlPicture);
+                    }
+
+                    $.ajax({
+                        url: "http://localhost:5245/api/userHome/AddToCart",
+                        type: "POST",
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            if (response.success) {
+
+                                 loadCartCount();
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success!',
+                                    text: response.message || "Item added to cart!",
+                                    showConfirmButton: true,
+                                    timer: 2000,
+                                    timerProgressBar: true
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Oops...',
+                                    text: response.message || "Failed to add item to cart.",
+                                    showConfirmButton: true
+                                });
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error adding to cart:", error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: "An error occurred while adding the item to the cart.",
+                                showConfirmButton: true
+                            });
+                        }
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: "Failed to get item details.",
+                        showConfirmButton: true
+                    });
+                }
+            });
+        }
+
+
+    </script>
+}

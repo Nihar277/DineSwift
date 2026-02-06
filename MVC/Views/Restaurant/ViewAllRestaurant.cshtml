@@ -1,0 +1,501 @@
+@{
+    ViewData["Title"] = "All Restaurants";
+    Layout = "_userdashboardLayout";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+
+
+<a href="javascript:history.back()"
+   title="Go Back"
+   style="
+        position: fixed;
+        left: 20px;
+        top: 100px;
+        width: 45px;
+        height: 45px;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: 50%;
+        background: rgba(252, 128, 25, 0.2);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(252, 128, 25, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 9999;
+        color: #fc8019;
+        font-size: 20px;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(252, 128, 25, 0.3),
+                    inset 0 1px 3px rgba(255, 255, 255, 0.2);
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        touch-action: manipulation;
+   "
+   onmouseover="this.style.transform='scale(1.1)'; this.style.background='rgba(252,128,25,0.3)';"
+   onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(252,128,25,0.2)';"
+   onmousedown="this.style.transform='scale(0.95)';"
+   onmouseup="this.style.transform='scale(1.1)';">
+    ←
+</a>
+<div class="container mt-4 mb-5">
+    
+
+    <!-- Header Section -->
+    <div class="page-header text-center mb-4">
+        
+        <h2 class="display-5 fw-bold mb-2">
+            <!-- <span class="header-icon">🏬</span> -->
+            
+            <span class="page-title-main">Discover</span>
+            <span class="page-title-accent">Restaurants</span>
+        </h2>
+        <p class="text-muted">Browse through our curated collection of dining experiences</p>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-4">
+        <div class="col-md-6 offset-md-3">
+            <div class="search-wrapper" style="display: ;">
+                
+                <input id="restaurantSearch" class="form-control search-input"
+                    placeholder="🔍 Search by restaurant name, city, or state..." />
+            </div>
+        </div>
+    </div>
+
+    <!-- Restaurant Count -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <p class="text-muted" id="restaurantCount">Loading restaurants...</p>
+        </div>
+    </div>
+
+    <!-- Restaurant Grid -->
+    
+    <div class="row g-4" id="restaurantContainer">
+        <!-- Restaurants load here -->
+        
+    </div>
+
+</div>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $(".containerrr").click(function(){
+                window.location="/UserHome/Index";
+            });
+            loadAllRestaurants();
+
+            $("#restaurantSearch").on("keyup", function (e) {
+                const searchValue = e.target.value.trim().toLowerCase();
+
+                // 🔹 If input is empty → show all restaurants
+                if (searchValue === "") {
+                    renderRestaurants(allRestaurants);
+                    updateCount(allRestaurants.length);
+                    return;
+                }
+
+                // 🔹 If value exists → call Elasticsearch API
+                $.ajax({
+                    url: `http://localhost:5245/api/ElasticSearchApi/searrchAllRestaurantName?value=${encodeURIComponent(searchValue)}`,
+                    type: "GET",
+                    success: function (data) {
+                        console.log("Search Result:", data);
+
+                        renderRestaurants(data || []);
+                        updateCount((data || []).length);
+                    },
+                    error: function (err) {
+                        console.error("Search API error:", err);
+                        renderRestaurants([]);
+                        updateCount(0);
+                    }
+                });
+            });
+        });
+
+        let allRestaurants = [];
+
+        function loadAllRestaurants() {
+            var apiBaseUrl = "@ViewBag.ApiBaseUrl";
+            if (apiBaseUrl && apiBaseUrl.length > 0) {
+                apiBaseUrl = apiBaseUrl.replace(/\/+$/, "");
+            }
+
+            $.ajax({
+                url: apiBaseUrl + "/restaurant/all",
+                type: "GET",
+                success: function (data) {
+                    console.log("Restaurant API Data:", data);
+                    allRestaurants = data || [];
+                    renderRestaurants(allRestaurants);
+                    updateCount(allRestaurants.length);
+                },
+                error: function (err) {
+                    console.error("Restaurant API ERROR:", err);
+                    $("#restaurantContainer").html(`
+                            <div class="col-12">
+                                <div class="alert alert-danger text-center">
+                                    <i class="bi bi-exclamation-triangle"></i> Failed to load restaurants. Please try again later.
+                                </div>
+                            </div>
+                        `);
+                    updateCount(0);
+                }
+            });
+        }
+
+        function updateCount(count) {
+            $("#restaurantCount").html(`<strong>${count}</strong> restaurant${count !== 1 ? 's' : ''} found`);
+        }
+
+        function renderRestaurants(data) {
+            let html = "";
+
+            if (!data || data.length === 0) {
+                html = `
+                        <div class="col-12">
+                            <div class="empty-state text-center py-5">
+                                <div class="empty-icon mb-3">🍽️</div>
+                                <h5 class="text-muted mb-2">No restaurants found</h5>
+                                <p class="text-muted small">Try adjusting your search criteria</p>
+                            </div>
+                        </div>`;
+            } else {
+                $.each(data, function (i, item) {
+                    let imagePath = item.c_r_image
+                        ? `/Images/restaurant/restaurantimages/${item.c_r_image}`
+                        : `/Images/default-restaurant.png`;
+
+                    html += `
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 restaurant-item">
+                            <div class="card restaurant-card h-100">
+                                <div class="card-img-wrapper">
+                                    <img src="${imagePath}"
+                                         class="card-img-top restaurant-img"
+                                         alt="${item.c_r_name}"
+                                         onerror="this.onerror=null; this.src='/Images/default-restaurant.png';">
+                                    <div class="card-overlay"></div>
+                                </div>
+
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title mb-2">
+                                        ${item.c_r_name}
+                                    </h5>
+                                
+                                    ${(item.c_r_city || item.c_r_state) ? `
+                                    <p class="card-text text-muted mb-3 restaurant-location">
+                                        <svg width="14" height="14" fill="currentColor" class="me-1" viewBox="0 0 16 16">
+                                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                                        </svg>
+                                        ${(item.c_r_city || '')}${item.c_r_city && item.c_r_state ? ', ' : ''}${item.c_r_state || ''}
+                                    </p>` : ''}
+
+                                    <div class="mt-auto">
+                                        <a href="/UserHome/RestaurantDetails/${item.c_r_id}"
+                                           class="btn btn-view w-100">
+                                            View Details
+                                            <svg width="16" height="16" fill="currentColor" class="ms-1" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+            }
+
+            $("#restaurantContainer").html(html);
+        }
+
+        function filterRestaurants(term) {
+            if (!term) {
+                renderRestaurants(allRestaurants);
+                updateCount(allRestaurants.length);
+                return;
+            }
+
+            const filtered = allRestaurants.filter(function (r) {
+                const name = (r.c_r_name || "").toLowerCase();
+                const city = (r.c_r_city || "").toLowerCase();
+                const state = (r.c_r_state || "").toLowerCase();
+                return name.includes(term) || city.includes(term) || state.includes(term);
+            });
+
+            renderRestaurants(filtered);
+            updateCount(filtered.length);
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary: #fa7414;
+            --primary-dark: #e35f00;
+            --primary-light: #ffb366;
+            --shadow-sm: 0 2px 8px rgba(250, 116, 20, 0.08);
+            --shadow-md: 0 4px 16px rgba(250, 116, 20, 0.12);
+            --shadow-lg: 0 8px 24px rgba(250, 116, 20, 0.18);
+        }
+
+        body {
+            background-color: #fef0e6;
+        }
+
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .page-title-main {
+            color: #2c3e50;
+            /* blackish for 'Discover' */
+        }
+
+        .page-title-accent {
+            color: #fa7414;
+            /* orange for 'Restaurants' */
+        }
+
+        .header-icon {
+            display: inline-block;
+            font-size: 2.5rem;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        /* Search */
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 14px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 50px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(250, 116, 20, 0.1);
+            outline: none;
+        }
+
+        /* Restaurant Count */
+        #restaurantCount {
+            font-size: 0.95rem;
+            padding-left: 0.5rem;
+        }
+
+        /* Restaurant Grid spacing (responsive) */
+        #restaurantContainer {
+            row-gap: 2.5rem;
+            /* vertical space between rows */
+        }
+
+        /* Restaurant Cards */
+        .restaurant-item {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .restaurant-item:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .restaurant-item:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .restaurant-item:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .restaurant-item:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        .restaurant-item:nth-child(n+5) {
+            animation-delay: 0.25s;
+        }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .restaurant-card {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+            background: #fff;
+        }
+
+        .restaurant-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-img-wrapper {
+            position: relative;
+            overflow: hidden;
+            height: 200px;
+        }
+
+        .restaurant-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .restaurant-card:hover .restaurant-img {
+            transform: scale(1.08);
+        }
+
+        .card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .restaurant-card:hover .card-overlay {
+            opacity: 1;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 2.8rem;
+        }
+
+        .restaurant-location {
+            font-size: 0.9rem;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            min-height: 24px;
+        }
+
+        .restaurant-location svg {
+            flex-shrink: 0;
+            color: var(--primary);
+        }
+
+        /* View Button */
+        .btn-view {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(250, 116, 20, 0.25);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-view:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(250, 116, 20, 0.35);
+            color: white;
+        }
+
+        .btn-view svg {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-view:hover svg {
+            transform: translateX(4px);
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 3rem 1rem;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .page-header h2 {
+                font-size: 1.75rem;
+            }
+
+            .header-icon {
+                font-size: 2rem;
+            }
+
+            .search-input {
+                padding: 12px 18px;
+                font-size: 0.95rem;
+            }
+
+            .card-img-wrapper {
+                height: 180px;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .restaurant-item {
+                animation-delay: 0s !important;
+            }
+        }
+
+        /* Loading State */
+        .alert {
+            border-radius: 12px;
+            border: none;
+        }
+    </style>
+}

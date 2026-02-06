@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ================= META ================= -->
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - DineSwift</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- ================= CSS ================= -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="~/kendo/kendo.default-v2.min.css" />
+    <link rel="stylesheet" href="~/css/_Vendor.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/RestaurantProfileUpdate.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    @RenderSection("Styles", required: false)
+
+</head>
+
+<body>
+    <div class="app-wrapper">
+
+        <!-- ================= SIDEBAR ================= -->
+        <aside class="sidebar">
+
+            <!-- Logo -->
+            <div class="sidebar-logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 100 100" class="logo-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Steam Lines -->
+                        <path class="steam steam-1" d="M35 25 Q37 20 35 15" stroke="currentColor" stroke-width="3"
+                            stroke-linecap="round" />
+                        <path class="steam steam-2" d="M50 22 Q52 17 50 12" stroke="currentColor" stroke-width="3"
+                            stroke-linecap="round" />
+                        <path class="steam steam-3" d="M65 25 Q67 20 65 15" stroke="currentColor" stroke-width="3"
+                            stroke-linecap="round" />
+
+                        <!-- Cloche Handle -->
+                        <circle class="cloche-part" cx="50" cy="32" r="6" fill="currentColor" />
+
+                        <!-- Cloche Dome -->
+                        <path class="cloche-part" d="M20 55 Q20 35 50 35 Q80 35 80 55 L20 55" fill="currentColor" />
+
+                        <!-- Plate -->
+                        <rect x="15" y="55" width="70" height="8" rx="4" fill="currentColor" />
+
+                        <!-- Left Wheel -->
+                        <g class="wheel wheel-left">
+                            <circle cx="30" cy="75" r="10" stroke="currentColor" stroke-width="3" fill="none" />
+                            <line x1="30" y1="68" x2="30" y2="82" stroke="currentColor" stroke-width="2" />
+                            <line x1="23" y1="75" x2="37" y2="75" stroke="currentColor" stroke-width="2" />
+                        </g>
+
+                        <!-- Right Wheel -->
+                        <g class="wheel wheel-right">
+                            <circle cx="70" cy="75" r="10" stroke="currentColor" stroke-width="3" fill="none" />
+                            <line x1="70" y1="68" x2="70" y2="82" stroke="currentColor" stroke-width="2" />
+                            <line x1="63" y1="75" x2="77" y2="75" stroke="currentColor" stroke-width="2" />
+                        </g>
+
+                        <!-- Axles -->
+                        <line x1="30" y1="65" x2="30" y2="75" stroke="currentColor" stroke-width="3" />
+                        <line x1="70" y1="65" x2="70" y2="75" stroke="currentColor" stroke-width="3" />
+                    </svg>
+                </div>
+
+                <div class="logo-text">
+                    <h3>DineSwift</h3>
+                    <span>Delivery Panel</span>
+                </div>
+            </div>
+
+            <!-- Menu -->
+            <nav class="sidebar-menu">
+                <a asp-controller="Delivery" asp-action="Dashboard"
+                    class="menu-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a asp-controller="Delivery" asp-action="Orders"
+                    class="menu-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Orders" ? "active" : "")">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>Orders</span>
+                </a>
+
+                <a asp-controller="Delivery" asp-action="Profile"
+                    class="menu-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Profile" ? "active" : "")">
+                    <i class="fa-solid fa-user"></i>
+                    <span>My Profile</span>
+                </a>
+            </nav>
+
+            <!-- Footer -->
+            <div class="sidebar-footer">
+                <a href="javascript:void(0)" onclick="logoutConfirm()" class="menu-item logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+
+        </aside>
+
+        <!-- ================= MAIN CONTENT ================= -->
+        <main class="main-content">
+            @RenderBody()
+        </main>
+
+    </div>
+
+    <!-- ================= SCRIPTS ================= -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/kendo/kendo.all.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+<script>
+    function logoutConfirm() {
+        Swal.fire({
+            title: 'Logout Confirmation',
+            text: 'Are you sure you want to logout?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Logout',
+            cancelButtonText: 'Cancel',
+            reverseButtons: false,
+            confirmButtonColor: '#f97316',
+            cancelButtonColor: '#64748b',
+            background: '#fff7ed',
+            color: '#1f2937',
+            iconColor: '#f97316',
+            customClass: {
+                popup: 'swal-orange-popup',
+                confirmButton: 'swal-orange-confirm',
+                cancelButton: 'swal-orange-cancel'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location = '../Delivery/Logout';
+            }
+        });
+    }
+</script>
+
+</html>

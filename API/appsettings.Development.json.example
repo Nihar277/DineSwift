@@ -1,0 +1,14 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning",
+      "Microsoft.AspNetCore.Session.SessionMiddleware": "Error",
+      "Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware": "Error"
+    }
+  },
+
+  "MvcWwwRootPath": "D:\\Path\\To\\Your\\Repo\\MVC\\wwwroot\\Images\\restaurant\\"
+}
+
+

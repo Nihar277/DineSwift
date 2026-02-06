@@ -1,0 +1,1202 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>DineSwift</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+    <!-- Bootstrap CSS (MUST be first) -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="~/css/userHome.css" asp-append-version="true" />
+    
+
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ✅ SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <!-- Navbar scroll effect -->
+    <script>
+        window.addEventListener("scroll", function () {
+            const navbar = document.querySelector(".custom-navbar");
+            if (window.scrollY > 60) {
+                navbar.classList.add("scrolled");
+            } else {
+                navbar.classList.remove("scrolled");
+            }
+        });
+    </script>
+    
+</head>
+
+<style>
+    body{
+        background-color:#FFF5E9;
+    }
+    .navbar-logo {
+        width: 10rem;
+        height: auto;
+        left: 5%;
+        margin-left: 2rem;
+        @* border: 1px solid red; *@
+    }
+
+    .custom-navbar {
+        height: 72px;
+        /* FIXED height */
+        background: #FFF5E9;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        z-index: 1050;
+    }
+
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+    }
+
+    .navbar-nav .nav-link {
+        @* display: flex; *@
+        @* align-items: center; *@
+        height: 72px;
+        /* SAME as navbar */
+        font-size: 20px;
+    }
+
+    .nav-icon {
+        padding: 0;
+    }
+
+    .navbar{
+        padding: 2.3rem  0rem !important;
+    }
+
+    /* Custom navbar styling */
+.custom-navbar {
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+}
+
+/* Cart icon styling */
+.nav-icon {
+    font-size: 1.5rem;
+    color: #333333;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    position: relative;
+
+}
+
+/* Cart icon specific */
+.nav-item:first-child .nav-icon {
+    font-size: 1.3rem;
+}
+
+/* Order history image styling */
+.order {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    transition: all 0.3s ease;
+    filter: grayscale(0%);
+}
+
+.nav-icon:hover .order {
+    filter: grayscale(0%) brightness(1.2);
+    transform: scale(1.1);
+}
+
+/* Profile icon specific */
+.nav-item:last-child .nav-link {
+    font-size: 1.5rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+/* Hover effects */
+.nav-icon:hover {
+    color: #007bff;
+    background-color: rgba(0, 123, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Profile icon */
+.fa-circle-user {
+    font-size: 1.8rem;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover .fa-circle-user {
+    color: #007bff;
+}
+
+/* Cart badge notification (optional) */
+.nav-icon::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 8px;
+    height: 8px;
+    background-color: #ff4757;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    display: none; /* Hidden by default */
+}
+
+/* Active state */
+.nav-icon.active {
+    color: #007bff;
+    background-color: rgba(0, 123, 255, 0.15);
+}
+
+/* Mobile responsive adjustments */
+@@media (max-width: 768px) {
+    .navbar-nav {
+        gap: 20px !important;
+    }
+    
+    .nav-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.3rem;
+    }
+    
+    .fa-circle-user {
+        font-size: 1.6rem;
+    }
+
+ 
+}
+
+
+/* ======================================================
+           FOOTER STYLES
+        ====================================================== */
+        footer {
+            background: linear-gradient(135deg, #2E2621 0%, #1a1614 100%);
+            color: #fff;
+            padding-top: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(233, 98, 42, 0.1), transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(223, 68, 35, 0.08), transparent 50%);
+            pointer-events: none;
+        }
+
+        /* AI CTA Banner */
+        .footer-cta {
+            background: linear-gradient(135deg, #E9622A 0%, #DF4423 50%, #fa7414 100%);
+            border-radius: 32px;
+            padding: 4rem 3rem;
+            text-align: center;
+            position: relative;
+            max-width: 1200px;
+            margin:auto;
+            margin-top:2rem;
+            box-shadow: 0 25px 60px rgba(233, 98, 42, 0.4);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .footer-cta::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15), transparent 70%);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .footer-cta::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            right: -15%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 70%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite reverse;
+        }
+
+        .footer-cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-cta h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .footer-cta p {
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2.5rem;
+            background: #fff;
+            color: #E9622A;
+            border: none;
+            border-radius: 999px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer-cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Main Footer Content */
+        .footer-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+            gap: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-brand-section {
+            padding-right: 2rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-brand .brand-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #E9622A, #DF4423);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .footer-brand-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .footer-brand-text .brand-dot {
+            color: #E9622A;
+        }
+
+        .footer-description {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            background: #E9622A;
+            transform: translateY(-3px);
+        }
+
+        .footer-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-links a:hover {
+            color: #E9622A;
+            transform: translateX(5px);
+        }
+
+        /* Newsletter Section */
+        .footer-newsletter h3 {
+            margin-bottom: 0.8rem;
+        }
+
+        .newsletter-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.4rem;
+            border-radius: 999px;
+            backdrop-filter: blur(10px);
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border: none;
+            background: transparent;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .newsletter-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .newsletter-btn {
+            padding: 0.8rem 1.8rem;
+            background: #E9622A;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .newsletter-btn:hover {
+            background: #DF4423;
+            transform: translateX(2px);
+        }
+
+        /* Footer Bottom */
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-copyright {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-legal a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-legal a:hover {
+            color: #E9622A;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 992px) {
+            .footer-main {
+                grid-template-columns: 1fr 1fr;
+                gap: 2.5rem;
+            }
+
+            .footer-cta h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .footer-cta {
+                margin: -60px 1rem 0;
+                padding: 3rem 2rem;
+            }
+
+            .footer-cta h2 {
+                font-size: 1.75rem;
+            }
+
+            .footer-main {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 4rem 1.5rem 2rem;
+            }
+
+            .footer-brand-section {
+                padding-right: 0;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-legal {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+                border-radius: 16px;
+                padding: 0.5rem;
+            }
+
+            .newsletter-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .footer-cta {
+                padding: 2.5rem 1.5rem;
+            }
+
+            .footer-cta h2 {
+                font-size: 1.5rem;
+            }
+
+            .footer-cta p {
+                font-size: 0.95rem;
+            }
+        }
+
+        @@keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -30px); }
+        }
+        .cart-wrapper {
+    position: relative;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    background: #f37021;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 50%;
+    padding: 3px 7px;
+    min-width: 18px;
+    text-align: center;
+    line-height: 1;
+}
+
+    /* ================= NOTIFICATION ================= */
+    .notification-wrapper {
+        position: relative;
+    }
+
+    .notification-btn {
+        width: 44px;
+        height: 44px;
+        background: hsl(var(--card));
+        border: 1px solid hsl(var(--border));
+        border-radius: 12px;
+        font-size: 18px;
+        color: hsl(var(--text));
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        position: relative;
+    }
+
+    .notification-btn:hover {
+        background: hsl(var(--primary));
+        color: #fff;
+        border-color: hsl(var(--primary));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+    }
+
+    .notification-count {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        min-width: 20px;
+        height: 20px;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 6px;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes
+    pulse {
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+    }
+
+    .notification-dropdown {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 8px);
+        width: 360px;
+        background: hsl(var(--card));
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        border: 1px solid hsl(var(--border));
+        overflow: hidden;
+        z-index: 2000;
+        animation: slideDown 0.2s ease;
+    }
+
+    @@keyframes
+    slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .notification-dropdown .notification-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, #fff7ed, #ffedd5);
+        border-bottom: 1px solid #fed7aa;
+    }
+
+    .notification-dropdown .notification-header strong {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #9a3412;
+    }
+
+    .view-all-link {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #f97316;
+        text-decoration: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        transition: var(--transition);
+    }
+
+    .view-all-link:hover {
+        background: #f97316;
+        color: #fff;
+    }
+
+    .notification-list {
+        max-height: 320px;
+        overflow-y: auto;
+    }
+
+    .notification-item {
+        padding: 14px 20px;
+        border-bottom: 1px solid hsl(var(--border));
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+
+    .notification-item:hover {
+        background: #fff7ed;
+    }
+
+    .notification-item strong {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: hsl(var(--text));
+        margin-bottom: 4px;
+        line-height: 1.4;
+    }
+
+    .notification-item small {
+        font-size: 0.75rem;
+        color: hsl(var(--text-muted));
+    }
+    
+
+</style>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+  <nav class="navbar navbar-expand-lg fixed-top custom-navbar">
+    <div class="container-fluid">
+        <div class="row w-100 align-items-center">
+            <!-- Logo Column -->
+            <div class="col-6 col-md-4">
+                <a class="navbar-brand" href="/UserHome/Index">
+                    <img src="~/Images/DineSwift-logo.png" alt="Logo" class="navbar-logo" />
+                </a>
+            </div>
+            
+            <!-- Empty Column for Center (optional) -->
+            <div class="col-md-4 d-none d-md-block"></div>
+            
+            <!-- Icons Column -->
+            <div class="col-4 col-md-4">
+                <div class="d-flex justify-content-end align-items-center h-100" style="margin-right: 10rem;">
+                    <ul class="navbar-nav flex-row align-items-center gap-3">
+                        <!-- Notification Bell -->
+                        <li class="nav-item">
+                                <div class="notification-wrapper" style="position: relative;">
+
+                                    <!-- 🔔 BELL BUTTON (REQUIRED) -->
+                                    <button id="notificationBtn"
+                                        class="nav-icon d-flex align-items-center justify-content-center"
+                                        style="background:none;border:none;padding:0;">
+
+                                        <i class="fas fa-bell" style="font-size:1.5rem;color:#e8642d;"></i>
+
+                                        <span id="notificationCount" class="notification-count d-none" style="position:absolute;top:-5px;right:-5px;
+                         background:#ff4757;color:white;border-radius:50%;
+                         width:20px;height:20px;display:flex;
+                         align-items:center;justify-content:center;
+                         font-size:0.75rem;font-weight:bold;">
+                                            0
+                                        </span>
+                                    </button>
+
+                                    <!-- 🔽 DROPDOWN -->
+                                    <div id="notificationDropdown" class="notification-dropdown d-none" style="position:absolute;top:100%;right:0;margin-top:10px;
+                    background:#fff;border-radius:8px;
+                    box-shadow:0 4px 20px rgba(0,0,0,0.15);
+                    min-width:300px;max-width:400px;z-index:1000;">
+
+                                        <!-- Header -->
+                                        <div class="notification-header" style="padding:1rem;border-bottom:1px solid #eee;
+                        display:flex;justify-content:space-between;align-items:center;">
+                                            <strong>Notifications</strong>
+
+                                            <!-- ✅ VIEW ALL -->
+                                            <a href="/UserHome/NotificationDetails" style="font-size:0.85rem;color:#f37021;
+                          font-weight:600;text-decoration:none;">
+                                                View All
+                                            </a>
+                                        </div>
+
+                                        <!-- List -->
+                                        <div id="notificationList"
+                                            style="padding:0.5rem;max-height:350px;overflow-y:auto;">
+                                            <p class="text-muted p-2">No notifications</p>
+                                        </div>
+                                    </div>
+                                </div>
+                        </li>
+                        <li class="nav-item">
+    <a href="/UserHome/Cart"
+       class="nav-icon d-flex align-items-center justify-content-center cart-wrapper">
+
+        <img src="~/Images/userHome/cart.png" alt="Cart" class="order"/>
+
+        <!-- CART COUNT BADGE -->
+        <span id="cartCount" class="cart-badge">0</span>
+    </a>
+</li>
+
+                         <li class="nav-item">
+                            <a href="/OrderHistory/orders" class="nav-icon d-flex align-items-center justify-content-center">
+                                <img src="~/Images/userHome/order_history.png"  alt="Logo" class="order"/>
+
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/Profile/edit" class="nav-link nav-icon d-flex align-items-center justify-content-center">
+                             <img src="~/Images/userHome/profile.png"  alt="Logo" class="order"/>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+
+    <!-- ================= PAGE CONTENT ================= -->
+    <main class="main-wrapper">
+
+        @RenderBody()
+    </main>
+ 
+    <!-- ===== FOOTER ===== -->
+   <footer>
+
+    <!-- Food Delivery CTA Banner -->
+    <div class="footer-cta">
+        <div class="footer-cta-content">
+            <h2>Hungry? Get your favorite food delivered fast</h2>
+            <p>
+                Discover nearby restaurants, order in seconds, and enjoy hot & fresh meals delivered right to your doorstep.
+            </p>
+           <a href="#hero" class="footer-cta-link">
+    <a class="footer-cta-btn" href="#dishes" style="text-decoration: none;">
+        Order Food Now
+        <i class="fas fa-arrow-right"></i>
+    </a>
+</a>
+        </div>
+    </div>
+
+    <!-- Main Footer Content -->
+    <div class="footer-main">
+
+        <!-- Brand Section -->
+        <div class="footer-brand-section">
+            <div class="footer-brand">
+                <img src="~/Images/dineswift-logo.png" alt="DineSwift" class="brand-logo-img footer-logo-img" />
+            </div>
+
+            <p class="footer-description">
+                DineSwift connects you with the best local restaurants. Order food online, track delivery in real-time,
+                and enjoy your meals anytime, anywhere.
+            </p>
+
+            <div class="footer-social">
+                <a href="#" class="social-link" aria-label="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="LinkedIn">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Company Links -->
+        <div class="footer-section">
+            <h3>Company</h3>
+            <ul class="footer-links">
+                <li><a href="#">About DineSwift</a></li>
+                <li><a href="#">Our Story</a></li>
+                <li><a href="#">Careers</a></li>
+                <li><a href="#">Press & Media</a></li>
+                <li><a href="#">Blog</a></li>
+            </ul>
+        </div>
+
+        <!-- Explore / Services -->
+        <div class="footer-section">
+            <h3>Explore</h3>
+            <ul class="footer-links">
+                <li><a href="#">Restaurants Near You</a></li>
+                <li><a href="#">Popular Cuisines</a></li>
+                <li><a href="#">Top Offers</a></li>
+                <li><a href="#">New Restaurants</a></li>
+                <li><a href="#">Partner With Us</a></li>
+            </ul>
+        </div>
+
+        <!-- Customer Support -->
+        <div class="footer-section">
+            <h3>Support</h3>
+            <ul class="footer-links">
+                <li><a href="#">Help Center</a></li>
+                <li><a href="#">Track Your Order</a></li>
+                <li><a href="#">Cancellation & Refunds</a></li>
+                <li><a href="#">FAQs</a></li>
+                <li><a href="#">Contact Support</a></li>
+            </ul>
+        </div>
+
+
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+        <div class="footer-copyright">
+            ©️ @DateTime.Now.Year DineSwift. All rights reserved.
+        </div>
+
+        <div class="footer-legal">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms & Conditions</a>
+            <a href="#">Refund Policy</a>
+            <a href="#">Cookies</a>
+        </div>
+    </div>
+
+</footer>
+
+    <!-- ================= SCRIPTS ================= -->
+    <!-- jQuery FIRST -->
+   
+    
+
+    @await RenderSectionAsync("scripts", required: false)
+
+<script>
+    const USER_ID = "@Context.Session.GetInt32("CustomerId")";
+
+    function loadCartCount() {
+        if (!USER_ID) return;
+
+        $.get(`http://localhost:5245/api/userHome/GetCartItems?userid=${USER_ID}`, function (res) {
+
+            let items = res.data ?? res;
+
+            // ✅ COUNT ONLY ROWS (NOT QUANTITY)
+            let count = items ? items.length : 0;
+
+            $("#cartCount").text(count);
+            $("#cartCount").toggle(count > 0);
+        });
+    }
+
+    // ✅ Load ONLY once on page open
+    $(document).ready(function () {
+        loadCartCount();
+
+        setInterval(loadCartCount, 1000); 
+
+    });
+</script>
+
+
+
+<!-- 🔔 CUSTOMER NOTIFICATION SCRIPT -->
+<script>
+    let unreadCount = 0;
+    let notificationsLoaded = false;
+    window.customerId = @Context.Session.GetInt32("CustomerId");
+    const NOTIFICATION_COUNT_KEY = `notification_count_${window.customerId}`;
+
+    // Load count from localStorage on page load
+    function loadStoredCount() {
+        const stored = localStorage.getItem(NOTIFICATION_COUNT_KEY);
+        console.log("Loading stored count:", stored);
+        if (stored !== null) {
+            unreadCount = parseInt(stored) || 0;
+            console.log("Stored count loaded:", unreadCount);
+        } else {
+            console.log("No stored count found");
+            unreadCount = 0;
+        }
+        
+        // Always update UI based on current count
+        if (unreadCount > 0) {
+            $("#notificationCount")
+                .text(unreadCount)
+                .removeClass("d-none")
+                .css("display", "flex"); // Ensure it's visible
+            console.log("Count displayed:", unreadCount);
+        } else {
+            $("#notificationCount")
+                .addClass("d-none")
+                .css("display", "none");
+        }
+    }
+
+    // Save count to localStorage
+    function saveCount(count) {
+        unreadCount = count;
+        localStorage.setItem(NOTIFICATION_COUNT_KEY, count.toString());
+        console.log("Saving count to localStorage:", count);
+        
+        // Always update UI
+        if (count > 0) {
+            $("#notificationCount")
+                .text(count)
+                .removeClass("d-none")
+                .css("display", "flex"); // Ensure it's visible
+            console.log("Count displayed in UI:", count);
+        } else {
+            $("#notificationCount")
+                .addClass("d-none")
+                .css("display", "none");
+            console.log("Count hidden (0)");
+        }
+    }
+
+    function formatNotification(raw) {
+        raw = raw.replace('[RabbitMQ] ', '').replace('[Redis] ', '');
+        const parts = raw.split('|');
+
+        const msg = parts[2] ?? raw;
+        const time = parts[1]
+            ? new Date(parts[1]).toLocaleString('en-IN')
+            : '';
+
+        return `
+            <div class="notification-item" style="padding: 0.75rem 1rem; border-bottom: 1px solid #f0f0f0;">
+                <strong style="display: block; margin-bottom: 0.25rem; color: #333;">${msg}</strong>
+                <small style="color: #999; font-size: 0.85rem;">${time}</small>
+            </div>
+        `;
+    }
+
+    // Store notifications in localStorage (newest at the end)
+    function storeNotifications(messages) {
+        const NOTIFICATIONS_KEY = `notifications_${window.customerId}`;
+        const existing = JSON.parse(localStorage.getItem(NOTIFICATIONS_KEY) || '[]');
+        const combined = [...existing, ...messages]; // Append new messages to the end
+        localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(combined));
+        return combined;
+    }
+
+    // Get stored notifications from localStorage
+    function getStoredNotifications() {
+        const NOTIFICATIONS_KEY = `notifications_${window.customerId}`;
+        return JSON.parse(localStorage.getItem(NOTIFICATIONS_KEY) || '[]');
+    }
+
+    // Clear stored notifications
+    function clearStoredNotifications() {
+        const NOTIFICATIONS_KEY = `notifications_${window.customerId}`;
+        localStorage.removeItem(NOTIFICATIONS_KEY);
+    }
+
+    // Check for new notifications and update count (consumes messages)
+    function checkNotificationCount() {
+        if (!window.customerId) {
+            console.log("No customerId found");
+            return;
+        }
+        
+        $.get(`http://localhost:5245/api/notifications/customer/${window.customerId}`,
+            function (res) {
+                console.log("Notification check response:", res);
+                if (res.success && res.messages && res.messages.length > 0) {
+                    // Store notifications in localStorage
+                    storeNotifications(res.messages);
+                    
+                    // New notifications found, add to existing count
+                    const newCount = unreadCount + res.messages.length;
+                    console.log(`Found ${res.messages.length} new notifications. Total count: ${newCount}`);
+                    saveCount(newCount);
+                } else {
+                    console.log("No new notifications found");
+                }
+            }).fail(function(xhr, status, error) {
+                console.error("Failed to check notifications:", error, xhr);
+            });
+    }
+
+    // Load and show notifications from localStorage (when user clicks bell)
+    function loadNotifications() {
+        if (!window.customerId) return;
+        
+        const list = $("#notificationList");
+        const storedNotifications = getStoredNotifications();
+        
+        console.log("Loading notifications from storage:", storedNotifications);
+        
+        if (storedNotifications && storedNotifications.length > 0) {
+            list.html("");
+            // Show latest notifications first (at top)
+            // Iterate in reverse order to show newest first
+            for (let i = storedNotifications.length - 1; i >= 0; i--) {
+                list.append(formatNotification(storedNotifications[i]));
+            }
+            
+            // Clear stored notifications and update count
+            clearStoredNotifications();
+            saveCount(0);
+            console.log("Notifications displayed and cleared");
+        } else {
+            // If no stored notifications, try to get from API
+            $.get(`http://localhost:5245/api/notifications/customer/${window.customerId}`,
+                function (res) {
+                    if (res.success && res.messages && res.messages.length > 0) {
+                        list.html("");
+                        // Show latest notifications first (at top)
+                        // Iterate in reverse order to show newest first
+                        for (let i = res.messages.length - 1; i >= 0; i--) {
+                            list.append(formatNotification(res.messages[i]));
+                        }
+                        
+                        // Update count - subtract consumed notifications
+                        const newCount = Math.max(0, unreadCount - res.messages.length);
+                        saveCount(newCount);
+                    } else {
+                        list.html("<p class='text-muted p-2'>No notifications</p>");
+                    }
+                }).fail(function() {
+                    console.error("Failed to load notifications");
+                    list.html("<p class='text-muted p-2'>No notifications</p>");
+                });
+        }
+    }
+
+    // Initialize on page load
+    $(document).ready(function() {
+        console.log("Document ready, customerId:", window.customerId);
+        console.log("Notification count element exists:", $("#notificationCount").length > 0);
+        
+        if (window.customerId) {
+            // First load stored count
+            loadStoredCount();
+            
+            // Wait a bit then check for new notifications on page load
+            setTimeout(function() {
+                checkNotificationCount();
+            }, 500);
+            
+            // Check for new notifications periodically (every 30 seconds)
+            setInterval(checkNotificationCount, 30000);
+        } else {
+            console.error("CustomerId is not set!");
+        }
+    });
+
+    $("#notificationBtn").on("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const isOpen = !$("#notificationDropdown").hasClass("d-none");
+        
+        if (!isOpen) {
+            // Opening dropdown - load and consume notifications
+            loadNotifications();
+            $("#notificationDropdown").removeClass("d-none");
+            
+            if (!notificationsLoaded) {
+                notificationsLoaded = true;
+            }
+        } else {
+            // Closing dropdown
+            $("#notificationDropdown").addClass("d-none");
+        }
+    });
+
+    $(document).on("click", function (e) {
+        if (!$(e.target).closest(".notification-wrapper").length) {
+            $("#notificationDropdown").addClass("d-none");
+        }
+    });
+</script>
+
+</body>
+
+</html>
+
