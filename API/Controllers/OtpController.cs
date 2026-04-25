@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Repository.Model;
 using Repository.service;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 namespace API.Controllers
 {
@@ -23,18 +26,20 @@ namespace API.Controllers
         /// Send OTP to email
         /// </summary>
         [HttpPost("send")]
-        public async Task<ActionResult<OtpResponse>> SendOtp([FromForm] SendOtpRequest request)
+        public async Task<ActionResult<OtpResponse>> SendOtp()
         {
-            if (!ModelState.IsValid)
+            var request = await ReadRequestAsync<SendOtpRequest>();
+
+            if (!TryValidateOtpEmail(request?.Email, out var email))
             {
                 return BadRequest(new OtpResponse
                 {
                     Success = false,
-                    Message = "Invalid email address"
+                    Message = "Please enter a valid email address."
                 });
             }
 
-            var (success, message) = await _otpService.SendOtpAsync(request.Email);
+            var (success, message) = await _otpService.SendOtpAsync(email);
 
             if (success)
             {
@@ -46,20 +51,20 @@ namespace API.Controllers
                 });
             }
 
-            return BadRequest(new OtpResponse
-            {
-                Success = false,
-                Message = message
-            });
+            return CreateOtpErrorResponse(message);
         }
 
         /// <summary>
         /// Verify OTP
         /// </summary>
         [HttpPost("verify")]
-        public async Task<ActionResult<OtpResponse>> VerifyOtp([FromForm] VerifyOtpRequest request)
+        public async Task<ActionResult<OtpResponse>> VerifyOtp()
         {
-            if (!ModelState.IsValid)
+            var request = await ReadRequestAsync<VerifyOtpRequest>();
+
+            if (!TryValidateOtpEmail(request?.Email, out var email) ||
+                string.IsNullOrWhiteSpace(request?.Otp) ||
+                request.Otp.Trim().Length != 6)
             {
                 return BadRequest(new OtpResponse
                 {
@@ -68,7 +73,7 @@ namespace API.Controllers
                 });
             }
 
-            var (success, message) = await _otpService.VerifyOtpAsync(request.Email, request.Otp);
+            var (success, message) = await _otpService.VerifyOtpAsync(email, request.Otp.Trim());
 
             if (success)
             {
@@ -79,29 +84,27 @@ namespace API.Controllers
                 });
             }
 
-            return BadRequest(new OtpResponse
-            {
-                Success = false,
-                Message = message
-            });
+            return CreateOtpErrorResponse(message);
         }
 
         /// <summary>
         /// Resend OTP
         /// </summary>
         [HttpPost("resend")]
-        public async Task<ActionResult<OtpResponse>> ResendOtp([FromForm] SendOtpRequest request)
+        public async Task<ActionResult<OtpResponse>> ResendOtp()
         {
-            if (!ModelState.IsValid)
+            var request = await ReadRequestAsync<SendOtpRequest>();
+
+            if (!TryValidateOtpEmail(request?.Email, out var email))
             {
                 return BadRequest(new OtpResponse
                 {
                     Success = false,
-                    Message = "Invalid email address"
+                    Message = "Please enter a valid email address."
                 });
             }
 
-            var (success, message) = await _otpService.ResendOtpAsync(request.Email);
+            var (success, message) = await _otpService.ResendOtpAsync(email);
 
             if (success)
             {
@@ -112,11 +115,75 @@ namespace API.Controllers
                 });
             }
 
-            return BadRequest(new OtpResponse
+            return CreateOtpErrorResponse(message);
+        }
+
+        private async Task<T?> ReadRequestAsync<T>() where T : class
+        {
+            if (Request.HasFormContentType)
+            {
+                var form = await Request.ReadFormAsync();
+                var values = form.ToDictionary(x => x.Key, x => x.Value.ToString());
+                var json = JsonSerializer.Serialize(values);
+
+                return JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+
+            Request.EnableBuffering();
+
+            if (Request.Body.CanSeek)
+            {
+                Request.Body.Position = 0;
+            }
+
+            using var reader = new StreamReader(Request.Body, leaveOpen: true);
+            var body = await reader.ReadToEndAsync();
+
+            if (Request.Body.CanSeek)
+            {
+                Request.Body.Position = 0;
+            }
+
+            if (string.IsNullOrWhiteSpace(body))
+            {
+                return null;
+            }
+
+            return JsonSerializer.Deserialize<T>(body, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+        }
+
+        private bool TryValidateOtpEmail(string? rawEmail, out string email)
+        {
+            email = rawEmail?.Trim() ?? string.Empty;
+            return !string.IsNullOrWhiteSpace(email) && new EmailAddressAttribute().IsValid(email);
+        }
+
+        private ActionResult<OtpResponse> CreateOtpErrorResponse(string message)
+        {
+            var response = new OtpResponse
             {
                 Success = false,
                 Message = message
-            });
+            };
+
+            if (message.Contains("wait", StringComparison.OrdinalIgnoreCase))
+            {
+                return StatusCode(StatusCodes.Status429TooManyRequests, response);
+            }
+
+            if (message.Contains("error", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("failed to send", StringComparison.OrdinalIgnoreCase))
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+
+            return BadRequest(response);
         }
 
         /// <summary>

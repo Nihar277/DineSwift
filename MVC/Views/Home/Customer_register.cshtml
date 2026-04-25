@@ -2008,6 +2008,15 @@
         };
         kendo.ui.validator.messages.pincodeValidation = "Enter a valid 6-digit pincode";
 
+        kendo.ui.validator.rules.addressValidation = function (input) {
+            if (input.is("[name='c_address']")) {
+                var value = (input.val() || "").trim();
+                return /^[A-Za-z0-9#\/\-\s\.,]{5,500}$/.test(value);
+            }
+            return true;
+        };
+        kendo.ui.validator.messages.addressValidation = "Enter a valid address using letters, numbers, spaces, commas, dots, / or -";
+
         kendo.ui.validator.rules.fileRequired = function (input) {
             if (input.is("[name='c_imagefile']")) {
                 var upload = input.data("kendoUpload");
@@ -2208,10 +2217,10 @@
                                     label: "Delivery Address",
                                     colSpan: 2,
                                     editor: function (container, options) {
-                                        $(`<textarea name="${options.field}" class="k-textarea" rows="3" required placeholder="Enter your complete delivery address like 180,vithhal nagar soc.,surat" data-required-msg="Address is required"></textarea>`)
+                                        $(`<textarea name="${options.field}" class="k-textarea" rows="3" required placeholder="Enter your complete delivery address, e.g. 180, Vithhal Nagar Soc., Surat" data-required-msg="Address is required"></textarea>`)
                                             .appendTo(container);
                                     },
-                                    validation: { required: { message: "Address is required" } }
+                                    validation: { required: { message: "Address is required" }, addressValidation: true }
                                 },
                                 {
                                     field: "c_imagefile",
@@ -2260,8 +2269,20 @@
                     let doneBtn = e.sender.element.find(".k-wizard-buttons .k-button.k-primary");
                     doneBtn.prop("disabled", true).html('<span class="loading-spinner"></span> Sending OTP...');
 
+                    const email = ($("[name='c_email']").val() || wizardData.c_email || "").trim();
+                    const firstName = ($("[name='c_fname']").val() || wizardData.c_fname || "").trim();
+
+                    if (!email) {
+                        kendo.alert("Please enter a valid email address.");
+                        doneBtn.prop("disabled", false).text("Done");
+                        return;
+                    }
+
+                    wizardData.c_email = email;
+                    wizardData.c_fname = firstName;
+
                     let sendFormData = new FormData();
-                    sendFormData.append("email", wizardData.c_email);
+                    sendFormData.append("email", email);
 
                     $.ajax({
                         url: "http://localhost:5245/api/Otp/send",
@@ -2271,10 +2292,10 @@
                         contentType: false,
                         success: function (response) {
 
-                            console.log("send Otyp response:", response);
+                            console.log("send OTP response:", response);
                             if (response.success) {
                                 doneBtn.prop("disabled", false).text("Done");
-                                showOtpVerificationModal(wizardData.c_email, wizardData.c_fname);
+                                showOtpVerificationModal(email, firstName);
                             } else {
                                 kendo.alert(response.message || "Failed to send OTP.");
                                 doneBtn.prop("disabled", false).text("Done");
@@ -2392,7 +2413,7 @@
                         .html('<span style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s linear infinite; margin-right: 8px;"></span> Verifying...');
 
                     let verifyFormData = new FormData();
-                    verifyFormData.append("email", email);
+                    verifyFormData.append("email", (email || "").trim());
                     verifyFormData.append("otp", otp);
 
                     $.ajax({
@@ -2410,9 +2431,10 @@
                                 $("#verifyOtpBtn").prop("disabled", false).text("Verify & Continue");
                             }
                         },
-                        error: function () {
+                        error: function (xhr) {
                             console.log("verify OTP error:", xhr);
-                            kendo.alert("Verification failed. Please try again.");
+                            let msg = xhr.responseJSON?.message || "Verification failed. Please try again.";
+                            kendo.alert(msg);
                             $("#verifyOtpBtn").prop("disabled", false).text("Verify & Continue");
                             $("#otpInput").val("").focus();
                         }
@@ -2432,6 +2454,10 @@
                     // Get state and city text values
                     wizardData.c_state = $("[name='c_state']").data("kendoDropDownList").text();
                     wizardData.c_city = $("[name='c_city']").data("kendoDropDownList").text();
+                    wizardData.c_email = (wizardData.c_email || "").trim();
+                    wizardData.c_address = (wizardData.c_address || "").trim();
+                    wizardData.c_role = wizardData.c_role || "c";
+                    wizardData.c_status = wizardData.c_status || "active";
 
                     // Append wizard data
                     Object.entries(wizardData).forEach(([key, value]) => {
@@ -2451,13 +2477,25 @@
                             if (response.success) {
                                 showSuccessModal(firstName);
                             } else {
+                                $("#verifyOtpBtn").prop("disabled", false).text("Verify & Continue");
                                 kendo.alert(response.message || "Registration failed.");
                             }
                         },
                         error: function (xhr) {
                             console.log("registration error:", xhr);
-                            let msg = "Registration failed.";
-                            if (xhr.responseJSON?.message) msg = xhr.responseJSON.message;
+
+                            let msg = xhr.responseJSON?.message || "Registration failed.";
+                            const validationErrors = xhr.responseJSON?.errors;
+
+                            if (validationErrors) {
+                                const allErrors = Object.values(validationErrors).flat();
+                                if (allErrors.length > 0) {
+                                    msg = allErrors[0];
+                                }
+                            }
+
+                            $("#verifyOtpBtn").prop("disabled", false).text("Verify & Continue");
+                            $("#otpInput").val("").focus();
                             kendo.alert(msg);
                         }
                     });
@@ -2469,11 +2507,15 @@
                     canResend = false;
                     $("#resendOtpBtn").css("opacity", "0.5");
 
+                    let resendFormData = new FormData();
+                    resendFormData.append("email", (email || "").trim());
+
                     $.ajax({
                         url: "http://localhost:5245/api/Otp/resend",
                         type: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify({ email: email }),
+                        data: resendFormData,
+                        processData: false,
+                        contentType: false,
                         success: function (response) {
                             console.log("resend OTP response:", response);
                             if (response.success) {
@@ -2492,7 +2534,8 @@
                         },
                         error: function (xhr) {
                             console.log("resend OTP error:", xhr);
-                            kendo.alert("Failed to resend OTP.");
+                            let msg = xhr.responseJSON?.message || "Failed to resend OTP.";
+                            kendo.alert(msg);
                             canResend = true;
                             $("#resendOtpBtn").css("opacity", "1");
                         }

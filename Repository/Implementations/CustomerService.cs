@@ -126,17 +126,24 @@ public class CustomerService : ICustomerService
                 return false;
             }
 
+            // Reset sequence to max id to avoid duplicate key
+            string resetSeqQuery = "SELECT setval('t_customer_c_customerid_seq', COALESCE((SELECT MAX(c_customerid) FROM t_customer), 0));";
+            using var resetCmd = new NpgsqlCommand(resetSeqQuery, _conn);
+            if (_conn.State != System.Data.ConnectionState.Open)
+                await _conn.OpenAsync();
+            await resetCmd.ExecuteNonQueryAsync();
+
             string query = @"
         INSERT INTO t_customer
         (
-            c_fname, c_lname, c_state, c_city, c_pincode,
+            c_customerid, c_fname, c_lname, c_state, c_city, c_pincode,
             c_gender, c_address, c_image, c_email,
             c_password, c_phonenumber, c_role,
             c_created_time, c_updated_time, c_status
         )
         VALUES
         (
-            @c_fname, @c_lname, @c_state, @c_city, @c_pincode,
+            DEFAULT, @c_fname, @c_lname, @c_state, @c_city, @c_pincode,
             @c_gender, @c_address, @c_image, @c_email,
             @c_password, @c_phonenumber, @c_role,
             @c_created_time, @c_updated_time, @c_status

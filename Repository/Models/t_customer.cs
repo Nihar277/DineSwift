@@ -43,7 +43,7 @@ public class t_customer
     public string c_gender { get; set; }
 
     [Required(ErrorMessage = "Address is required")]
-    [RegularExpression(@"^[A-Za-z0-9\/\-]{1,10},\s[A-Za-z0-9\s\.\-]{3,50},\s[A-Za-z0-9\s\.\-,]{3,60}$", ErrorMessage = "Address must be in the format: HouseNo, StreetName, City")]
+    [RegularExpression(@"^[A-Za-z0-9#\/\-\s\.,]{5,500}$", ErrorMessage = "Address can contain letters, numbers, spaces, commas, dots, / and - only")]
     [StringLength(500, ErrorMessage = "Address cannot exceed 500 characters")]
     [Column("c_address")]
     public string c_address { get; set; }
